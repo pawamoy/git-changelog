@@ -7,7 +7,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 {% for version in gitolog.versions_list -%}
 {% include 'version.md' with context %}
 {% endfor -%}
-
-{% for version in gitolog.versions_list -%}
-{% include 'version_link.md' with context %}
-{% endfor -%}

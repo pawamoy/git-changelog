@@ -1,1 +1,1 @@
-- {{ commit.subject }} ([{{ commit.hash }}]({{ commit.url }}))
+- {{ commit.subject }} ([{{ commit.hash|truncate(7, True, '') }}]({{ commit.url }}))

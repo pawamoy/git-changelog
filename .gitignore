@@ -2,4 +2,6 @@
 Pipfile.lock
 example/
 example2/
+example3/
 output.md
+__pycache__/

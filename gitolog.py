@@ -8,30 +8,65 @@ from jinja2 import Environment, FileSystemLoader
 env = Environment(loader=FileSystemLoader('templates'))
 
 
+def bump(version, part='patch'):
+    major, minor, patch = version.split('.', 2)
+    patch = patch.split('-', 1)
+    pre = ''
+    if len(patch) > 1:
+        patch, pre = patch
+    if part == 'major':
+        major = str(int(major) + 1)
+        minor = patch = '0'
+    elif part == 'minor':
+        minor = str(int(minor) + 1)
+        patch = '0'
+    elif part == 'patch' and not pre:
+        patch = str(int(patch) + 1)
+    return '.'.join((major, minor, patch))
+
+
+class GitHub:
+    ISSUE_REF = re.compile(
+        r'(?P<keyword>(close[sd]?|fix(e[sd])?|resolve[sd]?):? +)?'
+        r'(?P<ref>([-\w]+/[-\w]+)?#[1-9]\d*)', re.IGNORECASE)
+
+    @classmethod
+    def parse_issues_refs(cls, s):
+        return [m.groupdict() for m in cls.ISSUE_REF.finditer(s)]
+
+
+class GitLab(GitHub):
+    ISSUE_REF = re.compile(
+        r'(?P<keyword>'  # start keyword group
+        r'clos(?:e[sd]?|ing)|'
+        r'fix(?:e[sd]|ing)?|'
+        r'resolv(?:e[sd]?|ing)|'
+        r'implement(?:s|ed|ing)?'
+        r')'  # end keyword group
+        r':? +'  # optional : and spaces
+        r'(?:'  # start repetition of issues sep by "," or "and"
+        r'(?:issues? +)?'  # optional issue[s] word
+        r'(?P<ref>'  # start ref group
+        r'(?:(?:[-\w]+/)?[-\w]+)'  # [namespace/]project
+        r'?#[1-9]\d*'  # number
+        r')'  # end ref group
+        r'(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\d+)'
+        r')+',  # end repetition of issues
+        re.IGNORECASE)
+
+
 class Issue:
-    def __init__(self, number='', url=''):
+    def __init__(self, number='', url='', closed=False):
         self.number = number
         self.url = url
+        self.closed = closed
 
 
 class Commit:
-    subject_regex = re.compile(
-        r'^(?P<type>((add(ed|s)?)|(change[ds]?)|(fix(es|ed)?)|(remove[sd]?)|(merged?)))',
-        re.IGNORECASE)
-    body_regex = re.compile(r'(?P<issues>#\d+)')
-    break_regex = re.compile(r'^break(s|ing changes)?[ :].+$')
-    types = {
-        'add': 'Added',
-        'fix': 'Fixed',
-        'change': 'Changed',
-        'remove': 'Removed',
-        'merge': 'Merged'
-    }
-
     def __init__(
             self, hash, author_name='', author_email='', author_date='',
             committer_name='', committer_email='', committer_date='',
-            tag='', subject='', body=None, url=''):
+            tag='', subject='', body=None, url='', style=None):
         self.hash = hash
         self.author_name = author_name
         self.author_email = author_email
@@ -39,63 +74,111 @@ class Commit:
         self.committer_name = committer_name
         self.committer_email = committer_email
         self.committer_date = datetime.utcfromtimestamp(float(committer_date))
-        self.tag = self.version = tag.replace('tag: ', '')
         self.subject = subject
         self.body = body or []
-        self.type = ''
         self.url = url
+
+        if tag.startswith('tag: '):
+            tag = tag.replace('tag: ', '')
+        elif tag:
+            tag = ''
+        self.tag = self.version = tag
+
+        self.type = ''
         self.issues = []
 
-        self.has_breaking_change = None
-        self.adds_feature = None
-
-        self.parse_message()
-        self.fix_type()
-
-    def parse_message(self):
-        subject_match = self.subject_regex.match(self.subject)
-        if subject_match is not None:
-            for group, value in subject_match.groupdict().items():
-                setattr(self, group, value)
-        body_match = self.body_regex.match('\n'.join(self.body))
-        if body_match is not None:
-            for group, value in body_match.groupdict().items():
-                setattr(self, group, value)
-
-    def fix_type(self):
-        for k, v in self.types.items():
-            if self.type.lower().startswith(k):
-                self.type = v
-
-    def build_issues(self, url):
-        self.issues = [Issue(number=issue, url=url + issue)
-                       if isinstance(issue, str) else issue
-                       for issue in self.issues]
-
-    @property
-    def is_patch(self):
-        return not any((self.is_minor, self.is_major))
-
-    @property
-    def is_minor(self):
-        return self.type.lower() in ('add', 'adds', 'added') and not self.is_major
-
-    @property
-    def is_major(self):
-        return bool(self.break_regex.match('\n'.join(self.body)))
+        if style:
+            self.extra = style.parse_commit(self)
 
 
-class AngularCommit(Commit):
-    subject_regex = re.compile(
+class Style:
+    def parse_commit(self, commit):
+        raise NotImplementedError
+
+
+class DefaultStyle(Style):
+    TYPES = {
+        'add': 'Added',
+        'fix': 'Fixed',
+        'change': 'Changed',
+        'remove': 'Removed',
+        'merge': 'Merged',
+        'doc': 'Documented'
+    }
+
+    TYPE_REGEX = re.compile(r'^(?P<type>(%s))' % '|'.join(TYPES.keys()), re.IGNORECASE)
+    CLOSED = ('close', 'fix')
+    ISSUE_REGEX = re.compile(r'(?P<issues>((%s)\w* )?(#\d+,? ?)+)' % '|'.join(CLOSED))
+    BREAK_REGEX = re.compile(r'^break(s|ing changes)?[ :].+$')
+
+    def __init__(self, issue_url):
+        self.issue_url = issue_url
+
+    def parse_commit(self, commit):
+        commit_type = self.parse_type(commit.subject)
+        message = '\n'.join([commit.subject] + commit.body)
+        is_major = self.is_major(message)
+        is_minor = not is_major or self.is_minor(commit_type)
+        is_patch = not any((is_major, is_minor))
+        issues = self.parse_issues(message)
+
+        info = dict(
+            type=commit_type,
+            issues=issues,
+            related_issues=[],
+            closed_issues=[],
+            is_major=is_major,
+            is_minor=is_minor,
+            is_patch=is_patch
+        )
+
+        for issue in issues:
+            {True: info['closed_issues'],  # on-the-fly dict.gets are fun
+             False: info['related_issues']}.get(issue.closed).append(issue)
+
+    def parse_type(self, commit_subject):
+        type_match = self.TYPE_REGEX.match(commit_subject)
+        if type_match is not None:
+            return self.TYPES.get(type_match.groupdict().get('type').lower())
+
+    def parse_issues(self, commit_message):
+        issues = []
+        issue_match = self.ISSUE_REGEX.match(commit_message)
+        if issue_match is not None:
+            issues_found = issue_match.groupdict().get('issues')
+            for issue in issues_found:
+                closed = False
+                numbers = issue
+                for close_word in self.CLOSED:
+                    if issue.lower().startswith(close_word):
+                        closed = True
+                        numbers = issue.split(' ', 1)[1]
+                        break
+                numbers = numbers.replace(',', '').replace(' ', '').lstrip('#').split('#')
+                for number in numbers:
+                    url = self.issue_url.format(number)
+                    issue = Issue(number=number, url=url, closed=closed)
+                    issues.append(issue)
+        return issues
+
+    def is_minor(self, commit_type):
+        return commit_type == self.TYPES['add']
+
+    def is_major(self, commit_message):
+        return bool(self.BREAK_REGEX.match(commit_message))
+
+
+class AngularStyle(Style):
+    SUBJECT_REGEX = re.compile(
         r'^(?P<type>(feat|fix|docs|style|refactor|test|chore))'
         r'(?P<scope>\(.+\))?: (?P<subject>.+)$')
 
-    @property
-    def is_minor(self):
-        return self.type.lower() == 'feat' and not self.is_major
-
-    def fix_type(self):
+    def parse_commit(self, commit):
         pass
+
+    @staticmethod
+    def is_minor(commit_type):
+        return commit_type == 'feat'
 
 
 class Gitolog:
@@ -114,16 +197,14 @@ class Gitolog:
     )
 
     COMMAND = ['git', 'log', '--date=unix', '--format=' + FORMAT]
-    DEFAULT_STYLE = 'basic'
     STYLE = {
-        'basic': Commit,
-        'angular': AngularCommit
+        'angular': AngularStyle
     }
 
     def __init__(
             self, repository,
-            project_url='', commit_url='', issue_url='', compare_url='',
-            style=DEFAULT_STYLE):
+            project_url='', commit_url='', issue_url='', compare_url='', version_url='',
+            style=DefaultStyle):
         self.repository = repository
         self.project_url = project_url if project_url else self.get_url()
 
@@ -133,10 +214,13 @@ class Gitolog:
             issue_url = self.project_url + '/issues/'
         if not compare_url:
             compare_url = self.project_url + '/compare/'
+        if not version_url:
+            version_url = self.project_url + '/releases/tag/'
 
         self.commit_url = commit_url
         self.issue_url = issue_url
         self.compare_url = compare_url
+        self.version_url = version_url
 
         self.raw_log = self.get_log()
         self.commits = self.parse_commits()
@@ -145,6 +229,23 @@ class Gitolog:
         versions = self.group_commits_by_version(dates)
         self.versions_list = versions['as_list']
         self.versions_dict = versions['as_dict']
+
+        if not self.versions_list[0].tag and len(self.versions_list) > 1:
+            last_tag = self.versions_list[1].tag
+            major = minor = False
+            for commit in self.versions_list[0].commits:
+                if commit.is_major:
+                    major = True
+                    break
+                elif commit.is_minor:
+                    minor = True
+            if major:
+                planned_tag = bump(last_tag, 'major')
+            elif minor:
+                planned_tag = bump(last_tag, 'minor')
+            else:
+                planned_tag = bump(last_tag, 'patch')
+            self.versions_list[0].planned_tag = planned_tag
 
         if isinstance(style, str):
             try:
@@ -198,7 +299,7 @@ class Gitolog:
         return commits
 
     def apply_versions_to_commits(self):
-        versions_dates = {}
+        versions_dates = {'': None}
         version = None
         for commit in self.commits:
             if commit.version:
