@@ -25,41 +25,71 @@ def bump(version, part='patch'):
     return '.'.join((major, minor, patch))
 
 
-class GitHub:
-    ISSUE_REF = re.compile(
-        r'(?P<keyword>(close[sd]?|fix(e[sd])?|resolve[sd]?):? +)?'
-        r'(?P<ref>([-\w]+/[-\w]+)?#[1-9]\d*)', re.IGNORECASE)
+class Ref:
+    BB = r'(?:^|[\s,])'
+    BA = r'(?:[\s,]|$)'
+    NP = r'(?:(?P<namespace>[-\w]+)/)?(?P<project>[-\w]+)'
+    ID = r'(?P<ref>{symbol}[1-9]\d*)'
+    ONE_WORD = r'(?P<ref>{symbol}\w[-\w]*)'
+    MULTI_WORD = r'(?P<ref>{symbol}"\w[- \w]*")'
+    COMMIT = r'(?P<ref>[0-9a-f]{{{min},{max}}})'
+    COMMIT_RANGE = r'(?P<ref>[0-9a-f]{{{min},{max}}}\.\.\.[0-9a-f]{{{min},{max}}})'
+    MENTION = r'(?P<ref>@\w[-\w]*)'
+
+
+class ProviderRefParser:
+    REF = {}
 
     @classmethod
-    def parse_issues_refs(cls, s):
-        return [m.groupdict() for m in cls.ISSUE_REF.finditer(s)]
+    def parse_refs(cls, ref_type, text):
+        return [m.groupdict() for m in cls.REF[ref_type].finditer(text)]
 
 
-class GitLab(GitHub):
-    ISSUE_REF = re.compile(
-        r'(?P<keyword>'  # start keyword group
-        r'clos(?:e[sd]?|ing)|'
-        r'fix(?:e[sd]|ing)?|'
-        r'resolv(?:e[sd]?|ing)|'
-        r'implement(?:s|ed|ing)?'
-        r')'  # end keyword group
-        r':? +'  # optional : and spaces
-        r'(?:'  # start repetition of issues sep by "," or "and"
-        r'(?:issues? +)?'  # optional issue[s] word
-        r'(?P<ref>'  # start ref group
-        r'(?:(?:[-\w]+/)?[-\w]+)'  # [namespace/]project
-        r'?#[1-9]\d*'  # number
-        r')'  # end ref group
-        r'(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\d+)'
-        r')+',  # end repetition of issues
-        re.IGNORECASE)
+class GitHub(ProviderRefParser):
+    REF = dict(
+        issue=re.compile(Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol='#'), re.I),
+        commit=re.compile(Ref.BB + r'(?:{np}@)?{commit}{ba}'.format(
+            np=Ref.NP, commit=Ref.COMMIT.format(min=7, max=40), ba=Ref.BA), re.I),
+        commit_range=re.compile(Ref.BB + r'(?:{np}@)?{commit_range}'.format(
+            np=Ref.NP, commit_range=Ref.COMMIT_RANGE.format(min=7, max=40)), re.I),
+        mention=re.compile(Ref.BB + Ref.MENTION, re.I)
+    )
+
+
+class GitLab(ProviderRefParser):
+    REF = dict(
+        issue=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol='#'), re.I),
+        merge_request=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol=r'!'), re.I),
+        snippet=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol=r'\$'), re.I),
+        label_id=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol=r'~'), re.I),
+        label_one_word=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ONE_WORD.format(symbol=r'~'), re.I),
+        label_multi_word=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.MULTI_WORD.format(symbol=r'~'), re.I),
+        milestone_id=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ID.format(symbol=r'%'), re.I),
+        milestone_one_word=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.ONE_WORD.format(symbol=r'%'), re.I),
+        milestone_multi_word=re.compile(
+            Ref.BB + Ref.NP + '?' + Ref.MULTI_WORD.format(symbol=r'%'), re.I),
+        commit=re.compile(
+            Ref.BB + r'(?:{np}@)?{commit}{ba}'.format(
+                np=Ref.NP, commit=Ref.COMMIT.format(min=8, max=40), ba=Ref.BA), re.I),
+        commit_range=re.compile(
+            Ref.BB + r'(?:{np}@)?{commit_range}'.format(
+                np=Ref.NP, commit_range=Ref.COMMIT_RANGE.format(min=8, max=40)), re.I),
+        mention=re.compile(Ref.BB + Ref.MENTION, re.I)
+    )
 
 
 class Issue:
-    def __init__(self, number='', url='', closed=False):
+    def __init__(self, number='', url=''):
         self.number = number
         self.url = url
-        self.closed = closed
 
 
 class Commit:
@@ -106,7 +136,7 @@ class DefaultStyle(Style):
         'doc': 'Documented'
     }
 
-    TYPE_REGEX = re.compile(r'^(?P<type>(%s))' % '|'.join(TYPES.keys()), re.IGNORECASE)
+    TYPE_REGEX = re.compile(r'^(?P<type>(%s))' % '|'.join(TYPES.keys()), re.I)
     CLOSED = ('close', 'fix')
     ISSUE_REGEX = re.compile(r'(?P<issues>((%s)\w* )?(#\d+,? ?)+)' % '|'.join(CLOSED))
     BREAK_REGEX = re.compile(r'^break(s|ing changes)?[ :].+$')
