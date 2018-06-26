@@ -7,6 +7,6 @@
 
 {% for type, section in version.sections_dict|dictsort -%}
 {%- if type and type != 'Merged' -%}
-{% include 'angular/section.md' with context %}
+{% include 'section.md' with context %}
 {% endif -%}
 {%- endfor -%}
