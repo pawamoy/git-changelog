@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 setup(
     name='gitolog',
-    version='0.1.0',
+    version='0.1.1',
     license='ISC',
     description='Automatic Changelog generator using Jinja2 templates.',
     long_description='%s\n%s' % (read('README.md'), read('CHANGELOG.md')),

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.1.1](https://gitlab.com/pawamoy/gitolog/tags/0.1.1) ([compare](https://gitlab.com/pawamoy/gitolog/compare/0.1.0...0.1.1))
+
+### Fixed
+- Fix build with MANIFEST.in, add license file ([013fb69](https://gitlab.com/pawamoy/gitolog/commit/013fb691826924d6f71b4159a8fa650e40324db3)).
+
+### Misc
+- Improve readability ([5e590f6](https://gitlab.com/pawamoy/gitolog/commit/5e590f6ac62b23e608a507e08123efba3b0f7e0d)).
+
+
 ## [0.1.0](https://gitlab.com/pawamoy/gitolog/tags/0.1.0) ([compare](https://gitlab.com/pawamoy/gitolog/compare/83845fe8d7deb85a2e093fe68a4b6a48b6d8e446...0.1.0)) - 2018-06-27
 
 ### Added
@@ -20,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve angular template, improve style/refs system ([5b87d48](https://gitlab.com/pawamoy/gitolog/commit/5b87d48acdf3aa0f5cc2731f48e372c4065d9f9b)).
 - Initial commit ([83845fe](https://gitlab.com/pawamoy/gitolog/commit/83845fe8d7deb85a2e093fe68a4b6a48b6d8e446)).
 - Package code (#6) ([1219eaf](https://gitlab.com/pawamoy/gitolog/commit/1219eafd02521f6f6ab942a02b7a7aee3d664143)).
+- Update changelog for version 0.1.0 ([14edcaf](https://gitlab.com/pawamoy/gitolog/commit/14edcaf078d02c42abf1692664c620c509df88a0)).
 - Update changelog for version 0.1.0 ([610633d](https://gitlab.com/pawamoy/gitolog/commit/610633da8a569e7f2966f1675a30aca651563e0b)).
 - Update changelog for version 0.1.0 ([2eaaa2e](https://gitlab.com/pawamoy/gitolog/commit/2eaaa2e76fc35d111517ecd0a15daf65e705723c)).
 - Work in progress ([27a60e8](https://gitlab.com/pawamoy/gitolog/commit/27a60e80e9a8308b88942311184346b1bfa4b0a8)).
