@@ -154,9 +154,9 @@ class GitLab(ProviderRefParser):
 
     def build_ref_url(self, ref_type, match_dict):
         match_dict['base_url'] = self.url
-        if 'namespace' in match_dict and match_dict['namespace'] is None:
+        if not match_dict.get('namespace'):
             match_dict['namespace'] = self.namespace
-        if 'project' in match_dict and match_dict['project'] is None:
+        if not match_dict.get('project'):
             match_dict['project'] = self.project
         if ref_type.startswith('label'):
             match_dict['ref'] = match_dict['ref'].replace('"', '').replace(' ', '+')

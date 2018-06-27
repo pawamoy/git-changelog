@@ -6,4 +6,6 @@ example3/
 output.md
 __pycache__/
 src/dist/
-src/README.md
+build/
+dist/
+*.egg-info/

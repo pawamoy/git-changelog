@@ -196,6 +196,8 @@ class Gitolog:
             cwd=self.repository))[2:-1].rstrip('\\n')
         if git_url.startswith('git@'):
             git_url = git_url.replace(':', '/', 1).replace('git@', 'https://', 1)
+        if git_url.endswith('.git'):
+            git_url = git_url[:-4]
         return git_url
 
     def get_log(self):
