@@ -1,0 +1,17 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "gitolog"
+author = "Timothée Mazzucotelli"
+author-email = "timothee.mazzucotelli@protonmail.com"
+home-page = "https://gitlab.com/pawamoy/gitolog"
+requires = ["jinja2"]
+description-file = "README.md"
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: ISC License (ISCL)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development"
+]

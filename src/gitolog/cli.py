@@ -22,10 +22,10 @@ from . import __version__, templates
 from .build import Gitolog
 
 
-STYLES = ('basic', 'angular', 'atom')
+STYLES = ('angular', 'atom', 'basic')
 
 
-class Templates(set):
+class Templates(tuple):
     def __contains__(self, item):
         return item.startswith('path:') or super(Templates, self).__contains__(item)
 
