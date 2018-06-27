@@ -114,7 +114,7 @@ class Version:
         return self.tag.split('.', 2)[2]
 
 
-class Gitolog:
+class Changelog:
     MARKER = '--GITOLOG MARKER--'
     FORMAT = (
         '%H%n'  # commit hash
@@ -177,10 +177,11 @@ class Gitolog:
         self.versions_dict = versions['as_dict']
 
         # guess the next version number based on last version and recent commits
-        if not self.versions_list[0].tag and len(self.versions_list) > 1:
-            last_tag = self.versions_list[1].tag
+        last_version = self.versions_list[0]
+        if not last_version.tag and last_version.previous_version:
+            last_tag = last_version.previous_version.tag
             major = minor = False
-            for commit in self.versions_list[0].commits:
+            for commit in last_version.commits:
                 if commit.style['is_major']:
                     major = True
                     break
@@ -192,7 +193,10 @@ class Gitolog:
                 planned_tag = bump(last_tag, 'minor')
             else:
                 planned_tag = bump(last_tag, 'patch')
-            self.versions_list[0].planned_tag = planned_tag
+            last_version.planned_tag = planned_tag
+            last_version.url = self.provider.get_tag_url(tag=planned_tag)
+            last_version.compare_url = self.provider.get_compare_url(
+                base=last_version.previous_version.tag, target=last_version.planned_tag)
 
     def get_remote_url(self):
         git_url = str(check_output(
@@ -276,10 +280,8 @@ class Gitolog:
                 if next_version:
                     version.next_version = next_version
                     next_version.previous_version = version
-                    next_version.compare_url = self.provider.build_ref_url(
-                        # FIXME: hardcoded 'commits_ranges'
-                        'commits_ranges', {'ref': '%s...%s' % (
-                            version.tag, next_version.tag or 'HEAD')})
+                    next_version.compare_url = self.provider.get_compare_url(
+                        base=version.tag, target=next_version.tag or 'HEAD')
                 next_version = version
                 versions_list.append(version)
                 versions_types_dict[commit.version] = {}
@@ -291,9 +293,7 @@ class Gitolog:
                 versions_dict[commit.version].sections_list.append(section)
                 versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
             versions_types_dict[commit.version][commit.style['type']].commits.append(commit)
-        next_version.compare_url = self.provider.build_ref_url(
-            # FIXME: hardcoded 'commits_ranges'
-            'commits_ranges', {'ref': '%s...%s' % (
-                versions_list[-1].commits[-1].hash, next_version.tag or 'HEAD')})
+        next_version.compare_url = self.provider.get_compare_url(
+            base=versions_list[-1].commits[-1].hash, target=next_version.tag or 'HEAD')
         return {'as_list': versions_list, 'as_dict': versions_dict}
 

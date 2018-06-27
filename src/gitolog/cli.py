@@ -19,7 +19,7 @@ import argparse
 import sys
 
 from . import __version__, templates
-from .build import Gitolog
+from .build import Changelog
 
 
 STYLES = ('angular', 'atom', 'basic')
@@ -78,10 +78,10 @@ def main(args=None):
         template = templates.get_template(args.template)
 
     # build data
-    gitolog = Gitolog(args.repository, style=args.style)
+    changelog = Changelog(args.repository, style=args.style)
 
     # get rendered contents
-    rendered = template.render(gitolog=gitolog)
+    rendered = template.render(changelog=changelog)
 
     # write result in specified output
     if args.output is sys.stdout:

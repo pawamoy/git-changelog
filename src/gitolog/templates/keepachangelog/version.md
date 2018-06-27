@@ -1,7 +1,9 @@
-{%- if version.tag -%}
-## [{{ version.tag }}]({{ version.url }}) ([compare]({{ version.compare_url }}))
+{%- if version.tag or version.planned_tag -%}
+## [{{ version.tag or version.planned_tag }}]({{ version.url }}) ([compare]({{ version.compare_url }}))
 {%- else -%}
-## {{ version.planned_tag or "Unrealeased" }} ([compare]({{ version.compare_url }})){%- endif -%}{% if version.date %} - {{ version.date }}{% endif %}
+## Unrealeased ([compare]({{ version.compare_url }}))
+{%- endif -%}
+{% if version.date %} - {{ version.date }}{% endif %}
 
 {% for type, section in version.sections_dict|dictsort -%}
 {%- if type and type != 'Merged' -%}

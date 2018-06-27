@@ -80,6 +80,9 @@ class GitHub(ProviderRefParser):
         return self.tag_url.format(
             base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
+    def get_compare_url(self, base, target):
+        return self.build_ref_url('commits_ranges', {'ref': '%s...%s' % (base, target)})
+
 
 class GitLab(ProviderRefParser):
     url = 'https://gitlab.com'
@@ -165,3 +168,6 @@ class GitLab(ProviderRefParser):
     def get_tag_url(self, tag=''):
         return self.tag_url.format(
             base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+
+    def get_compare_url(self, base, target):
+        return self.build_ref_url('commits_ranges', {'ref': '%s...%s' % (base, target)})
