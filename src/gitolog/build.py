@@ -12,6 +12,8 @@ def bump(version, part='patch'):
     pre = ''
     if len(patch) > 1:
         patch, pre = patch
+    else:
+        patch = patch[0]
     if part == 'major':
         major = str(int(major) + 1)
         minor = patch = '0'
