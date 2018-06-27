@@ -27,7 +27,7 @@ class Commit:
     def __init__(
             self, hash, author_name='', author_email='', author_date='',
             committer_name='', committer_email='', committer_date='',
-            ref='', subject='', body=None, url=''):
+            refs='', subject='', body=None, url=''):
         self.hash = hash
         self.author_name = author_name
         self.author_email = author_email
@@ -39,11 +39,13 @@ class Commit:
         self.body = body or []
         self.url = url
 
-        if ref.startswith('tag: '):
-            ref = ref.replace('tag: ', '')
-        elif ref:
-            ref = ''
-        self.tag = self.version = ref
+        tag = ''
+        for ref in refs.split(','):
+            ref = ref.strip()
+            if ref.startswith('tag: '):
+                tag = ref.replace('tag: ', '')
+                break
+        self.tag = self.version = tag
 
         self.text_refs = {}
         self.style = {}
@@ -220,7 +222,7 @@ class Gitolog:
                 committer_name=lines[pos+4],
                 committer_email=lines[pos+5],
                 committer_date=lines[pos+6],
-                ref=lines[pos+7],
+                refs=lines[pos+7],
                 subject=lines[pos+8],
                 body=[lines[pos+9]]
             )
