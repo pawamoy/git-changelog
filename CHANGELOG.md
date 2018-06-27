@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unrealeased ([compare](https://gitlab.com/pawamoy/gitolog/compare/83845fe8d7deb85a2e093fe68a4b6a48b6d8e446...HEAD))
+## [0.1.0](https://gitlab.com/pawamoy/gitolog/tags/0.1.0) - 2018-06-27
 
 ### Added
 - Add github/gitlab regexes ([584fd73](https://gitlab.com/pawamoy/gitolog/commit/584fd73ec88ac51abbf8555d8f78b7144529e6b3)).
