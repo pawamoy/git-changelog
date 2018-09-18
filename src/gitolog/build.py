@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 from datetime import datetime
 from subprocess import check_output
@@ -199,9 +201,10 @@ class Changelog:
                 base=last_version.previous_version.tag, target=last_version.planned_tag)
 
     def get_remote_url(self):
-        git_url = str(check_output(
+        git_url = check_output(
             ['git', 'config', '--get', 'remote.origin.url'],
-            cwd=self.repository))[2:-1].rstrip('\\n')
+            cwd=self.repository
+        ).decode('utf-8').rstrip('\n')
         if git_url.startswith('git@'):
             git_url = git_url.replace(':', '/', 1).replace('git@', 'https://', 1)
         if git_url.endswith('.git'):
@@ -209,13 +212,12 @@ class Changelog:
         return git_url
 
     def get_log(self):
-        # remove enclosing b-quotes (b'' or b"")
-        return str(check_output(
+        return check_output(
             ['git', 'log', '--date=unix', '--format=' + self.FORMAT],
-            cwd=self.repository))[2:-1].replace("\\'", "'")
+            cwd=self.repository).decode('utf-8')
 
     def parse_commits(self):
-        lines = self.raw_log.split('\\n')
+        lines = self.raw_log.split('\n')
         size = len(lines) - 1  # don't count last blank line
         commits = []
         pos = 0
@@ -293,7 +295,8 @@ class Changelog:
                 versions_dict[commit.version].sections_list.append(section)
                 versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
             versions_types_dict[commit.version][commit.style['type']].commits.append(commit)
-        next_version.compare_url = self.provider.get_compare_url(
-            base=versions_list[-1].commits[-1].hash, target=next_version.tag or 'HEAD')
+        if next_version is not None:
+            next_version.compare_url = self.provider.get_compare_url(
+                base=versions_list[-1].commits[-1].hash, target=next_version.tag or 'HEAD')
         return {'as_list': versions_list, 'as_dict': versions_dict}
 

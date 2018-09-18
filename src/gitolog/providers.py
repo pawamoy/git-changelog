@@ -22,7 +22,7 @@ class Ref:
         return self.ref + ': ' + self.url
 
 
-class ProviderRefParser:
+class ProviderRefParser(object):
     REF = {}
 
     def get_refs(self, ref_type, text):

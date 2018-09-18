@@ -7,3 +7,4 @@ src/dist/
 build/
 dist/
 *.egg-info/
+*.pyc
