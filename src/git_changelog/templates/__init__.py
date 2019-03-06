@@ -9,7 +9,7 @@ def get_path():
 
 
 def get_env(path):
-    return Environment(loader=FileSystemLoader(path))
+    return Environment(loader=FileSystemLoader(path))  # nosec
 
 
 def get_custom_template(path):

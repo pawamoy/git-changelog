@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import sys
 from datetime import datetime
-from subprocess import check_output
+from subprocess import check_output  # nosec
 
 from .providers import GitHub, GitLab
 from .style import AngularStyle, AtomStyle, BasicStyle, CommitStyle
@@ -205,7 +205,7 @@ class Changelog:
 
     def get_remote_url(self):
         git_url = (
-            check_output(["git", "config", "--get", "remote.origin.url"], cwd=self.repository)
+            check_output(["git", "config", "--get", "remote.origin.url"], cwd=self.repository)  # nosec
             .decode("utf-8")
             .rstrip("\n")
         )
@@ -216,9 +216,9 @@ class Changelog:
         return git_url
 
     def get_log(self):
-        return check_output(["git", "log", "--date=unix", "--format=" + self.FORMAT], cwd=self.repository).decode(
-            "utf-8"
-        )
+        return check_output(
+            ["git", "log", "--date=unix", "--format=" + self.FORMAT], cwd=self.repository  # nosec
+        ).decode("utf-8")
 
     def parse_commits(self):
         lines = self.raw_log.split("\n")
