@@ -24,22 +24,22 @@ Some milestones: %2, %version1, %"awesome version"
 
 
 def test_github_issue_parsing():
-    github = gitolog.GitHub('pawamoy', 'gitolog')
+    github = gitolog.GitHub("pawamoy", "gitolog")
     for ref in github.REF.keys():
         refs = github.get_refs(ref, text)
-        print('\n'.join(map(str, refs)))
+        print("\n".join(map(str, refs)))
 
 
 def test_gitlab_issue_parsing():
-    gitlab = gitolog.GitLab('pawamoy', 'gitolog')
+    gitlab = gitolog.GitLab("pawamoy", "gitolog")
     for ref in gitlab.REF.keys():
         refs = gitlab.get_refs(ref, text)
-        print('\n'.join(map(str, refs)))
+        print("\n".join(map(str, refs)))
 
 
-if __name__ == '__main__':
-    print('Searching references for GitHub')
+if __name__ == "__main__":
+    print("Searching references for GitHub")
     test_github_issue_parsing()
-    print('-------------------------------')
-    print('Searching references for GitLab')
+    print("-------------------------------")
+    print("Searching references for GitLab")
     test_gitlab_issue_parsing()
