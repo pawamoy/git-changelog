@@ -1,4 +1,4 @@
-import gitolog
+import git_changelog
 
 text = """
 This is the subject #1
@@ -24,14 +24,14 @@ Some milestones: %2, %version1, %"awesome version"
 
 
 def test_github_issue_parsing():
-    github = gitolog.GitHub("pawamoy", "gitolog")
+    github = git_changelog.GitHub("pawamoy", "git-changelog")
     for ref in github.REF.keys():
         refs = github.get_refs(ref, text)
         print("\n".join(map(str, refs)))
 
 
 def test_gitlab_issue_parsing():
-    gitlab = gitolog.GitLab("pawamoy", "gitolog")
+    gitlab = git_changelog.GitLab("pawamoy", "git-changelog")
     for ref in gitlab.REF.keys():
         refs = gitlab.get_refs(ref, text)
         print("\n".join(map(str, refs)))
