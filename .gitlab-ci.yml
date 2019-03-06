@@ -46,6 +46,7 @@ check-safety:
     - apt-get install -y python-enchant
     - pip install poetry
     - poetry config settings.virtualenvs.in-project true
+    - rm -rf .venv
     - poetry install -vv
     - poetry --version
   script: make check-safety
