@@ -1,5 +1,5 @@
 # Credits
-These projects were used to build `aria2p`. **Thank you!**
+These projects were used to build `git-changelog`. **Thank you!**
 
 [![`python`](https://www.vectorlogo.zone/logos/python/python-ar21.svg)](https://www.python.org/) |
 [`poetry`](https://poetry.eustace.io/)
@@ -12,8 +12,6 @@ These projects were used to build `aria2p`. **Thank you!**
 [`pytest-sugar`](http://pivotfinland.com/pytest-sugar/) |
 [`pytest-xdist`](https://github.com/pytest-dev/pytest-xdist) |
 [`recommonmark`](https://github.com/rtfd/recommonmark) |
-[`requests`](http://python-requests.org) |
-[`responses`](https://github.com/getsentry/responses) |
 [`Sphinx`](http://sphinx-doc.org/) |
 [`sphinx-rtd-theme`](https://github.com/rtfd/sphinx_rtd_theme/) |
 [`sphinxcontrib-spelling`](https://github.com/sphinx-contrib/spelling)

@@ -40,7 +40,7 @@ sphinx-rtd-theme = "^0.4.3"
 toml = "^0.10.0"
 
 [tool.poetry.scripts]
-aria2p = "git_changelog.cli:main"
+git-changelog = "git_changelog.cli:main"
 
 [tool.black]
 line-length = 120

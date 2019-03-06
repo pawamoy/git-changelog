@@ -48,11 +48,11 @@ Make sure to have atomic commits and contextual commit messages!
 
 [Check out this awesome blog post by Chris Beams for more information.][8]
 
-[1]: https://github.com/pawamoy/aria2p/issues/new
-[2]: https://gitlab.com/pawamoy/aria2p/issues/new
-[3]: https://github.com/pawamoy/aria2p
-[4]: https://gitlab.com/pawamoy/aria2p
+[1]: https://github.com/pawamoy/git-changelog/issues/new
+[2]: https://gitlab.com/pawamoy/git-changelog/issues/new
+[3]: https://github.com/pawamoy/git-changelog
+[4]: https://gitlab.com/pawamoy/git-changelog
 [5]: https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name
-[6]: https://github.com/pawamoy/aria2p/compare
-[7]: https://gitlab.com/pawamoy/aria2p/compare
+[6]: https://github.com/pawamoy/git-changelog/compare
+[7]: https://gitlab.com/pawamoy/git-changelog/compare
 [8]: http://chris.beams.io/posts/git-commit/
