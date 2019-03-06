@@ -16,7 +16,7 @@ readme: README.md  ## Regenerate README.md.
 docs:  ## Build the documentation locally.
 	poetry run sphinx-build -E -b html docs build/docs
 
-check: check-bandit check-black check-flake8 check-isort check-safety check-ports check-docs-spelling  ## Check it all!
+check: check-bandit check-black check-flake8 check-isort check-safety check-docs-spelling  ## Check it all!
 
 update-spelling-wordlist:  ## Update the spelling word list.
 	scripts/update-spelling-wordlist.sh
@@ -38,11 +38,8 @@ check-bandit:  ## Check for security warnings in code using bandit.
 
 check-safety:  ## Check for vulnerabilities in dependencies using safety.
 	poetry run pip freeze 2>/dev/null | \
-		grep -v aria2p | \
+		grep -v git-changelog | \
 		poetry run safety check --stdin --full-report 2>/dev/null
-
-check-ports:  ## Check if the ports used in the tests are all unique.
-	scripts/check-ports.sh
 
 run-black:  ## Lint the code using black.
 	poetry run black src/ tests/ docs/conf.py
@@ -58,10 +55,10 @@ clean-tests:  ## Delete temporary tests files.
 clean: clean-tests  ## Delete temporary files.
 	@rm -rf build 2>/dev/null
 	@rm -rf dist 2>/dev/null
-	@rm -rf src/aria2p.egg-info 2>/dev/null
+	@rm -rf src/*.egg-info 2>/dev/null
 	@rm -rf .coverage* 2>/dev/null
 	@rm -rf .pytest_cache 2>/dev/null
 	@rm -rf pip-wheel-metadata 2>/dev/null
 
-test: check-ports clean-tests  ## Run the tests using pytest.
+test: clean-tests  ## Run the tests using pytest.
 	poetry run pytest -n6 2>/dev/null
