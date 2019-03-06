@@ -1,10 +1,11 @@
 .idea/
-Pipfile.lock
-examples/
-output.md
 __pycache__/
-src/dist/
-build/
+*.py[cod]
 dist/
 *.egg-info/
-*.pyc
+build/
+.coverage
+tests/tmp/*
+!tests/tmp/.gitkeep
+pip-wheel-metadata/
+.pytest_cache/
