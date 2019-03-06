@@ -28,27 +28,7 @@ Automatic changelog generator. From git logs to change logs.
 
 ```console
 $ git-changelog --help
-usage: git-changelog [-h] [-o OUTPUT] [-s {angular,atom,basic}]
-                     [-t {angular,keepachangelog}] [-v]
-                     REPOSITORY
-
-Command line tool for git-changelog Python package.
-
-positional arguments:
-  REPOSITORY            The repository path, relative or absolute.
-
-optional arguments:
-  -h, --help            Show this help message and exit.
-  -o OUTPUT, --output OUTPUT
-                        Output to given file. Default: stdout.
-  -s {angular,atom,basic}, --style {angular,atom,basic}
-                        The commit style to match against.
-  -t {angular,keepachangelog}, --template {angular,keepachangelog}
-                        The Jinja2 template to use. Prefix with "path:" to
-                        specify the path to a directory containing a file
-                        named "changelog.md".
-  -v, --version         Show the current version of the program and exit.
-
+{{ main_usage }}
 ```
 
 [jinja2]:                 http://jinja.pocoo.org/

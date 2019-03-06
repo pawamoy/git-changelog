@@ -1,5 +1,5 @@
 """
-Entrypoint module, in case you use `python -mgitolog`.
+Entrypoint module, in case you use `python -m git_changelog`.
 
 Why does this file exist, and why __main__? For more info, read:
 
@@ -10,7 +10,7 @@ Why does this file exist, and why __main__? For more info, read:
 
 import sys
 
-from gitolog.cli import main
+from git_changelog.cli import main
 
 if __name__ == "__main__":
     main(sys.argv[1:])

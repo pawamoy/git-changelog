@@ -3,16 +3,16 @@ Module that contains the command line application.
 
 Why does this file exist, and why not put this in __main__?
 
-  You might be tempted to import things from __main__ later,
-  but that will cause problems: the code will get executed twice:
+You might be tempted to import things from __main__ later,
+but that will cause problems: the code will get executed twice:
 
-  - When you run `python -mgitolog` python will execute
-    ``__main__.py`` as a script. That means there won't be any
-    ``gitolog.__main__`` in ``sys.modules``.
-  - When you import __main__ it will get executed again (as a module) because
-    there's no ``gitolog.__main__`` in ``sys.modules``.
+- When you run `python -m git_changelog` python will execute
+  ``__main__.py`` as a script. That means there won't be any
+  ``git_changelog.__main__`` in ``sys.modules``.
+- When you import __main__ it will get executed again (as a module) because
+  there's no ``git_changelog.__main__`` in ``sys.modules``.
 
-  Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
+Also see http://click.pocoo.org/5/setuptools/#setuptools-integration.
 """
 
 from __future__ import print_function
@@ -20,7 +20,7 @@ from __future__ import print_function
 import argparse
 import sys
 
-from . import __version__, templates
+from . import templates
 from .build import Changelog
 
 STYLES = ("angular", "atom", "basic")
@@ -33,7 +33,7 @@ class Templates(tuple):
 
 def get_parser():
     """Return a parser for the command-line arguments."""
-    parser = argparse.ArgumentParser(add_help=False, description="Command line tool for gitolog Python package.")
+    parser = argparse.ArgumentParser(add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package.")
 
     parser.add_argument("repository", metavar="REPOSITORY", help="The repository path, relative or absolute.")
 
@@ -64,7 +64,7 @@ def get_parser():
         "-v",
         "--version",
         action="version",
-        version="gitolog %s" % __version__,
+        version="git-changelog 0.1.0",
         help="Show the current version of the program and exit.",
     )
     return parser
@@ -80,7 +80,7 @@ def main(args=None):
         try:
             template = templates.get_custom_template(path)
         except FileNotFoundError:
-            print("gitolog: no such directory, " "or missing changelog.md: %s" % path, file=sys.stderr)
+            print("git-changelog: no such directory, " "or missing changelog.md: %s" % path, file=sys.stderr)
             return 1
     else:
         template = templates.get_template(args.template)

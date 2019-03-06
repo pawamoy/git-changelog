@@ -160,7 +160,7 @@ class Changelog:
             try:
                 style = self.STYLE[style]()
             except KeyError:
-                print("gitolog: no such style available: %s, " "using default style" % style, file=sys.stderr)
+                print("git-changelog: no such style available: %s, " "using default style" % style, file=sys.stderr)
                 style = BasicStyle()
         elif style is None:
             style = BasicStyle()

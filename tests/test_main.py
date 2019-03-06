@@ -7,14 +7,14 @@ This is the body. Related: #2. Also mentions #3 and #4.
 Closes #5. closed #6, #7. FIX: #89 and #10.
 Resolve        #1111.
 Also support other projects references like shellm-org/shellm-data#19!!
-Or fix pawamoy/gitolog#1.
+Or fix pawamoy/git-changelog#1.
 Don't match this one: #01.
 
 Now some other references:
 
 A merge request: !153!
 A mention: @hello
-A commit gitolog@06abf793
+A commit git-changelog@06abf793
 A longer commit 3879fabda896da89954adec8
 A commit range: 00000000...11111111
 A snippet: $45
