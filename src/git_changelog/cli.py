@@ -33,7 +33,9 @@ class Templates(tuple):
 
 def get_parser():
     """Return a parser for the command-line arguments."""
-    parser = argparse.ArgumentParser(add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package.")
+    parser = argparse.ArgumentParser(
+        add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package."
+    )
 
     parser.add_argument("repository", metavar="REPOSITORY", help="The repository path, relative or absolute.")
 
