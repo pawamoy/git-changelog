@@ -1,4 +1,4 @@
-# Welcome to aria2p's documentation!
+# Welcome to git-changelog's documentation!
 
 - [Overview](readme.md)
 - [Contributing](contributing.md)
