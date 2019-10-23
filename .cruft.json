@@ -1,6 +1,6 @@
 {
     "template": "https://github.com/pawamoy/cookie-poetry",
-    "commit": "e76abd133eebbdf329da7fd8a445e6998db7c5e8",
+    "commit": "97493f9f8f3ee8e2119f76431353166d50f40383",
     "context": {
         "cookiecutter": {
             "project_name": "git-changelog",

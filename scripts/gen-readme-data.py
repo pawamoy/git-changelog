@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 import json
-# import argparse
 
 from git_changelog.cli import get_parser
 
+# import argparse
+
+
 parser = get_parser()
 
-output = {
-    "main_usage": parser.format_help(),
-    "commands": []
-}
+output = {"main_usage": parser.format_help(), "commands": []}
 
 # subparser_actions = [
 #     action for action in parser._actions
@@ -24,5 +23,6 @@ output = {
 #             "usage": subparser.format_help()
 #         })
 
+output["commands"] = list(sorted(output["commands"], key=lambda c: c["name"]))
 json_output = json.dumps(output)
 print(json_output)

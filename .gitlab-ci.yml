@@ -11,57 +11,46 @@ stages:
   - quality
   - tests
 
+.install-deps-template: &install-deps
+  before_script:
+    - pip install poetry
+    - poetry --version
+    - poetry config settings.virtualenvs.in-project true
+    - poetry install -vv
+
+# Quality jobs
+
 .quality-template: &quality
+  <<: *install-deps
   image: python:3.6
   stage: quality
 
+check-bandit:
+  <<: *quality
+  script: make check-bandit
+
 check-black:
   <<: *quality
-  before_script:
-    - pip install black
-  script: black --check src/ tests/
-
-check-isort:
-  <<: *quality
-  before_script:
-    - pip install isort[pyproject]
-  script: isort -c -rc src/ tests/
+  script: make check-black
 
 check-flake8:
   <<: *quality
-  before_script:
-    - pip install flake8
-  script: flake8 src/ tests/
+  script: make check-flake8
 
-check-bandit:
+check-isort:
   <<: *quality
-  before_script:
-    - pip install bandit
-  script: bandit -r src/
+  script: make check-isort
 
 check-safety:
   <<: *quality
-  before_script:
-    - apt-get update
-    - apt-get install -y python-enchant
-    - pip install poetry
-    - poetry config settings.virtualenvs.in-project true
-    - rm -rf .venv
-    - poetry install -vv
-    - poetry --version
   script: make check-safety
 
+# Tests jobs
+
 .test-template: &test
+  <<: *install-deps
   stage: tests
-  before_script:
-    - apt-get update
-    - apt-get install -y python-enchant
-    - apt-get install -y aria2
-    - pip install poetry
-    - poetry config settings.virtualenvs.in-project true
-    - poetry install -vv
-    - poetry --version
-  script: poetry run pytest -v
+  script: make test
 
 python3.6:
   <<: *test
@@ -73,6 +62,4 @@ python3.7:
 
 python3.8:
   <<: *test
-  image: python:3.8-rc
-  allow_failure: true
-
+  image: python:3.8
