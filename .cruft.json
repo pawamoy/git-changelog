@@ -1,0 +1,24 @@
+{
+    "template": "https://github.com/pawamoy/cookie-poetry",
+    "commit": "e76abd133eebbdf329da7fd8a445e6998db7c5e8",
+    "context": {
+        "cookiecutter": {
+            "project_name": "git-changelog",
+            "project_description": "Automatic Changelog generator using Jinja2 templates.",
+            "author_fullname": "Timothée Mazzucotelli",
+            "author_email": "pawamoy@pm.me",
+            "author_username": "pawamoy",
+            "repository_provider": "github.com",
+            "repository_namespace": "pawamoy",
+            "repository_name": "git-changelog",
+            "copyright_holder": "Timothée Mazzucotelli",
+            "copyright_holder_email": "pawamoy@pm.me",
+            "copyright_date": "2018",
+            "copyright_license": "ISC License",
+            "python_package_distribution_name": "git-changelog",
+            "python_package_import_name": "git_changelog",
+            "python_package_command_line_name": "git-changelog",
+            "_template": "https://github.com/pawamoy/cookie-poetry"
+        }
+    }
+}
