@@ -82,9 +82,8 @@ class AngularStyle(CommitStyle):
             return dct
         return {"type": "", "scope": "", "subject": commit_subject}
 
-    @staticmethod
-    def is_minor(commit_type):
-        return commit_type == "feat"
+    def is_minor(self, commit_type):
+        return commit_type == self.TYPES["feat"]
 
     def is_major(self, commit_message):
         return bool(self.BREAK_REGEX.match(commit_message))
