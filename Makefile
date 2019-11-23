@@ -40,6 +40,8 @@ clean: clean-tests  ## Delete temporary files.
 	@rm -rf build 2>/dev/null
 	@rm -rf dist 2>/dev/null
 	@rm -rf src/*.egg-info 2>/dev/null
+	@rm -rf src/git_changelog/*.pyc 2>/dev/null
+	@rm -rf src/git_changelog/__pycache__ 2>/dev/null
 	@rm -rf .coverage* 2>/dev/null
 	@rm -rf .pytest_cache 2>/dev/null
 	@rm -rf pip-wheel-metadata 2>/dev/null

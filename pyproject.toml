@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "git-changelog"
-version = "0.1.0"
+version = "0.2.0"
 description = "Automatic Changelog generator using Jinja2 templates."
 authors = ["Timothée Mazzucotelli <pawamoy@pm.me>"]
 license = "ISC"
@@ -26,6 +26,7 @@ Jinja2 = "^2.10"
 bandit = "^1.5"
 black = { version = "*", allows-prereleases = true }
 coverage = { version = "=5.0a8", allows-prereleases = true }
+cruft = "^1.1"
 flake8 = "^3.7"
 ipython = "^7.3"
 isort = { version = "^4.3", extras = ["pyproject"] }
@@ -40,7 +41,6 @@ safety = "^1.8"
 sphinx = "^1.8"
 sphinx-rtd-theme = "^0.4.3"
 toml = "^0.10.0"
-cruft = "^1.1"
 
 [tool.poetry.scripts]
 git-changelog = "git_changelog.cli:main"
