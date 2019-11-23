@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import sys
 from datetime import datetime
 from subprocess import check_output  # nosec

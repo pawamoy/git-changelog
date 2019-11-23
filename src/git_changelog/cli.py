@@ -15,8 +15,6 @@ but that will cause problems: the code will get executed twice:
 Also see http://click.pocoo.org/5/setuptools/#setuptools-integration.
 """
 
-from __future__ import print_function
-
 import argparse
 import sys
 
