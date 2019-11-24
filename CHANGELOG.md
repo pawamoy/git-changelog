@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.2.0](https://github.com/pawamoy/git-changelog/releases/tag/0.2.0) ([compare](https://github.com/pawamoy/git-changelog/compare/0.1.1...0.2.0))
 
+Drop support for Python < 3.6.
+
 Use [poetry](https://github.com/sdispater/poetry) to manage the project!
 
 ### Fixed
