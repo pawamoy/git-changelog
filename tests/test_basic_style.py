@@ -1,43 +1,43 @@
 from git_changelog.build import Commit
-from git_changelog.style import AngularStyle
+from git_changelog.style import BasicStyle
 
 
-def test_angular_style_breaking_change():
-    subject = "feat: this is a new breaking feature"
+def test_basic_style_breaking_change():
+    subject = "Added a new breaking feature"
     body = ["BREAKING CHANGE: there is a breaking feature in this code"]
     commit = Commit(hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645")
-    style = AngularStyle()
+    style = BasicStyle()
     commit_dict = style.parse_commit(commit)
     assert commit_dict["is_major"]
     assert not commit_dict["is_minor"]
     assert not commit_dict["is_patch"]
 
 
-def test_angular_style_breaking_changes():
-    subject = "feat: this is a new breaking feature"
+def test_basic_style_breaking_changes():
+    subject = "Added a new breaking feature"
     body = ["BREAKING CHANGES: there is a breaking feature in this code"]
     commit = Commit(hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645")
-    style = AngularStyle()
+    style = BasicStyle()
     commit_dict = style.parse_commit(commit)
     assert commit_dict["is_major"]
     assert not commit_dict["is_minor"]
     assert not commit_dict["is_patch"]
 
 
-def test_angular_style_feat():
-    subject = "feat: this is a new feature"
+def test_basic_style_feat():
+    subject = "Added a new feature"
     commit = Commit(hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = AngularStyle()
+    style = BasicStyle()
     commit_dict = style.parse_commit(commit)
     assert not commit_dict["is_major"]
     assert commit_dict["is_minor"]
     assert not commit_dict["is_patch"]
 
 
-def test_angular_style_fix():
-    subject = "fix: this is a bug fix"
+def test_basic_style_fix():
+    subject = "Fixed a bug"
     commit = Commit(hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = AngularStyle()
+    style = BasicStyle()
     commit_dict = style.parse_commit(commit)
     assert not commit_dict["is_major"]
     assert not commit_dict["is_minor"]
