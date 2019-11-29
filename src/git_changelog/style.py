@@ -17,7 +17,7 @@ class BasicStyle(CommitStyle):
     }
 
     TYPE_REGEX = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
-    BREAK_REGEX = re.compile(r"^break(s|ing changes)?[ :].+$", re.I)
+    BREAK_REGEX = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
 
     def parse_commit(self, commit):
         commit_type = self.parse_type(commit.subject)
@@ -38,7 +38,7 @@ class BasicStyle(CommitStyle):
         return commit_type == self.TYPES["add"]
 
     def is_major(self, commit_message):
-        return bool(self.BREAK_REGEX.match(commit_message))
+        return bool(self.BREAK_REGEX.search(commit_message))
 
 
 class AngularStyle(CommitStyle):
@@ -56,7 +56,7 @@ class AngularStyle(CommitStyle):
         # 'chore': '',
     }
     SUBJECT_REGEX = re.compile(r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())))
-    BREAK_REGEX = re.compile(r"^break(s|ing changes)?[ :].+$", re.I)
+    BREAK_REGEX = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
 
     def parse_commit(self, commit):
         subject = self.parse_subject(commit.subject)
@@ -86,7 +86,7 @@ class AngularStyle(CommitStyle):
         return commit_type == self.TYPES["feat"]
 
     def is_major(self, commit_message):
-        return bool(self.BREAK_REGEX.match(commit_message))
+        return bool(self.BREAK_REGEX.search(commit_message))
 
 
 class AtomStyle(CommitStyle):
