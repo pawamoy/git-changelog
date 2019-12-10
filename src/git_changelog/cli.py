@@ -17,6 +17,7 @@ Also see http://click.pocoo.org/5/setuptools/#setuptools-integration.
 
 import argparse
 import sys
+from typing import List
 
 from . import templates
 from .build import Changelog
@@ -25,11 +26,11 @@ STYLES = ("angular", "atom", "basic")
 
 
 class Templates(tuple):
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         return item.startswith("path:") or super(Templates, self).__contains__(item)
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """Return a parser for the command-line arguments."""
     parser = argparse.ArgumentParser(
         add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package."
@@ -70,7 +71,7 @@ def get_parser():
     return parser
 
 
-def main(args=None):
+def main(args: List[str] = None) -> int:
     parser = get_parser()
     args = parser.parse_args(args=args)
 

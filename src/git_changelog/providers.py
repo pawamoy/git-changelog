@@ -1,4 +1,5 @@
 import re
+from typing import Dict, Pattern, Union, List, Match
 
 
 class RefRe:
@@ -14,39 +15,48 @@ class RefRe:
 
 
 class Ref:
-    def __init__(self, ref, url):
-        self.ref = ref
-        self.url = url
+    def __init__(self, ref: str, url: str):
+        self.ref: str = ref
+        self.url: str = url
 
     def __str__(self):
         return self.ref + ": " + self.url
 
 
 class ProviderRefParser:
-    REF = {}
+    url: str
+    namespace: str
+    project: str
+    REF: Dict[str, Dict[str, Union[str, Pattern]]] = {}
 
-    def get_refs(self, ref_type, text):
+    def get_refs(self, ref_type: str, text: str) -> List[Ref]:
         return [
             Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
             for match in self.parse_refs(ref_type, text)
         ]
 
-    def parse_refs(self, ref_type, text):
+    def parse_refs(self, ref_type: str, text: str) -> List[Match]:
         if ref_type not in self.REF:
             refs = [k for k in self.REF.keys() if k.startswith(ref_type)]
             return [m for ref in refs for m in self.REF[ref]["regex"].finditer(text)]
         return [m for m in self.REF[ref_type]["regex"].finditer(text)]
 
-    def build_ref_url(self, ref_type, match_dict):
+    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
         return self.REF[ref_type]["url"].format(**match_dict)
+
+    def get_tag_url(self, tag: str) -> str:
+        raise NotImplementedError
+
+    def get_compare_url(self, base: str, target: str) -> str:
+        raise NotImplementedError
 
 
 class GitHub(ProviderRefParser):
-    url = "https://github.com"
-    project_url = "{base_url}/{namespace}/{project}"
-    tag_url = "{base_url}/{namespace}/{project}/releases/tag/{ref}"
+    url: str = "https://github.com"
+    project_url: str = "{base_url}/{namespace}/{project}"
+    tag_url: str = "{base_url}/{namespace}/{project}/releases/tag/{ref}"
 
-    REF = dict(
+    REF: Dict[str, Dict[str, Union[str, Pattern]]] = dict(
         issues=dict(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url="{base_url}/{namespace}/{project}/issues/{ref}",
@@ -72,12 +82,12 @@ class GitHub(ProviderRefParser):
         mentions=dict(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url="{base_url}/{ref}"),
     )
 
-    def __init__(self, namespace, project, url=url):
-        self.namespace = namespace
-        self.project = project
-        self.url = url
+    def __init__(self, namespace: str, project: str, url: str = url):
+        self.namespace: str = namespace
+        self.project: str = project
+        self.url: str = url
 
-    def build_ref_url(self, ref_type, match_dict):
+    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -85,19 +95,19 @@ class GitHub(ProviderRefParser):
             match_dict["project"] = self.project
         return super(GitHub, self).build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag=""):
+    def get_tag_url(self, tag: str = "") -> str:
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
-    def get_compare_url(self, base, target):
+    def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": "%s...%s" % (base, target)})
 
 
 class GitLab(ProviderRefParser):
-    url = "https://gitlab.com"
-    project_url = "{base_url}/{namespace}/{project}"
-    tag_url = "{base_url}/{namespace}/{project}/tags/{ref}"
+    url: str = "https://gitlab.com"
+    project_url: str = "{base_url}/{namespace}/{project}"
+    tag_url: str = "{base_url}/{namespace}/{project}/tags/{ref}"
 
-    REF = dict(
+    REF: Dict[str, Dict[str, Union[str, Pattern]]] = dict(
         issues=dict(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url="{base_url}/{namespace}/{project}/issues/{ref}",
@@ -159,12 +169,12 @@ class GitLab(ProviderRefParser):
         mentions=dict(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url="{base_url}/{ref}"),
     )
 
-    def __init__(self, namespace, project, url=url):
-        self.namespace = namespace
-        self.project = project
-        self.url = url
+    def __init__(self, namespace: str, project: str, url: str = url):
+        self.namespace: str = namespace
+        self.project: str = project
+        self.url: str = url
 
-    def build_ref_url(self, ref_type, match_dict):
+    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -174,8 +184,8 @@ class GitLab(ProviderRefParser):
             match_dict["ref"] = match_dict["ref"].replace('"', "").replace(" ", "+")
         return super(GitLab, self).build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag=""):
+    def get_tag_url(self, tag: str = "") -> str:
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
-    def get_compare_url(self, base, target):
+    def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": "%s...%s" % (base, target)})
