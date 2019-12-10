@@ -118,7 +118,7 @@ class Version:
 
     @property
     def is_minor(self):
-        return self.tag.split(".", 2)[2]
+        return bool(self.tag.split(".", 2)[2])
 
 
 class Changelog:
