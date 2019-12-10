@@ -34,7 +34,7 @@ class ProviderRefParser:
     def parse_refs(self, ref_type, text):
         if ref_type not in self.REF:
             refs = [k for k in self.REF.keys() if k.startswith(ref_type)]
-            return [m for ref in refs for m in self.REF[ref].finditer(text)]
+            return [m for ref in refs for m in self.REF[ref]["regex"].finditer(text)]
         return [m for m in self.REF[ref_type]["regex"].finditer(text)]
 
     def build_ref_url(self, ref_type, match_dict):
