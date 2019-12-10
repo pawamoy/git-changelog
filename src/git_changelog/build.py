@@ -1,12 +1,13 @@
 import sys
-from datetime import datetime
+from datetime import datetime, date as date_type
 from subprocess import check_output  # nosec
+from typing import List, Dict, Union, Type
 
-from .providers import GitHub, GitLab
+from .providers import GitHub, GitLab, ProviderRefParser, Ref
 from .style import AngularStyle, AtomStyle, BasicStyle, CommitStyle
 
 
-def bump(version, part="patch"):
+def bump(version: str, part: str = "patch") -> str:
     major, minor, patch = version.split(".", 2)
     patch = patch.split("-", 1)
     pre = ""
@@ -28,28 +29,28 @@ def bump(version, part="patch"):
 class Commit:
     def __init__(
         self,
-        hash,
-        author_name="",
-        author_email="",
-        author_date="",
-        committer_name="",
-        committer_email="",
-        committer_date="",
-        refs="",
-        subject="",
-        body=None,
-        url="",
+        hash: str,
+        author_name: str = "",
+        author_email: str = "",
+        author_date: str = "",
+        committer_name: str = "",
+        committer_email: str = "",
+        committer_date: str = "",
+        refs: str = "",
+        subject: str = "",
+        body: List[str] = None,
+        url: str = "",
     ):
-        self.hash = hash
-        self.author_name = author_name
-        self.author_email = author_email
-        self.author_date = datetime.utcfromtimestamp(float(author_date))
-        self.committer_name = committer_name
-        self.committer_email = committer_email
-        self.committer_date = datetime.utcfromtimestamp(float(committer_date))
-        self.subject = subject
-        self.body = body or []
-        self.url = url
+        self.hash: str = hash
+        self.author_name: str = author_name
+        self.author_email: str = author_email
+        self.author_date: datetime = datetime.utcfromtimestamp(float(author_date))
+        self.committer_name: str = committer_name
+        self.committer_email: str = committer_email
+        self.committer_date: datetime = datetime.utcfromtimestamp(float(committer_date))
+        self.subject: str = subject
+        self.body: List[str] = body or []
+        self.url: str = url
 
         tag = ""
         for ref in refs.split(","):
@@ -57,15 +58,16 @@ class Commit:
             if ref.startswith("tag: "):
                 tag = ref.replace("tag: ", "")
                 break
-        self.tag = self.version = tag
+        self.tag: str = tag
+        self.version: str = tag
 
-        self.text_refs = {}
-        self.style = {}
+        self.text_refs: Dict[str, List[Ref]] = {}
+        self.style: Dict[str, Union[str, bool]] = {}
 
-    def update_with_style(self, style):
+    def update_with_style(self, style: CommitStyle):
         self.style.update(style.parse_commit(self))
 
-    def update_with_provider(self, provider):
+    def update_with_provider(self, provider: ProviderRefParser):
         # set the commit url based on provider
         # FIXME: hardcoded 'commits'
         if "commits" in provider.REF:
@@ -86,44 +88,49 @@ class Commit:
 
 
 class Section:
-    def __init__(self, type="", commits=None):
-        self.type = type
-        self.commits = commits or []
+    def __init__(self, type: str = "", commits: List[Commit] = None):
+        self.type: str = type
+        self.commits: List[Commit] = commits or []
 
 
 class Version:
-    def __init__(self, tag="", date="", sections=None, commits=None, url="", compare_url=""):
-        self.tag = tag
-        self.date = date
+    def __init__(self,
+                 tag: str = "",
+                 date: date_type = "",
+                 sections: List[Section] = None,
+                 commits: List[Commit] = None,
+                 url: str = "", compare_url: str = ""):
+        self.tag: str = tag
+        self.date: date_type = date
 
-        self.sections_list = sections or []
-        self.sections_dict = {s.type: s for s in self.sections_list}
-        self.commits = commits or []
-        self.url = url
-        self.compare_url = compare_url
-        self.previous_version = None
-        self.next_version = None
+        self.sections_list: List[Section] = sections or []
+        self.sections_dict: Dict[str, Section] = {s.type: s for s in self.sections_list}
+        self.commits: List[Commit] = commits or []
+        self.url: str = url
+        self.compare_url: str = compare_url
+        self.previous_version: Union[Version, None] = None
+        self.next_version: Union[Version, None] = None
 
     @property
-    def typed_sections(self):
+    def typed_sections(self) -> List[Section]:
         return [s for s in self.sections_list if s.type]
 
     @property
-    def untyped_section(self):
+    def untyped_section(self) -> Section:
         return self.sections_dict.get("", None)
 
     @property
-    def is_major(self):
+    def is_major(self) -> bool:
         return self.tag.split(".", 1)[1].startswith("0.0")
 
     @property
-    def is_minor(self):
-        return self.tag.split(".", 2)[2]
+    def is_minor(self) -> bool:
+        return bool(self.tag.split(".", 2)[2])
 
 
 class Changelog:
-    MARKER = "--GITOLOG MARKER--"
-    FORMAT = (
+    MARKER: str = "--GITOLOG MARKER--"
+    FORMAT: str = (
         "%H%n"  # commit hash
         "%an%n"  # author name
         "%ae%n"  # author email
@@ -135,10 +142,13 @@ class Changelog:
         "%s%n"  # subject
         "%b%n" + MARKER  # body
     )
-    STYLE = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
+    STYLE: Dict[str, Type[CommitStyle]] = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
 
-    def __init__(self, repository, provider=None, style=None):
-        self.repository = repository
+    def __init__(self,
+                 repository: str,
+                 provider: str = None,
+                 style: Union[str, CommitStyle, Type[CommitStyle]] = None):
+        self.repository: str = repository
 
         # set provider
         if not provider:
@@ -150,8 +160,8 @@ class Changelog:
                 provider = GitHub(namespace, project, url=provider_url)
             elif "gitlab" in provider_url:
                 provider = GitLab(namespace, project, url=provider_url)
-            self.remote_url = remote_url
-        self.provider = provider
+            self.remote_url: str = remote_url
+        self.provider: ProviderRefParser = provider
 
         # set style
         if isinstance(style, str):
@@ -166,17 +176,17 @@ class Changelog:
             style = style()
         elif isinstance(style, CommitStyle):
             pass
-        self.style = style
+        self.style: CommitStyle = style
 
         # get git log and parse it into list of commits
-        self.raw_log = self.get_log()
-        self.commits = self.parse_commits()
+        self.raw_log: str = self.get_log()
+        self.commits: List[Commit] = self.parse_commits()
 
         # apply dates to commits and group them by version
         dates = self.apply_versions_to_commits()
         versions = self.group_commits_by_version(dates)
-        self.versions_list = versions["as_list"]
-        self.versions_dict = versions["as_dict"]
+        self.versions_list: List[Version] = versions["as_list"]
+        self.versions_dict: Dict[str, Version] = versions["as_dict"]
 
         # guess the next version number based on last version and recent commits
         last_version = self.versions_list[0]
@@ -201,7 +211,7 @@ class Changelog:
                 base=last_version.previous_version.tag, target=last_version.planned_tag
             )
 
-    def get_remote_url(self):
+    def get_remote_url(self) -> str:
         git_url = (
             check_output(["git", "config", "--get", "remote.origin.url"], cwd=self.repository)  # nosec
             .decode("utf-8")
@@ -213,12 +223,12 @@ class Changelog:
             git_url = git_url[:-4]
         return git_url
 
-    def get_log(self):
+    def get_log(self) -> str:
         return check_output(
             ["git", "log", "--date=unix", "--format=" + self.FORMAT], cwd=self.repository  # nosec
         ).decode("utf-8")
 
-    def parse_commits(self):
+    def parse_commits(self) -> List[Commit]:
         lines = self.raw_log.split("\n")
         size = len(lines) - 1  # don't count last blank line
         commits = []
@@ -260,7 +270,7 @@ class Changelog:
 
         return commits
 
-    def apply_versions_to_commits(self):
+    def apply_versions_to_commits(self) -> Dict[str, date_type]:
         versions_dates = {"": None}
         version = None
         for commit in self.commits:
@@ -271,7 +281,7 @@ class Changelog:
                 commit.version = version
         return versions_dates
 
-    def group_commits_by_version(self, dates):
+    def group_commits_by_version(self, dates: Dict[str, date_type]):
         versions_list = []
         versions_dict = {}
         versions_types_dict = {}
