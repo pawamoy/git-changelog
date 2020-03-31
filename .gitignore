@@ -10,3 +10,5 @@ tests/tmp/*
 pip-wheel-metadata/
 .pytest_cache/
 .python-version
+poetry.lock
+.mypy_cache/
