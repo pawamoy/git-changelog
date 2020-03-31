@@ -7,7 +7,7 @@ class CommitStyle:
     TYPE_REGEX: Pattern
     BREAK_REGEX: Pattern
 
-    def parse_commit(self, commit: 'Commit') -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
         raise NotImplementedError
 
 
@@ -24,7 +24,7 @@ class BasicStyle(CommitStyle):
     TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
 
-    def parse_commit(self, commit: 'Commit') -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)
@@ -60,11 +60,12 @@ class AngularStyle(CommitStyle):
         # 'test': '',
         # 'chore': '',
     }
-    SUBJECT_REGEX: Pattern = re.compile(r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$"
-                                        % ("|".join(TYPES.keys())))
+    SUBJECT_REGEX: Pattern = re.compile(
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))
+    )
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
 
-    def parse_commit(self, commit: 'Commit') -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)

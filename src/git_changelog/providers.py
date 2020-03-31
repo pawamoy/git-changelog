@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Pattern, Union, List, Match
+from typing import Dict, List, Match, Pattern, Union
 
 
 class RefRe:

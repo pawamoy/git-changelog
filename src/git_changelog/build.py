@@ -1,7 +1,8 @@
 import sys
-from datetime import datetime, date as date_type
+from datetime import date as date_type
+from datetime import datetime
 from subprocess import check_output  # nosec
-from typing import List, Dict, Union, Type
+from typing import Dict, List, Type, Union
 
 from .providers import GitHub, GitLab, ProviderRefParser, Ref
 from .style import AngularStyle, AtomStyle, BasicStyle, CommitStyle
@@ -94,12 +95,15 @@ class Section:
 
 
 class Version:
-    def __init__(self,
-                 tag: str = "",
-                 date: date_type = "",
-                 sections: List[Section] = None,
-                 commits: List[Commit] = None,
-                 url: str = "", compare_url: str = ""):
+    def __init__(
+        self,
+        tag: str = "",
+        date: date_type = "",
+        sections: List[Section] = None,
+        commits: List[Commit] = None,
+        url: str = "",
+        compare_url: str = "",
+    ):
         self.tag: str = tag
         self.date: date_type = date
 
@@ -144,10 +148,7 @@ class Changelog:
     )
     STYLE: Dict[str, Type[CommitStyle]] = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
 
-    def __init__(self,
-                 repository: str,
-                 provider: str = None,
-                 style: Union[str, CommitStyle, Type[CommitStyle]] = None):
+    def __init__(self, repository: str, provider: str = None, style: Union[str, CommitStyle, Type[CommitStyle]] = None):
         self.repository: str = repository
 
         # set provider
