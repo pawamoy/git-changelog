@@ -4,7 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.2.0](https://github.com/pawamoy/git-changelog/releases/tag/0.2.0) ([compare](https://github.com/pawamoy/git-changelog/compare/0.1.1...0.2.0))
+## [v0.3.0](https://github.com/pawamoy/git-changelog/releases/tag/v0.3.0) - 2020-03-31
+
+<small>[Compare with v0.2.0](https://github.com/pawamoy/git-changelog/compare/v0.2.0...v0.3.0)</small>
+
+### Bug Fixes
+- Fix `is_minor` method for version ([6d08978](https://github.com/pawamoy/git-changelog/commit/6d089785f692d4a21349c9eaa117641a481ba398) by Loïc Viennois).
+- Fix `parse_refs` method for `ProviderRefParser` ([dc51589](https://github.com/pawamoy/git-changelog/commit/dc515898fef7dd47cde749c7dd690f607f5cf10c) by Loïc Viennois).
+- Correctly detect major version, for both angular style and basic style ([7385e19](https://github.com/pawamoy/git-changelog/commit/7385e1952848e79a18a599119debf4bd75a2ecb7) by Loïc Viennois).
+
+### Code Refactoring
+- Add type hints to all classes and methods ([95276ef](https://github.com/pawamoy/git-changelog/commit/95276ef0b600575813ecaca30b582c2067f6439c) by Loïc Viennois).
+
+### Features
+- Update template `keepachangelog` ([ce76ed6](https://github.com/pawamoy/git-changelog/commit/ce76ed6bb8d92eb4b44513cf1cac9d34a5ef658f)) by RainChen:
+    - Capitalize commit subject
+    - Show author name for each commit
+    - Sort commits by date
+    - Unique commit subjects
+
+
+## [0.2.0](https://github.com/pawamoy/git-changelog/releases/tag/0.2.0) - 2019-11-24
+
+<small>[Compare with 0.1.1](https://github.com/pawamoy/git-changelog/compare/0.1.1...0.2.0)</small>
 
 Drop support for Python < 3.6.
 
@@ -13,7 +35,9 @@ Use [poetry](https://github.com/sdispater/poetry) to manage the project!
 ### Fixed
 - Fix detection of feature (is_minor) for angular style ([4fbf0ee](https://github.com/pawamoy/git-changelog/commit/4fbf0ee4ae582c1925e80b885bb4da42b69ecc09)).
 
-## [0.1.1](https://github.com/pawamoy/git-changelog/tags/0.1.1) ([compare](https://github.com/pawamoy/git-changelog/compare/0.1.0...0.1.1))
+## [0.1.1](https://github.com/pawamoy/git-changelog/tags/0.1.1) - 2018-06-27
+
+<small>[Compare with 0.1.0](https://github.com/pawamoy/git-changelog/compare/0.1.0...0.1.1)</small>
 
 ### Fixed
 - Fix build with MANIFEST.in, add license file ([013fb69](https://github.com/pawamoy/git-changelog/commit/013fb691826924d6f71b4159a8fa650e40324db3)).
@@ -22,7 +46,9 @@ Use [poetry](https://github.com/sdispater/poetry) to manage the project!
 - Improve readability ([5e590f6](https://github.com/pawamoy/git-changelog/commit/5e590f6ac62b23e608a507e08123efba3b0f7e0d)).
 
 
-## [0.1.0](https://github.com/pawamoy/git-changelog/tags/0.1.0) ([compare](https://github.com/pawamoy/git-changelog/compare/83845fe8d7deb85a2e093fe68a4b6a48b6d8e446...0.1.0)) - 2018-06-27
+## [0.1.0](https://github.com/pawamoy/git-changelog/tags/0.1.0) - 2018-06-27
+
+<small>[Compare with first commit](https://github.com/pawamoy/git-changelog/compare/83845fe8d7deb85a2e093fe68a4b6a48b6d8e446...0.1.0)</small>
 
 ### Added
 - Add github/github regexes ([584fd73](https://github.com/pawamoy/git-changelog/commit/584fd73ec88ac51abbf8555d8f78b7144529e6b3)).
