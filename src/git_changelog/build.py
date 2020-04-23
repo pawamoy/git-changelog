@@ -160,7 +160,7 @@ class Changelog:
             remote_url = self.get_remote_url()
             split = remote_url.split("/")
             provider_url = "/".join(split[:3])
-            namespace, project = split[3], split[4]
+            namespace, project = "/".join(split[3:-1]), split[-1]
             if "github" in provider_url:
                 provider = GitHub(namespace, project, url=provider_url)
             elif "gitlab" in provider_url:
