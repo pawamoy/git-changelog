@@ -275,8 +275,8 @@ class Changelog:
 
         return commits
 
-    def apply_versions_to_commits(self) -> Dict[str, date_type]:
-        versions_dates = {"": None}
+    def apply_versions_to_commits(self) -> Dict[str, date]:
+        versions_dates = {"": date.today()}
         version = None
         for commit in self.commits:
             if commit.version:
