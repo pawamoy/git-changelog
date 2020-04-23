@@ -23,6 +23,7 @@ class BasicStyle(CommitStyle):
 
     TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
+    DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
     def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
         commit_type = self.parse_type(commit.subject)
@@ -48,22 +49,23 @@ class BasicStyle(CommitStyle):
 
 class AngularStyle(CommitStyle):
     TYPES: Dict[str, str] = {
-        # 'build': 'Build',
-        # 'ci': 'CI',
+        "build": "Build",
+        "ci": "CI",
         "perf": "Performance Improvements",
         "feat": "Features",
         "fix": "Bug Fixes",
         "revert": "Reverts",
-        # 'docs': 'Docs',
-        # 'style': '',
+        "docs": "Docs",
+        "style": "Style",
         "refactor": "Code Refactoring",
-        # 'test': '',
-        # 'chore': '',
+        "test": "Tests",
+        "chore": "Chore",
     }
     SUBJECT_REGEX: Pattern = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))
     )
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
+    DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
 
     def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
         subject = self.parse_subject(commit.subject)
