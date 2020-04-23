@@ -1,5 +1,5 @@
 import sys
-from datetime import date as date_type
+from datetime import date
 from datetime import datetime
 from subprocess import check_output  # nosec
 from typing import Dict, List, Type, Union
@@ -102,14 +102,14 @@ class Version:
     def __init__(
         self,
         tag: str = "",
-        date: date_type = "",
+        date: date = "",
         sections: List[Section] = None,
         commits: List[Commit] = None,
         url: str = "",
         compare_url: str = "",
     ):
         self.tag: str = tag
-        self.date: date_type = date
+        self.date: date = date
 
         self.sections_list: List[Section] = sections or []
         self.sections_dict: Dict[str, Section] = {s.type: s for s in self.sections_list}
@@ -137,7 +137,7 @@ class Version:
 
 
 class Changelog:
-    MARKER: str = "--GITOLOG MARKER--"
+    MARKER: str = "--GIT-CHANGELOG MARKER--"
     FORMAT: str = (
         "%H%n"  # commit hash
         "%an%n"  # author name
@@ -286,7 +286,7 @@ class Changelog:
                 commit.version = version
         return versions_dates
 
-    def group_commits_by_version(self, dates: Dict[str, date_type]):
+    def group_commits_by_version(self, dates: Dict[str, date]):
         versions_list = []
         versions_dict = {}
         versions_types_dict = {}
