@@ -10,21 +10,25 @@ from .style import AngularStyle, AtomStyle, BasicStyle, CommitStyle
 
 def bump(version: str, part: str = "patch") -> str:
     major, minor, patch = version.split(".", 2)
+    v = ""
+    if major[0] == "v":
+        v = "v"
+        major = major[1:]
     patch = patch.split("-", 1)
     pre = ""
     if len(patch) > 1:
         patch, pre = patch
     else:
         patch = patch[0]
-    if part == "major":
+    if part == "major" and major != "0":
         major = str(int(major) + 1)
         minor = patch = "0"
-    elif part == "minor":
+    elif part == "minor" or (part == "major" and major == "0"):
         minor = str(int(minor) + 1)
         patch = "0"
     elif part == "patch" and not pre:
         patch = str(int(patch) + 1)
-    return ".".join((major, minor, patch))
+    return v + ".".join((major, minor, patch))
 
 
 class Commit:
