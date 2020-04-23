@@ -1,5 +1,4 @@
-from git_changelog.build import Commit
-from git_changelog.style import BasicStyle
+from git_changelog.commit import BasicStyle, Commit
 
 
 def test_basic_style_breaking_change():

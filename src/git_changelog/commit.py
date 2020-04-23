@@ -1,5 +1,69 @@
 import re
-from typing import Dict, Pattern, Union
+from datetime import datetime
+from typing import Dict, List, Pattern, Union
+
+from .providers import ProviderRefParser, Ref
+
+
+class Commit:
+    def __init__(
+        self,
+        hash: str,
+        author_name: str = "",
+        author_email: str = "",
+        author_date: str = "",
+        committer_name: str = "",
+        committer_email: str = "",
+        committer_date: str = "",
+        refs: str = "",
+        subject: str = "",
+        body: List[str] = None,
+        url: str = "",
+    ):
+        self.hash: str = hash
+        self.author_name: str = author_name
+        self.author_email: str = author_email
+        self.author_date: datetime = datetime.utcfromtimestamp(float(author_date))
+        self.committer_name: str = committer_name
+        self.committer_email: str = committer_email
+        self.committer_date: datetime = datetime.utcfromtimestamp(float(committer_date))
+        self.subject: str = subject
+        self.body: List[str] = body or []
+        self.url: str = url
+
+        tag = ""
+        for ref in refs.split(","):
+            ref = ref.strip()
+            if ref.startswith("tag: "):
+                tag = ref.replace("tag: ", "")
+                break
+        self.tag: str = tag
+        self.version: str = tag
+
+        self.text_refs: Dict[str, List[Ref]] = {}
+        self.style: Dict[str, Union[str, bool]] = {}
+
+    def update_with_style(self, style: "CommitStyle"):
+        self.style.update(style.parse_commit(self))
+
+    def update_with_provider(self, provider: ProviderRefParser):
+        # set the commit url based on provider
+        # FIXME: hardcoded 'commits'
+        if "commits" in provider.REF:
+            self.url = provider.build_ref_url("commits", {"ref": self.hash})
+        else:
+            # use default "commit" url (could be wrong)
+            self.url = "%s/%s/%s/commit/%s" % (provider.url, provider.namespace, provider.project, self.hash)
+
+        # build commit text references from its subject and body
+        for ref_type in provider.REF.keys():
+            self.text_refs[ref_type] = provider.get_refs(ref_type, "\n".join([self.subject] + self.body))
+
+        if "issues" in self.text_refs:
+            self.text_refs["issues_not_in_subject"] = []
+            for issue in self.text_refs["issues"]:
+                if issue.ref not in self.subject:
+                    self.text_refs["issues_not_in_subject"].append(issue)
 
 
 class CommitStyle:
@@ -7,7 +71,7 @@ class CommitStyle:
     TYPE_REGEX: Pattern
     BREAK_REGEX: Pattern
 
-    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:
         raise NotImplementedError
 
 
@@ -25,7 +89,7 @@ class BasicStyle(CommitStyle):
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
-    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)
@@ -67,7 +131,7 @@ class AngularStyle(CommitStyle):
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
 
-    def parse_commit(self, commit: "Commit") -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)

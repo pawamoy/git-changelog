@@ -1,5 +1,4 @@
-from git_changelog.build import Commit
-from git_changelog.style import AngularStyle
+from git_changelog.commit import AngularStyle, Commit
 
 
 def test_angular_style_breaking_change():

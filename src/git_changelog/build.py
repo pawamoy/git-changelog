@@ -1,11 +1,10 @@
 import sys
 from datetime import date
-from datetime import datetime
 from subprocess import check_output  # nosec
 from typing import Dict, List, Type, Union
 
-from .providers import GitHub, GitLab, ProviderRefParser, Ref
-from .style import AngularStyle, AtomStyle, BasicStyle, CommitStyle
+from .commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle
+from .providers import GitHub, GitLab, ProviderRefParser
 
 
 def bump(version: str, part: str = "patch") -> str:
@@ -29,67 +28,6 @@ def bump(version: str, part: str = "patch") -> str:
     elif part == "patch" and not pre:
         patch = str(int(patch) + 1)
     return v + ".".join((major, minor, patch))
-
-
-class Commit:
-    def __init__(
-        self,
-        hash: str,
-        author_name: str = "",
-        author_email: str = "",
-        author_date: str = "",
-        committer_name: str = "",
-        committer_email: str = "",
-        committer_date: str = "",
-        refs: str = "",
-        subject: str = "",
-        body: List[str] = None,
-        url: str = "",
-    ):
-        self.hash: str = hash
-        self.author_name: str = author_name
-        self.author_email: str = author_email
-        self.author_date: datetime = datetime.utcfromtimestamp(float(author_date))
-        self.committer_name: str = committer_name
-        self.committer_email: str = committer_email
-        self.committer_date: datetime = datetime.utcfromtimestamp(float(committer_date))
-        self.subject: str = subject
-        self.body: List[str] = body or []
-        self.url: str = url
-
-        tag = ""
-        for ref in refs.split(","):
-            ref = ref.strip()
-            if ref.startswith("tag: "):
-                tag = ref.replace("tag: ", "")
-                break
-        self.tag: str = tag
-        self.version: str = tag
-
-        self.text_refs: Dict[str, List[Ref]] = {}
-        self.style: Dict[str, Union[str, bool]] = {}
-
-    def update_with_style(self, style: CommitStyle):
-        self.style.update(style.parse_commit(self))
-
-    def update_with_provider(self, provider: ProviderRefParser):
-        # set the commit url based on provider
-        # FIXME: hardcoded 'commits'
-        if "commits" in provider.REF:
-            self.url = provider.build_ref_url("commits", {"ref": self.hash})
-        else:
-            # use default "commit" url (could be wrong)
-            self.url = "%s/%s/%s/commit/%s" % (provider.url, provider.namespace, provider.project, self.hash)
-
-        # build commit text references from its subject and body
-        for ref_type in provider.REF.keys():
-            self.text_refs[ref_type] = provider.get_refs(ref_type, "\n".join([self.subject] + self.body))
-
-        if "issues" in self.text_refs:
-            self.text_refs["issues_not_in_subject"] = []
-            for issue in self.text_refs["issues"]:
-                if issue.ref not in self.subject:
-                    self.text_refs["issues_not_in_subject"].append(issue)
 
 
 class Section:
