@@ -307,10 +307,7 @@ class Changelog:
                 versions_list.append(version)
                 versions_types_dict[commit.version] = {}
             versions_dict[commit.version].commits.append(commit)
-            if (
-                "type" in commit.style
-                and commit.style["type"] not in versions_types_dict[commit.version]
-            ):
+            if "type" in commit.style and commit.style["type"] not in versions_types_dict[commit.version]:
                 section = versions_types_dict[commit.version][commit.style["type"]] = Section(
                     section_type=commit.style["type"]
                 )
