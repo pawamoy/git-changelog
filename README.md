@@ -1,27 +1,13 @@
-<!--
-IMPORTANT: This file is generated from the template at 'scripts/templates/README.md'.
-           Please update the template instead of this file.
--->
-
 # git-changelog
 
-[![pipeline status](https://gitlab.com/pawamoy/git-changelog/badges/master/pipeline.svg)](https://gitlab.com/pawamoy/git-changelog/commits/master)
-[![coverage report](https://gitlab.com/pawamoy/git-changelog/badges/master/coverage.svg)](https://gitlab.com/pawamoy/git-changelog/commits/master)
-[![documentation](https://img.shields.io/readthedocs/git-changelog.svg?style=flat)](https://git-changelog.readthedocs.io/en/latest/index.html)
+[![ci](https://github.com/pawamoy/git-changelog/workflows/ci/badge.svg)](https://github.com/pawamoy/git-changelog/actions?query=workflow%3Aci)
+[![documentation](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://pawamoy.github.io/git-changelog/)
 [![pypi version](https://img.shields.io/pypi/v/git-changelog.svg)](https://pypi.org/project/git-changelog/)
-[![Gitter](https://badges.gitter.im/git-changelog/community.svg)](https://gitter.im/git-changelog/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Automatic changelog generator. From git logs to change logs.
-
-**Table of contents**
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage as a library](#usage-as-a-library)
-- [Usage on the command line](#usage-command-line)
-- [Troubleshoot](#troubleshoot)
+Automatic Changelog generator using Jinja2 templates. From git logs to change logs.
 
 ## Features
+
 - [Jinja2][jinja2] templates!
   You get full control over the rendering.
   Built-in [Keep a Changelog][keep-a-changelog] and [Angular][angular] templates
@@ -63,6 +49,7 @@ Automatic changelog generator. From git logs to change logs.
 [issue-7]: https://gitlab.com/pawamoy/git-changelog/issues/7
 
 ## Requirements
+
 git-changelog requires Python 3.6 or above.
 
 <details>
@@ -86,6 +73,7 @@ pyenv global system 3.6.8
 </details>
 
 ## Installation
+
 With `pip`:
 ```bash
 python3.6 -m pip install git-changelog
@@ -99,6 +87,7 @@ pipx install --python python3.6 git-changelog
 ```
 
 ## Usage (command-line)
+
 ```
 usage: git-changelog [-h] [-o OUTPUT] [-s {angular,atom,basic}]
                      [-t {angular,keepachangelog}] [-v]

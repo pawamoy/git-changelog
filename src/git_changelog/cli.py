@@ -1,37 +1,34 @@
-"""
-Module that contains the command line application.
+# Why does this file exist, and why not put this in `__main__`?
+#
+# You might be tempted to import things from `__main__` later,
+# but that will cause problems: the code will get executed twice:
+#
+# - When you run `python -m git_changelog` python will execute
+#   `__main__.py` as a script. That means there won't be any
+#   `git_changelog.__main__` in `sys.modules`.
+# - When you import `__main__` it will get executed again (as a module) because
+#   there's no `git_changelog.__main__` in `sys.modules`.
 
-Why does this file exist, and why not put this in __main__?
-
-You might be tempted to import things from __main__ later,
-but that will cause problems: the code will get executed twice:
-
-- When you run `python -m git_changelog` python will execute
-  ``__main__.py`` as a script. That means there won't be any
-  ``git_changelog.__main__`` in ``sys.modules``.
-- When you import __main__ it will get executed again (as a module) because
-  there's no ``git_changelog.__main__`` in ``sys.modules``.
-
-Also see http://click.pocoo.org/5/setuptools/#setuptools-integration.
-"""
+"""Module that contains the command line application."""
 
 import argparse
 import sys
-from typing import List
 
-from . import templates
-from .build import Changelog
+from git_changelog import templates
+from git_changelog.build import Changelog
 
 STYLES = ("angular", "atom", "basic")
 
 
 class Templates(tuple):
+    """Helper to pick a template on the command line."""
+
     def __contains__(self, item: str) -> bool:
         return item.startswith("path:") or super(Templates, self).__contains__(item)
 
 
-def get_parser() -> argparse.ArgumentParser:
-    """Return a parser for the command-line arguments."""
+def get_parser():
+    """Return the CLI argument parser."""
     parser = argparse.ArgumentParser(
         add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package."
     )
@@ -71,7 +68,8 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(args: List[str] = None) -> int:
+def main(args=None):
+    """The main function, which is executed when you section_type `git-changelog` or `python -m git_changelog`."""
     parser = get_parser()
     args = parser.parse_args(args=args)
 

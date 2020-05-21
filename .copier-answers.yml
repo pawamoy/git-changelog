@@ -1,0 +1,18 @@
+# Changes here will be overwritten by Copier
+_commit: 2b68356
+_src_path: gh:pawamoy/copier-poetry
+author_email: pawamoy@pm.me
+author_fullname: "Timoth\xE9e Mazzucotelli"
+author_username: pawamoy
+copyright_date: '2020'
+copyright_holder: "Timoth\xE9e Mazzucotelli"
+copyright_holder_email: pawamoy@pm.me
+copyright_license: ISC License
+project_description: Automatic Changelog generator using Jinja2 templates.
+project_name: git-changelog
+python_package_command_line_name: git-changelog
+python_package_distribution_name: git-changelog
+python_package_import_name: git_changelog
+repository_name: git-changelog
+repository_namespace: pawamoy
+repository_provider: github.com

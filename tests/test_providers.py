@@ -1,3 +1,5 @@
+"""Test providers references parsing."""
+
 import git_changelog
 
 text = """
@@ -24,6 +26,7 @@ Some milestones: %2, %version1, %"awesome version"
 
 
 def test_github_issue_parsing():
+    """GitHub issues are correctly parsed."""  # noqa: D403 (first word *is* correctly capitalized)
     github = git_changelog.GitHub("pawamoy", "git-changelog")
     for ref in github.REF.keys():
         refs = github.get_refs(ref, text)
@@ -31,15 +34,8 @@ def test_github_issue_parsing():
 
 
 def test_gitlab_issue_parsing():
+    """GitLab issues are correctly parsed."""  # noqa: D403 (first word *is* correctly capitalized)
     gitlab = git_changelog.GitLab("pawamoy", "git-changelog")
     for ref in gitlab.REF.keys():
         refs = gitlab.get_refs(ref, text)
         print("\n".join(map(str, refs)))
-
-
-if __name__ == "__main__":
-    print("Searching references for GitHub")
-    test_github_issue_parsing()
-    print("-------------------------------")
-    print("Searching references for GitLab")
-    test_gitlab_issue_parsing()

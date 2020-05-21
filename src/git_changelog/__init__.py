@@ -1,7 +1,11 @@
 """
-Git Changelog package.
+git-changelog package.
+
+Automatic Changelog generator using Jinja2 templates.
 """
 
-from .build import GitHub, GitLab
+from typing import List
 
-__all__ = ["GitHub", "GitLab"]
+from git_changelog.build import GitHub, GitLab
+
+__all__: List[str] = ["GitHub", "GitLab"]

@@ -1,0 +1,35 @@
+site_name: "git-changelog"
+site_description: "Automatic Changelog generator using Jinja2 templates."
+site_url: "https://pawamoy.github.io/git-changelog"
+repo_url: "https://github.com/pawamoy/git-changelog"
+repo_name: "pawamoy/git-changelog"
+
+nav:
+  - Overview: index.md
+  - Reference:
+    - cli.py: reference/cli.md
+  - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md
+  - Changelog: changelog.md
+  - Credits: credits.md
+
+theme:
+  name: material
+
+extra_css:
+  - css/mkdocstrings.css
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - toc:
+      permalink: "¤"
+
+plugins:
+  - search
+  - mkdocstrings:
+      watch:
+        - src/git_changelog
