@@ -2,7 +2,7 @@
 
 import re
 from datetime import datetime
-from typing import Dict, List, Pattern, Union
+from typing import Any, Dict, List, Pattern, Union
 
 from git_changelog.providers import ProviderRefParser, Ref
 
@@ -12,7 +12,7 @@ class Commit:
 
     def __init__(
         self,
-        sha: str,
+        commit_hash: str,
         author_name: str = "",
         author_email: str = "",
         author_date: str = "",
@@ -28,7 +28,7 @@ class Commit:
         Initialization method.
 
         Arguments:
-            sha: The commit hash.
+            commit_hash: The commit hash.
             author_name: The author name.
             author_email: The author email.
             author_date: The authoring date.
@@ -40,7 +40,7 @@ class Commit:
             body: The commit message body.
             url: The commit URL.
         """
-        self.sha: str = sha
+        self.hash: str = commit_hash
         self.author_name: str = author_name
         self.author_email: str = author_email
         self.author_date: datetime = datetime.utcfromtimestamp(float(author_date))
@@ -61,7 +61,7 @@ class Commit:
         self.version: str = tag
 
         self.text_refs: Dict[str, List[Ref]] = {}
-        self.style: Dict[str, Union[str, bool]] = {}
+        self.style: Dict[str, Any] = {}
 
     def update_with_style(self, style: "CommitStyle") -> None:
         """
@@ -82,10 +82,10 @@ class Commit:
         # set the commit url based on provider
         # FIXME: hardcoded 'commits'
         if "commits" in provider.REF:
-            self.url = provider.build_ref_url("commits", {"ref": self.sha})
+            self.url = provider.build_ref_url("commits", {"ref": self.hash})
         else:
             # use default "commit" url (could be wrong)
-            self.url = "%s/%s/%s/commit/%s" % (provider.url, provider.namespace, provider.project, self.sha)
+            self.url = "%s/%s/%s/commit/%s" % (provider.url, provider.namespace, provider.project, self.hash)
 
         # build commit text references from its subject and body
         for ref_type in provider.REF.keys():
@@ -130,7 +130,7 @@ class BasicStyle(CommitStyle):
         "doc": "Documented",
     }
 
-    TYPE_REGEX: Pattern = re.compile(r"^(?P<section_type>(%s))" % "|".join(TYPES.keys()), re.I)
+    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
@@ -155,7 +155,7 @@ class BasicStyle(CommitStyle):
         """
         type_match = self.TYPE_REGEX.match(commit_subject)
         if type_match:
-            return self.TYPES.get(type_match.groupdict().get("section_type").lower())
+            return self.TYPES.get(type_match.groupdict()["type"].lower(), "")
         return ""
 
     def is_minor(self, commit_type: str) -> bool:
@@ -184,7 +184,7 @@ class AngularStyle(CommitStyle):
         "chore": "Chore",
     }
     SUBJECT_REGEX: Pattern = re.compile(
-        r"^(?P<section_type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))
     )
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
@@ -193,11 +193,11 @@ class AngularStyle(CommitStyle):
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)
-        is_minor = not is_major and self.is_minor(subject["section_type"])
+        is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))
 
         return {
-            "type": subject["section_type"],
+            "type": subject["type"],
             "scope": subject["scope"],
             "subject": subject["subject"],
             "is_major": is_major,
@@ -218,9 +218,9 @@ class AngularStyle(CommitStyle):
         subject_match = self.SUBJECT_REGEX.match(commit_subject)
         if subject_match:
             dct = subject_match.groupdict()
-            dct["section_type"] = self.TYPES[dct["section_type"]]
+            dct["type"] = self.TYPES[dct["type"]]
             return dct
-        return {"section_type": "", "scope": "", "subject": commit_subject}
+        return {"type": "", "scope": "", "subject": commit_subject}
 
     def is_minor(self, commit_type: str) -> bool:
         """Is this commit worth a minor bump?"""

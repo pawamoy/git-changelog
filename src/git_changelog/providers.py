@@ -1,7 +1,7 @@
 """Module containing the parsing utilities for git providers."""
 
 import re
-from typing import Dict, List, Match, Pattern, Union
+from typing import Dict, List, Match, Pattern
 
 
 class RefRe:
@@ -36,13 +36,28 @@ class Ref:
         return self.ref + ": " + self.url
 
 
+class RefDef:
+    """A class to store a reference regular expression and URL building string."""
+
+    def __init__(self, regex: Pattern, url_string: str):
+        """
+        Initialization method.
+
+        Arguments:
+            regex: The regular expression to match the reference.
+            url_string: The URL string to format using matched groups.
+        """
+        self.regex = regex
+        self.url_string = url_string
+
+
 class ProviderRefParser:
     """A base class for specific providers reference parsers."""
 
     url: str
     namespace: str
     project: str
-    REF: Dict[str, Dict[str, Union[str, Pattern]]] = {}
+    REF: Dict[str, RefDef] = {}
 
     def get_refs(self, ref_type: str, text: str) -> List[Ref]:
         """
@@ -73,8 +88,8 @@ class ProviderRefParser:
         """
         if ref_type not in self.REF:
             refs = [k for k in self.REF.keys() if k.startswith(ref_type)]
-            return [m for ref in refs for m in self.REF[ref]["regex"].finditer(text)]
-        return list(self.REF[ref_type]["regex"].finditer(text))
+            return [m for ref in refs for m in self.REF[ref].regex.finditer(text)]
+        return list(self.REF[ref_type].regex.finditer(text))
 
     def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
         """
@@ -87,7 +102,7 @@ class ProviderRefParser:
         Returns:
             The built URL.
         """
-        return self.REF[ref_type]["url"].format(**match_dict)
+        return self.REF[ref_type].url_string.format(**match_dict)
 
     def get_tag_url(self, tag: str) -> str:
         """
@@ -122,30 +137,30 @@ class GitHub(ProviderRefParser):
     project_url: str = "{base_url}/{namespace}/{project}"
     tag_url: str = "{base_url}/{namespace}/{project}/releases/tag/{ref}"
 
-    REF: Dict[str, Dict[str, Union[str, Pattern]]] = {
-        "issues": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
-            "url": "{base_url}/{namespace}/{project}/issues/{ref}",
-        },
-        "commits": {
-            "regex": re.compile(
+    REF: Dict[str, RefDef] = {
+        "issues": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
+            url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+        ),
+        "commits": RefDef(
+            regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit}{ba}".format(np=RefRe.NP, commit=RefRe.COMMIT.format(min=7, max=40), ba=RefRe.BA),
                 re.I,
             ),
-            "url": "{base_url}/{namespace}/{project}/commit/{ref}",
-        },
-        "commits_ranges": {
-            "regex": re.compile(
+            url_string="{base_url}/{namespace}/{project}/commit/{ref}",
+        ),
+        "commits_ranges": RefDef(
+            regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit_range}".format(
                     np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=7, max=40)
                 ),
                 re.I,
             ),
-            "url": "{base_url}/{namespace}/{project}/compare/{ref}",
-        },
-        "mentions": {"regex": re.compile(RefRe.BB + RefRe.MENTION, re.I), "url": "{base_url}/{ref}"},
+            url_string="{base_url}/{namespace}/{project}/compare/{ref}",
+        ),
+        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
 
     def __init__(self, namespace: str, project: str, url: str = url):
@@ -183,66 +198,66 @@ class GitLab(ProviderRefParser):
     project_url: str = "{base_url}/{namespace}/{project}"
     tag_url: str = "{base_url}/{namespace}/{project}/tags/{ref}"
 
-    REF: Dict[str, Dict[str, Union[str, Pattern]]] = {
-        "issues": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
-            "url": "{base_url}/{namespace}/{project}/issues/{ref}",
-        },
-        "merge_requests": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"!"), re.I),
-            "url": "{base_url}/{namespace}/{project}/merge_requests/{ref}",
-        },
-        "snippets": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"\$"), re.I),
-            "url": "{base_url}/{namespace}/{project}/snippets/{ref}",
-        },
-        "labels_ids": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"~"), re.I),
-            "url": "{base_url}/{namespace}/{project}/issues?label_name[]={ref}",  # no label_id param?
-        },
-        "labels_one_word": {
-            "regex": re.compile(  # also matches label IDs
+    REF: Dict[str, RefDef] = {
+        "issues": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
+            url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+        ),
+        "merge_requests": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"!"), re.I),
+            url_string="{base_url}/{namespace}/{project}/merge_requests/{ref}",
+        ),
+        "snippets": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"\$"), re.I),
+            url_string="{base_url}/{namespace}/{project}/snippets/{ref}",
+        ),
+        "labels_ids": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"~"), re.I),
+            url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",  # no label_id param?
+        ),
+        "labels_one_word": RefDef(
+            regex=re.compile(  # also matches label IDs
                 RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"~"), re.I
             ),
-            "url": "{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
-        },
-        "labels_multi_word": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"~"), re.I),
-            "url": "{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
-        },
-        "milestones_ids": {
-            "regex": re.compile(  # also matches milestones IDs
+            url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
+        ),
+        "labels_multi_word": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"~"), re.I),
+            url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
+        ),
+        "milestones_ids": RefDef(
+            regex=re.compile(  # also matches milestones IDs
                 RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"%"), re.I
             ),
-            "url": "{base_url}/{namespace}/{project}/milestones/{ref}",
-        },
-        "milestones_one_word": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"%"), re.I),
-            "url": "{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
-        },
-        "milestones_multi_word": {
-            "regex": re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"%"), re.I),
-            "url": "{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
-        },
-        "commits": {
-            "regex": re.compile(
+            url_string="{base_url}/{namespace}/{project}/milestones/{ref}",
+        ),
+        "milestones_one_word": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"%"), re.I),
+            url_string="{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
+        ),
+        "milestones_multi_word": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"%"), re.I),
+            url_string="{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
+        ),
+        "commits": RefDef(
+            regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit}{ba}".format(np=RefRe.NP, commit=RefRe.COMMIT.format(min=8, max=40), ba=RefRe.BA),
                 re.I,
             ),
-            "url": "{base_url}/{namespace}/{project}/commit/{ref}",
-        },
-        "commits_ranges": {
-            "regex": re.compile(
+            url_string="{base_url}/{namespace}/{project}/commit/{ref}",
+        ),
+        "commits_ranges": RefDef(
+            regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit_range}".format(
                     np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=8, max=40)
                 ),
                 re.I,
             ),
-            "url": "{base_url}/{namespace}/{project}/compare/{ref}",
-        },
-        "mentions": {"regex": re.compile(RefRe.BB + RefRe.MENTION, re.I), "url": "{base_url}/{ref}"},
+            url_string="{base_url}/{namespace}/{project}/compare/{ref}",
+        ),
+        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
 
     def __init__(self, namespace: str, project: str, url: str = url):

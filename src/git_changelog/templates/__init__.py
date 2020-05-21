@@ -16,7 +16,7 @@ def get_env(path: str) -> Environment:
     return Environment(loader=FileSystemLoader(path))  # noqa: S701 (we are OK with not auto-escaping)
 
 
-def get_custom_template(path: str) -> Environment:
+def get_custom_template(path: str) -> Template:
     """Get a custom templates' path."""
     try:
         return get_env(os.path.abspath(path)).get_template("changelog.md")

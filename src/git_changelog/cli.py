@@ -23,8 +23,10 @@ STYLES = ("angular", "atom", "basic")
 class Templates(tuple):
     """Helper to pick a template on the command line."""
 
-    def __contains__(self, item: str) -> bool:
-        return item.startswith("path:") or super(Templates, self).__contains__(item)
+    def __contains__(self, item: object) -> bool:
+        if isinstance(item, str):
+            return item.startswith("path:") or super(Templates, self).__contains__(item)
+        return False
 
 
 def get_parser():

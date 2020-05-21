@@ -3,7 +3,7 @@
 import sys
 from datetime import date
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
-from typing import Dict, List, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle
 from git_changelog.providers import GitHub, GitLab, ProviderRefParser
@@ -25,12 +25,12 @@ def bump(version: str, part: str = "patch") -> str:
     if major[0] == "v":
         prefix = "v"
         major = major[1:]
-    patch = patch.split("-", 1)
+    patch_parts = patch.split("-", 1)
     pre = ""
-    if len(patch) > 1:
-        patch, pre = patch
+    if len(patch_parts) > 1:
+        patch, pre = patch_parts
     else:
-        patch = patch[0]
+        patch = patch_parts[0]
     if part == "major" and major != "0":
         major = str(int(major) + 1)
         minor = patch = "0"
@@ -63,7 +63,7 @@ class Version:
     def __init__(
         self,
         tag: str = "",
-        date: date = "",
+        date: Optional[date] = None,
         sections: List[Section] = None,
         commits: List[Commit] = None,
         url: str = "",
@@ -80,8 +80,8 @@ class Version:
             url: The version URL.
             compare_url: The version 'compare' URL.
         """
-        self.tag: str = tag
-        self.date: date = date
+        self.tag = tag
+        self.date = date
 
         self.sections_list: List[Section] = sections or []
         self.sections_dict: Dict[str, Section] = {s.type: s for s in self.sections_list}
@@ -90,6 +90,7 @@ class Version:
         self.compare_url: str = compare_url
         self.previous_version: Union[Version, None] = None
         self.next_version: Union[Version, None] = None
+        self.planned_tag: Optional[str] = None
 
     @property
     def typed_sections(self) -> List[Section]:
@@ -97,7 +98,7 @@ class Version:
         return [s for s in self.sections_list if s.type]
 
     @property
-    def untyped_section(self) -> Section:
+    def untyped_section(self) -> Optional[Section]:
         """Untyped section."""
         return self.sections_dict.get("", None)
 
@@ -117,7 +118,7 @@ class Changelog:
 
     MARKER: str = "--GIT-CHANGELOG MARKER--"
     FORMAT: str = (
-        "%H%n"  # commit sha
+        "%H%n"  # commit commit_hash
         "%an%n"  # author name
         "%ae%n"  # author email
         "%ad%n"  # author date
@@ -130,7 +131,12 @@ class Changelog:
     )
     STYLE: Dict[str, Type[CommitStyle]] = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
 
-    def __init__(self, repository: str, provider: str = None, style: Union[str, CommitStyle, Type[CommitStyle]] = None):
+    def __init__(
+        self,
+        repository: str,
+        provider: Optional[ProviderRefParser] = None,
+        style: Optional[Union[str, CommitStyle, Type[CommitStyle]]] = None,
+    ):
         """
         Initialization method.
 
@@ -152,7 +158,7 @@ class Changelog:
             elif "gitlab" in provider_url:
                 provider = GitLab(namespace, project, url=provider_url)
             self.remote_url: str = remote_url
-        self.provider: ProviderRefParser = provider
+        self.provider = provider
 
         # set style
         if isinstance(style, str):
@@ -163,10 +169,10 @@ class Changelog:
                 style = BasicStyle()
         elif style is None:
             style = BasicStyle()
-        elif issubclass(style, CommitStyle):
-            style = style()
         elif isinstance(style, CommitStyle):
             pass
+        elif issubclass(style, CommitStyle):
+            style = style()
         self.style: CommitStyle = style
 
         # get git log and parse it into list of commits
@@ -197,10 +203,11 @@ class Changelog:
             else:
                 planned_tag = bump(last_tag, "patch")
             last_version.planned_tag = planned_tag
-            last_version.url = self.provider.get_tag_url(tag=planned_tag)
-            last_version.compare_url = self.provider.get_compare_url(
-                base=last_version.previous_version.tag, target=last_version.planned_tag
-            )
+            if self.provider:
+                last_version.url = self.provider.get_tag_url(tag=planned_tag)
+                last_version.compare_url = self.provider.get_compare_url(
+                    base=last_version.previous_version.tag, target=last_version.planned_tag
+                )
 
     def get_remote_url(self) -> str:
         """Get the git remote URL for the repository."""
@@ -231,7 +238,7 @@ class Changelog:
         pos = 0
         while pos < size:
             commit = Commit(
-                hash=lines[pos],
+                commit_hash=lines[pos],
                 author_name=lines[pos + 1],
                 author_email=lines[pos + 2],
                 author_date=lines[pos + 3],
@@ -282,33 +289,35 @@ class Changelog:
         """Iterate on commits to group them by version."""
         versions_list = []
         versions_dict = {}
-        versions_types_dict = {}
+        versions_types_dict: Dict[str, Dict[str, Section]] = {}
         next_version = None
         for commit in self.commits:
             if commit.version not in versions_dict:
                 version = versions_dict[commit.version] = Version(tag=commit.version, date=dates[commit.version])
-                version.url = self.provider.get_tag_url(tag=commit.version)
+                if self.provider:
+                    version.url = self.provider.get_tag_url(tag=commit.version)
                 if next_version:
                     version.next_version = next_version
                     next_version.previous_version = version
-                    next_version.compare_url = self.provider.get_compare_url(
-                        base=version.tag, target=next_version.tag or "HEAD"
-                    )
+                    if self.provider:
+                        next_version.compare_url = self.provider.get_compare_url(
+                            base=version.tag, target=next_version.tag or "HEAD"
+                        )
                 next_version = version
                 versions_list.append(version)
                 versions_types_dict[commit.version] = {}
             versions_dict[commit.version].commits.append(commit)
             if (
-                "section_type" in commit.style
-                and commit.style["section_type"] not in versions_types_dict[commit.version]
+                "type" in commit.style
+                and commit.style["type"] not in versions_types_dict[commit.version]
             ):
-                section = versions_types_dict[commit.version][commit.style["section_type"]] = Section(
-                    section_type=commit.style["section_type"]
+                section = versions_types_dict[commit.version][commit.style["type"]] = Section(
+                    section_type=commit.style["type"]
                 )
                 versions_dict[commit.version].sections_list.append(section)
                 versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
-            versions_types_dict[commit.version][commit.style["section_type"]].commits.append(commit)
-        if next_version is not None:
+            versions_types_dict[commit.version][commit.style["type"]].commits.append(commit)
+        if next_version is not None and self.provider:
             next_version.compare_url = self.provider.get_compare_url(
                 base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
             )
