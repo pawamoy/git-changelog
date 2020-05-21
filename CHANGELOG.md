@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.4.0](https://github.com/pawamoy/git-changelog/releases/tag/v0.4.0) - 2020-05-21
+
+<small>[Compare with v0.3.0](https://github.com/pawamoy/git-changelog/compare/v0.3.0...v0.4.0)</small>
+
+### Bug Fixes
+- Use actual url for references ([46a8790](https://github.com/pawamoy/git-changelog/commit/46a87907eaa4bdf48c9c5e581cd0a9877145f262) by Timothée Mazzucotelli).
+- Use style subject if possible ([7f2c3ad](https://github.com/pawamoy/git-changelog/commit/7f2c3ad43bd9c3cd22e725529b8178663d26e905) by Timothée Mazzucotelli).
+- Correctly handle nested subgroups for gitlab repos ([8ca990b](https://github.com/pawamoy/git-changelog/commit/8ca990b8b3a49ca4d21efb30b9888efaa506eead) by Timothée Mazzucotelli).
+- Fix bumping versions starting with "v" ([44e7644](https://github.com/pawamoy/git-changelog/commit/44e7644477b1cfe0c0aced748ce1c21af0cf8aca) by Timothée Mazzucotelli).
+
+### Code Refactoring
+- Move styles into new commit module to avoid cyclic dependencies ([d90bd15](https://github.com/pawamoy/git-changelog/commit/d90bd154ae13666ddca08682a1f2f0dae3e30852) by Timothée Mazzucotelli).
+
+### Features
+- Improve changelog rendering ([e9dd3f4](https://github.com/pawamoy/git-changelog/commit/e9dd3f42b3bc30816dafbfce39c489521d44f994) by Timothée Mazzucotelli).
+    - Use today's date for current version
+    - Move "compare" link below the heading (better table of contents in documentation)
+    - Improve "compare" links to handle first and current version
+    - Use selected commit types to render sections
+- Add default commit types to render variable ([173392a](https://github.com/pawamoy/git-changelog/commit/173392a60a15ae888fe400ca94f35a37a9a90d85) by Timothée Mazzucotelli).
+- Always use today's date for unreleased version ([1c34fa8](https://github.com/pawamoy/git-changelog/commit/1c34fa86ff3f875e63fa9f8390c6a8324e37e3d4) by Timothée Mazzucotelli).
+
+
 ## [v0.3.0](https://github.com/pawamoy/git-changelog/releases/tag/v0.3.0) - 2020-03-31
 
 <small>[Compare with v0.2.0](https://github.com/pawamoy/git-changelog/compare/v0.2.0...v0.3.0)</small>
