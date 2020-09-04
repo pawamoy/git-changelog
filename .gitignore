@@ -10,3 +10,4 @@ pip-wheel-metadata/
 .mypy_cache/
 site/
 poetry.lock
+.venv/

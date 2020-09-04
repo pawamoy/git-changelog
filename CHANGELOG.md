@@ -5,9 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
-## [v0.4.0](https://github.com/pawamoy/git-changelog/releases/tag/v0.4.0) - 2020-05-21
+## [0.4.0](https://github.com/pawamoy/git-changelog/releases/tag/0.4.0) - 2020-05-21
 
-<small>[Compare with v0.3.0](https://github.com/pawamoy/git-changelog/compare/v0.3.0...v0.4.0)</small>
+<small>[Compare with 0.3.0](https://github.com/pawamoy/git-changelog/compare/0.3.0...0.4.0)</small>
 
 ### Bug Fixes
 - Use actual url for references ([46a8790](https://github.com/pawamoy/git-changelog/commit/46a87907eaa4bdf48c9c5e581cd0a9877145f262) by Timothée Mazzucotelli).
@@ -28,9 +28,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Always use today's date for unreleased version ([1c34fa8](https://github.com/pawamoy/git-changelog/commit/1c34fa86ff3f875e63fa9f8390c6a8324e37e3d4) by Timothée Mazzucotelli).
 
 
-## [v0.3.0](https://github.com/pawamoy/git-changelog/releases/tag/v0.3.0) - 2020-03-31
+## [0.3.0](https://github.com/pawamoy/git-changelog/releases/tag/0.3.0) - 2020-03-31
 
-<small>[Compare with v0.2.0](https://github.com/pawamoy/git-changelog/compare/v0.2.0...v0.3.0)</small>
+<small>[Compare with 0.2.0](https://github.com/pawamoy/git-changelog/compare/0.2.0...0.3.0)</small>
 
 ### Bug Fixes
 - Fix `is_minor` method for version ([6d08978](https://github.com/pawamoy/git-changelog/commit/6d089785f692d4a21349c9eaa117641a481ba398) by Loïc Viennois).

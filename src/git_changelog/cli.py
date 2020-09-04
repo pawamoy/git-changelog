@@ -13,6 +13,7 @@
 
 import argparse
 import sys
+from typing import List, Optional
 
 from git_changelog import templates
 from git_changelog.build import Changelog
@@ -29,8 +30,13 @@ class Templates(tuple):
         return False
 
 
-def get_parser():
-    """Return the CLI argument parser."""
+def get_parser() -> argparse.ArgumentParser:
+    """
+    Return the CLI argument parser.
+
+    Returns:
+        An argparse parser.
+    """
     parser = argparse.ArgumentParser(
         add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package."
     )
@@ -70,8 +76,18 @@ def get_parser():
     return parser
 
 
-def main(args=None):
-    """The main function, which is executed when you section_type `git-changelog` or `python -m git_changelog`."""
+def main(args: Optional[List[str]] = None) -> int:
+    """
+    Run the main program.
+
+    This function is executed when you type `git-changelog` or `python -m git_changelog`.
+
+    Arguments:
+        args: Arguments passed from the command line.
+
+    Returns:
+        An exit code.
+    """
     parser = get_parser()
     args = parser.parse_args(args=args)
 
