@@ -5,10 +5,9 @@ import sys
 from typing import List, Optional, Pattern
 
 import httpx
-from git_changelog.build import Changelog, Version
 from jinja2.sandbox import SandboxedEnvironment
 
-from git_changelog.build import Changelog
+from git_changelog.build import Changelog, Version
 
 TEMPLATE_URL = "https://raw.githubusercontent.com/pawamoy/jinja-templates/master/keepachangelog.md"
 COMMIT_STYLE = "angular"
