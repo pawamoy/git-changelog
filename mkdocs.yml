@@ -6,8 +6,11 @@ repo_name: "pawamoy/git-changelog"
 
 nav:
   - Overview: index.md
-  - Reference:
+  - API Reference:
+    - build.py: reference/build.md
     - cli.py: reference/cli.md
+    - commit.py: reference/commit.md
+    - providers.py: reference/providers.md
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
   - Changelog: changelog.md
@@ -23,8 +26,11 @@ markdown_extensions:
   - admonition
   - codehilite:
       guess_lang: false
-  - pymdownx.superfences
   - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
   - toc:
       permalink: "¤"
 
