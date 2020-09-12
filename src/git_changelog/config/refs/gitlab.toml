@@ -1,0 +1,125 @@
+[refs]
+base_url = "https://gitlab.com"
+project_url = "{base_url}/{namespace}/{project}"
+tag_url = "{base_url}/{namespace}/{project}/tags/{tag}"
+
+[refs.issues]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    #
+    (?P<issue>[1-9]\d*)
+"""
+url = "{base_url}/{namespace}/{project}/issues/{issue}"
+
+[refs.merge_requests]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    !
+    (?P<merge_request>[1-9]\d*)
+"""
+url = "{base_url}/{namespace}/{project}/merge_requests/{merge_request}"
+
+[refs.snippets]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    \$
+    (?P<snippet>[1-9]\d*)
+"""
+url = "{base_url}/{namespace}/{project}/snippets/{snippet}"
+
+[refs.labels_ids]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    ~
+    (?P<label>[1-9]\d*)
+"""
+url = "{base_url}/{namespace}/{project}/issues?label_name[]={label}"
+
+[refs.labels_one_word]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    ~
+    (?P<label>\w*[-a-z_ ][-\w]*)
+"""
+url = "{base_url}/{namespace}/{project}/issues?label_name[]={label}"
+
+[refs.labels_multi_word]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    ~
+    (?P<labels>"\w[- \w]*")
+"""
+url = "{base_url}/{namespace}/{project}/issues?label_name[]={labels}"
+
+[refs.milestones_ids]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    %
+    (?P<milestone>[1-9]\d*)
+"""
+url = "{base_url}/{namespace}/{project}/milestones/{milestone}"
+
+[refs.milestones_one_word]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    %
+    (?P<milestone>\w*[-a-z_ ][-\w]*)
+"""
+url = "{base_url}/{namespace}/{project}/milestones"  # cannot guess ID
+
+[refs.milestones_multi_word]
+regex = """
+    (?:^|[\s,])
+    (?:(?P<namespace>[-\w]+)/)?
+    (?P<project>[-\w]+)?
+    %
+    (?P<milestone>"\w[- \w]*")
+"""
+url = "{base_url}/{namespace}/{project}/milestones"  # cannot guess ID
+
+[refs.commits]
+regex = """
+    (?:^|[\s,])
+    (?:
+        (?:(?P<namespace>[-\w]+)/)?
+        (?P<project>[-\w]+)@
+    )?
+    (?P<commit>[0-9a-f]{8,40})
+    (?:[\s,]|$)
+"""
+url = "{base_url}/{namespace}/{project}/commit/{commit}"
+
+[refs.commits_ranges]
+regex = """
+    (?:^|[\s,])
+    (?:
+        (?:(?P<namespace>[-\w]+)/)?
+        (?P<project>[-\w]+)@
+    )?
+    (?P<range>[0-9a-f]{8,40}\.\.\.[0-9a-f]{8,40})
+"""
+url = "{base_url}/{namespace}/{project}/compare/{range}"
+
+[refs.mentions]
+regex = """
+    (?:^|[\s,])
+    @
+    (?P<mention>\w[-\w]*)
+"""
+url = "{base_url}/{mention}"

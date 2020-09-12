@@ -1,4 +1,9 @@
-"""The module responsible for building the data."""
+"""
+The module responsible for building the data.
+
+!!! danger "Breaking changes"
+    This is supposed to be an admonition.
+"""
 
 import sys
 from datetime import date
@@ -157,6 +162,8 @@ class Changelog:
                 provider = GitHub(namespace, project, url=provider_url)
             elif "gitlab" in provider_url:
                 provider = GitLab(namespace, project, url=provider_url)
+            else:
+                provider = GitHub(namespace, project, url=provider_url)
             self.remote_url: str = remote_url
         self.provider = provider
 

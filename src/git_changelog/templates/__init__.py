@@ -1,29 +1,38 @@
 """The subpackage containing the builtin templates."""
 
 import os
+from pathlib import Path
+from typing import Union
 
+import httpx
 from jinja2 import Environment, FileSystemLoader, Template
 from jinja2.exceptions import TemplateNotFound
 
 
-def get_path() -> str:
+def get_path() -> Path:
     """Get the path to the templates directory."""
-    return os.path.dirname(os.path.abspath(__file__))
+    return Path(__file__).parent
 
 
-def get_env(path: str) -> Environment:
+def get_env(path: Union[Path, str]) -> Environment:
     """Get the Jinja environment."""
-    return Environment(loader=FileSystemLoader(path))  # noqa: S701 (we are OK with not auto-escaping)
+    return Environment(loader=FileSystemLoader(str(path)))  # noqa: S701 (we are OK with not auto-escaping)
 
 
-def get_custom_template(path: str) -> Template:
-    """Get a custom templates' path."""
+def get_local_template(path: str) -> Template:
+    """Get a local template."""
+    template_path = Path(path)
     try:
-        return get_env(os.path.abspath(path)).get_template("changelog.md")
+        return get_env(template_path.parent).get_template(template_path.name)
     except TemplateNotFound:
         raise FileNotFoundError
 
 
+def get_online_template(url: str) -> Template:
+    """Get an online template."""
+    return Environment().from_string(httpx.get(url).text)
+
+
 def get_template(name: str) -> Template:
     """Get a builtin template path."""
-    return get_env(os.path.join(get_path(), name)).get_template("changelog.md")
+    return get_env(get_path()).get_template(name)

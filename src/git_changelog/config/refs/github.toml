@@ -1,0 +1,45 @@
+[refs]
+base_url = "https://github.com"
+project_url = "{base_url}/{namespace}/{project}"
+tag_url = "{base_url}/{namespace}/{project}/releases/tag/{tag}"
+
+[refs.issues]
+regex = """
+    (?:^|[\\s,])
+    (?:(?P<namespace>[-\\w]+)/)?
+    (?P<project>[-\\w]+)?
+    #
+    (?P<issue>[1-9]\\d*)
+"""
+url = "{base_url}/{namespace}/{project}/issues/{issue}"
+
+[refs.commits]
+regex = """
+    (?:^|[\\s,])
+    (?:
+        (?:(?P<namespace>[-\\w]+)/)?
+        (?P<project>[-\\w]+)@
+    )?
+    (?P<commit>[0-9a-f]{7,40})
+    (?:[\\s,]|$)
+"""
+url = "{base_url}/{namespace}/{project}/commit/{commit}"
+
+[refs.commits_ranges]
+regex = """
+    (?:^|[\\s,])
+    (?:
+        (?:(?P<namespace>[-\\w]+)/)?
+        (?P<project>[-\\w]+)@
+    )?
+    (?P<range>[0-9a-f]{7,40}\\.\\.\\.[0-9a-f]{7,40})
+"""
+url = "{base_url}/{namespace}/{project}/compare/{range}"
+
+[refs.mentions]
+regex = """
+    (?:^|[\\s,])
+    @
+    (?P<mention>\\w[-\\w]*)
+"""
+url = "{base_url}/{mention}"

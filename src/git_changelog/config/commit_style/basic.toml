@@ -1,0 +1,23 @@
+[commit_style]
+enable_sections = [
+    "added",
+    "fixed",
+    "changed",
+    "removed",
+    "documented",
+]
+
+[commit_style.sections]
+added = {attr = "subject", regex = "^add", ignore_case = true, name = "Added"}
+fixed = {attr = "subject", regex = "^fix", ignore_case = true, name = "Fixed"}
+changed = {attr = "subject", regex = "^change", ignore_case = true, name = "Changed"}
+removed = {attr = "subject", regex = "^remove", ignore_case = true, name = "Removed"}
+merged = {attr = "subject", regex = "^merge", ignore_case = true, name = "Merged"}
+documented = {attr = "subject", regex = "^doc", ignore_case = true, name = "Documented"}
+
+[commit_style.subject]
+[commit_style.body]
+[commit_style.breaking_changes]
+regex = "^break(s|ing changes?)?[ :].+$"
+multiline = true
+ignore_case = true

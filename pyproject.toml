@@ -30,6 +30,10 @@ pytest-cov = {version = "^2.10.1", optional = true}
 pytest-randomly = {version = "^3.4.1", optional = true}
 pytest-sugar = {version = "^0.9.4", optional = true}
 pytest-xdist = {version = "^2.1.0", optional = true}
+httpx = "^0.14.3"
+semver = "^2.10.2"
+packaging = "^20.4"
+deepmerge = "^0.1.0"
 
 [tool.poetry.extras]
 tests = ["coverage", "invoke", "mypy", "pytest", "pytest-cov", "pytest-randomly", "pytest-sugar", "pytest-xdist"]
@@ -117,3 +121,41 @@ exclude = ["tests/fixtures"]
     "-WPS412",  # __init__ modules with logic
     "-WPS433",  # redundant with C0415 (not top-level import)
 ]
+
+[tool.git-changelog.commit_style]
+base = "angular"
+enable_sections = [
+    "break",
+    "pkg",
+    "feat",
+    "fix",
+    "revert",
+    "refactor",
+    "perf",
+]
+
+[tool.git-changelog.commit_style.sections]
+break = {attr = "breaking_changes", bool = true}
+pkg = {attr = "type", regex = "pkg", name = "Packaging"}
+
+[tool.git-changelog.refs]
+base = "github"
+
+[tool.git-changelog.refs.issues]
+regex = """
+    (?:^|[\\s,])
+    (?:(?P<namespace>[-\\w]+)/)?
+    (?P<project>[-\\w]+)?
+    ghi-|github-issue-|#
+    (?P<issue>[1-9]\\d*)
+"""
+
+[tool.git-changelog.refs.pull-requests]
+regex = """
+    (?:^|[\\s,])
+    (?:(?P<namespace>[-\\w]+)/)?
+    (?P<project>[-\\w]+)?
+    ghpr-|github-pr-
+    (?P<pr>[1-9]\\d*)
+"""
+url = "{base_url}/{namespace}/{project}/issues/{pr}"

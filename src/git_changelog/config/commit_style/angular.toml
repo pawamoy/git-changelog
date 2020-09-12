@@ -1,0 +1,33 @@
+[commit_style]
+enable_sections = [
+    "break",
+    "build",
+    "feat",
+    "fix",
+    "revert",
+    "refactor",
+    "perf",
+]
+
+[commit_style.sections]
+break = {attr = "breaking_changes", bool = true, name = "Breaking Changes"}
+build = {attr = "type", regex = "build", name = "Build"}
+ci = {attr = "type", regex = "ci", name = "CI"}
+perf = {attr = "type", regex = "perf", name = "Performance Improvements"}
+feat = {attr = "type", regex = "feat", name = "Features"}
+fix = {attr = "type", regex = "fix", name = "Bug Fixes"}
+revert = {attr = "type", regex = "revert", name = "Reverts"}
+docs = {attr = "type", regex = "docs?", name = "Documentation"}
+style = {attr = "type", regex = "style", name = "Style"}
+refactor = {attr = "type", regex = "refactor", name = "Code Refactoring"}
+test = {attr = "type", regex = "tests?", name = "Tests"}
+chore = {attr = "type", regex = "chore", name = "Chore"}
+
+[commit_style.rules.subject]
+regex = "^(?P<type>[a-z]+)(?:\\((?P<scope>.+)\\))?: (?P<subject>.+)$"
+
+[commit_style.rules.body]
+[commit_style.rules.breaking_changes]
+regex = "^break(?:s|ing changes?)?:?\\s*(?P<breaking_changes>(?:.+\\n)*)"
+multiline = true
+find_all = true

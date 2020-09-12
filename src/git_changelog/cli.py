@@ -26,7 +26,7 @@ class Templates(tuple):
 
     def __contains__(self, item: object) -> bool:
         if isinstance(item, str):
-            return item.startswith("path:") or super(Templates, self).__contains__(item)
+            return item.startswith("path:") or item.startswith("url:") or super(Templates, self).__contains__(item)
         return False
 
 
@@ -47,6 +47,14 @@ def get_parser() -> argparse.ArgumentParser:
         "-h", "--help", action="help", default=argparse.SUPPRESS, help="Show this help message and exit."
     )
     parser.add_argument(
+        "-c",
+        "--config",
+        action="store",
+        dest="config",
+        default="pyproject.toml",
+        help="Path to the config file to use. Default: pyproject.toml."
+    )
+    parser.add_argument(
         "-o",
         "--output",
         action="store",
@@ -63,8 +71,8 @@ def get_parser() -> argparse.ArgumentParser:
         choices=Templates(("angular", "keepachangelog")),
         default="keepachangelog",
         dest="template",
-        help='The Jinja2 template to use. Prefix with "path:" to specify the path '
-        'to a directory containing a file named "changelog.md".',
+        help="The Jinja2 template to use. Prefix with 'path:' to specify the path "
+        "to a custom template, or 'url:' to download a custom template.",
     )
     parser.add_argument(
         "-v",
@@ -89,30 +97,39 @@ def main(args: Optional[List[str]] = None) -> int:
         An exit code.
     """
     parser = get_parser()
-    args = parser.parse_args(args=args)
+    opts = parser.parse_args(args=args)
+
+    config = Config.from_file(opts.config)
 
     # get template
-    if args.template.startswith("path:"):
-        path = args.template.replace("path:", "", 1)
+    if opts.template.startswith("path:"):
+        path = opts.template.replace("path:", "", 1)
         try:
-            template = templates.get_custom_template(path)
+            template = templates.get_local_template(path)
         except FileNotFoundError:
-            print("git-changelog: no such directory, " "or missing changelog.md: %s" % path, file=sys.stderr)
+            print(f"git-changelog: no such file: {path}", file=sys.stderr)
+            return 1
+    elif opts.template.startswith("url:"):
+        try:
+            url = opts.template.replace("url:", "", 1)
+            template = templates.get_online_template(url)
+        except Exception:
+            print(f"git-changelog: could not fetch template at: {url}", file=sys.stderr)
             return 1
     else:
-        template = templates.get_template(args.template)
+        template = templates.get_template(opts.template)
 
     # build data
-    changelog = Changelog(args.repository, style=args.style)
+    changelog = Changelog(opts.repository, style=opts.style)
 
     # get rendered contents
     rendered = template.render(changelog=changelog)
 
     # write result in specified output
-    if args.output is sys.stdout:
+    if opts.output is sys.stdout:
         sys.stdout.write(rendered)
     else:
-        with open(args.output, "w") as stream:
+        with open(opts.output, "w") as stream:
             stream.write(rendered)
 
     return 0
