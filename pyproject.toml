@@ -122,7 +122,7 @@ exclude = ["tests/fixtures"]
     "-WPS433",  # redundant with C0415 (not top-level import)
 ]
 
-[tool.git-changelog.commit_style]
+[tool.git-changelog.style]
 base = "angular"
 enable_sections = [
     "break",
@@ -134,7 +134,7 @@ enable_sections = [
     "perf",
 ]
 
-[tool.git-changelog.commit_style.sections]
+[tool.git-changelog.style.sections]
 break = {attr = "breaking_changes", bool = true}
 pkg = {attr = "type", regex = "pkg", name = "Packaging"}
 

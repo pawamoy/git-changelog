@@ -1,0 +1,4 @@
+[urls]
+base_url = "https://github.com"
+project_url = "{base_url}/{namespace}/{project}"
+tag_url = "{base_url}/{namespace}/{project}/releases/tag/{tag}"

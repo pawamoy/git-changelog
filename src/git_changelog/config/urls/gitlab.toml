@@ -1,0 +1,4 @@
+[urls]
+base_url = "https://gitlab.com"
+project_url = "{base_url}/{namespace}/{project}"
+tag_url = "{base_url}/{namespace}/{project}/tags/{tag}"

@@ -72,7 +72,7 @@ class Commit:
         """
         self.style.update(style.parse_commit(self))
 
-    def update_with_provider(self, provider: ProviderRefParser) -> None:
+    def update_with_refs(self, refs) -> None:
         """
         Apply the provider-parsed data to this commit.
 

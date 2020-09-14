@@ -15,10 +15,8 @@ import argparse
 import sys
 from typing import List, Optional
 
-from git_changelog import templates
 from git_changelog.build import Changelog
-
-STYLES = ("angular", "atom", "basic")
+from git_changelog.config import Config
 
 
 class Templates(tuple):
@@ -28,6 +26,11 @@ class Templates(tuple):
         if isinstance(item, str):
             return item.startswith("path:") or item.startswith("url:") or super(Templates, self).__contains__(item)
         return False
+
+
+STYLES = ("angular", "basic")
+REFS_PARSERS = ("github", "gitlab")
+TEMPLATES = Templates(("angular", "keepachangelog"))
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -52,24 +55,32 @@ def get_parser() -> argparse.ArgumentParser:
         action="store",
         dest="config",
         default="pyproject.toml",
-        help="Path to the config file to use. Default: pyproject.toml."
+        help="Path to the config file to use. Default: pyproject.toml.",
     )
     parser.add_argument(
         "-o",
         "--output",
         action="store",
         dest="output",
-        default=sys.stdout,
+        default=None,
         help="Output to given file. Default: stdout.",
     )
     parser.add_argument(
-        "-s", "--style", choices=STYLES, default="basic", dest="style", help="The commit style to match against."
+        "-r",
+        "--refs",
+        choices=REFS_PARSERS,
+        default=None,
+        dest="refs",
+        help="The references to parse in the commit messages. Available: github, gitlab.",
+    )
+    parser.add_argument(
+        "-s", "--style", choices=STYLES, default=None, dest="style", help="The commit style to match against."
     )
     parser.add_argument(
         "-t",
         "--template",
-        choices=Templates(("angular", "keepachangelog")),
-        default="keepachangelog",
+        choices=TEMPLATES,
+        default=None,
         dest="template",
         help="The Jinja2 template to use. Prefix with 'path:' to specify the path "
         "to a custom template, or 'url:' to download a custom template.",
@@ -99,37 +110,18 @@ def main(args: Optional[List[str]] = None) -> int:
     parser = get_parser()
     opts = parser.parse_args(args=args)
 
-    config = Config.from_file(opts.config)
+    config = Config.from_file(
+        opts.config,
+        overrides={"output": opts.output, "refs": opts.refs, "style": opts.style, "template": opts.template},
+    )
 
-    # get template
-    if opts.template.startswith("path:"):
-        path = opts.template.replace("path:", "", 1)
-        try:
-            template = templates.get_local_template(path)
-        except FileNotFoundError:
-            print(f"git-changelog: no such file: {path}", file=sys.stderr)
-            return 1
-    elif opts.template.startswith("url:"):
-        try:
-            url = opts.template.replace("url:", "", 1)
-            template = templates.get_online_template(url)
-        except Exception:
-            print(f"git-changelog: could not fetch template at: {url}", file=sys.stderr)
-            return 1
-    else:
-        template = templates.get_template(opts.template)
+    changelog = Changelog(repository=config.repository, style=config.style, refs=config.refs)
+    rendered = config.template.render(changelog=changelog)
 
-    # build data
-    changelog = Changelog(opts.repository, style=opts.style)
-
-    # get rendered contents
-    rendered = template.render(changelog=changelog)
-
-    # write result in specified output
-    if opts.output is sys.stdout:
+    if config.output is sys.stdout:
         sys.stdout.write(rendered)
     else:
-        with open(opts.output, "w") as stream:
+        with open(config.output, "w") as stream:
             stream.write(rendered)
 
     return 0

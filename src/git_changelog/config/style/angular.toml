@@ -1,4 +1,4 @@
-[commit_style]
+[style]
 enable_sections = [
     "break",
     "build",
@@ -9,7 +9,7 @@ enable_sections = [
     "perf",
 ]
 
-[commit_style.sections]
+[style.sections]
 break = {attr = "breaking_changes", bool = true, name = "Breaking Changes"}
 build = {attr = "type", regex = "build", name = "Build"}
 ci = {attr = "type", regex = "ci", name = "CI"}
@@ -23,11 +23,11 @@ refactor = {attr = "type", regex = "refactor", name = "Code Refactoring"}
 test = {attr = "type", regex = "tests?", name = "Tests"}
 chore = {attr = "type", regex = "chore", name = "Chore"}
 
-[commit_style.rules.subject]
+[style.rules.subject]
 regex = "^(?P<type>[a-z]+)(?:\\((?P<scope>.+)\\))?: (?P<subject>.+)$"
 
-[commit_style.rules.body]
-[commit_style.rules.breaking_changes]
+[style.rules.body]
+[style.rules.breaking_changes]
 regex = "^break(?:s|ing changes?)?:?\\s*(?P<breaking_changes>(?:.+\\n)*)"
 multiline = true
 find_all = true

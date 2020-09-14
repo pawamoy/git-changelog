@@ -1,17 +1,13 @@
-"""
-The module responsible for building the data.
-
-!!! danger "Breaking changes"
-    This is supposed to be an admonition.
-"""
+"""The module responsible for building the data."""
 
 import sys
 from datetime import date
+from functools import lru_cache
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
 from typing import Dict, List, Optional, Type, Union
 
-from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle
-from git_changelog.providers import GitHub, GitLab, ProviderRefParser
+from git_changelog.commit import Commit
+from git_changelog.config import MessageRefs, URLs
 
 
 def bump(version: str, part: str = "patch") -> str:
@@ -134,53 +130,34 @@ class Changelog:
         "%s%n"  # subject
         "%b%n" + MARKER  # body
     )
-    STYLE: Dict[str, Type[CommitStyle]] = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
 
     def __init__(
         self,
         repository: str,
-        provider: Optional[ProviderRefParser] = None,
-        style: Optional[Union[str, CommitStyle, Type[CommitStyle]]] = None,
+        urls=None,
+        refs=None,
+        style=None,
     ):
         """
         Initialization method.
 
         Arguments:
             repository: The repository (directory) for which to build the changelog.
-            provider: The provider to use (github.com, gitlab.com, etc.).
+            refs: The provider to use (github.com, gitlab.com, etc.).
             style: The commit style to use (angular, atom, etc.).
+            urls: The URLs templates to use when building items URLs. 
         """
         self.repository: str = repository
+        
+        if refs is True:
+            refs = self.guess_refs()
 
-        # set provider
-        if not provider:
-            remote_url = self.get_remote_url()
-            split = remote_url.split("/")
-            provider_url = "/".join(split[:3])
-            namespace, project = "/".join(split[3:-1]), split[-1]
-            if "github" in provider_url:
-                provider = GitHub(namespace, project, url=provider_url)
-            elif "gitlab" in provider_url:
-                provider = GitLab(namespace, project, url=provider_url)
-            else:
-                provider = GitHub(namespace, project, url=provider_url)
-            self.remote_url: str = remote_url
-        self.provider = provider
+        if urls is True:
+            urls = self.guess_urls()
 
-        # set style
-        if isinstance(style, str):
-            try:
-                style = self.STYLE[style]()
-            except KeyError:
-                print("git-changelog: no such style available: %s, " "using default style" % style, file=sys.stderr)
-                style = BasicStyle()
-        elif style is None:
-            style = BasicStyle()
-        elif isinstance(style, CommitStyle):
-            pass
-        elif issubclass(style, CommitStyle):
-            style = style()
-        self.style: CommitStyle = style
+        self.refs = refs
+        self.style = style
+        self.urls = urls
 
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
@@ -210,11 +187,40 @@ class Changelog:
             else:
                 planned_tag = bump(last_tag, "patch")
             last_version.planned_tag = planned_tag
-            if self.provider:
-                last_version.url = self.provider.get_tag_url(tag=planned_tag)
-                last_version.compare_url = self.provider.get_compare_url(
+            if self.refs:
+                last_version.url = self.refs.tag_url.format(base_url="", namespace="", project="", tag=planned_tag)
+                last_version.compare_url = self.refs.compare_url.format(
+                    base_url="", namespace="", project="",
                     base=last_version.previous_version.tag, target=last_version.planned_tag
                 )
+
+    @lru_cache()
+    def get_git_config(self):
+        remote_url = self.get_remote_url()
+        split = remote_url.split("/")
+        provider_url = "/".join(split[:3])
+        namespace, project = "/".join(split[3:-1]), split[-1]
+        return provider_url, namespace, project
+
+    def guess_refs(self):
+        provider_url, _, _ = self.get_git_config()
+        if "github" in provider_url:
+            return MessageRefs.builtin("github")
+        elif "gitlab" in provider_url:
+            return MessageRefs.builtin("gitlab")
+        return None
+
+    def guess_urls(self):
+        provider_url, namespace, project = self.get_git_config()
+        if "github" in provider_url:
+            urls = URLs.builtin("github")
+            urls.base_url, urls.namespace, urls.project = provider_url, namespace, project
+        elif "gitlab" in provider_url:
+            urls = URLs.builtin("gitlab")
+            urls.base_url, urls.namespace, urls.project = provider_url, namespace, project
+        else:
+            urls = None
+        return urls
 
     def get_remote_url(self) -> str:
         """Get the git remote URL for the repository."""
@@ -265,12 +271,8 @@ class Changelog:
             pos += nbl_index + 1
 
             # expand commit object with provider parsing
-            if self.provider:
-                commit.update_with_provider(self.provider)
-
-            elif self.remote_url:
-                # set the commit url based on remote_url (could be wrong)
-                commit.url = self.remote_url + "/commit/" + commit.hash
+            if self.refs:
+                commit.update_with_refs(self.refs)
 
             # expand commit object with style parsing
             if self.style:
@@ -301,8 +303,8 @@ class Changelog:
         for commit in self.commits:
             if commit.version not in versions_dict:
                 version = versions_dict[commit.version] = Version(tag=commit.version, date=dates[commit.version])
-                if self.provider:
-                    version.url = self.provider.get_tag_url(tag=commit.version)
+                if self.refs:
+                    version.url = self.refs.tag_url.format(base_url="", namespace="", project="", tag=commit.version)
                 if next_version:
                     version.next_version = next_version
                     next_version.previous_version = version
@@ -321,8 +323,9 @@ class Changelog:
                 versions_dict[commit.version].sections_list.append(section)
                 versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
             versions_types_dict[commit.version][commit.style["type"]].commits.append(commit)
-        if next_version is not None and self.provider:
-            next_version.compare_url = self.provider.get_compare_url(
+        if next_version is not None and self.refs:
+            next_version.compare_url = self.refs.compare_url.format(
+                base_url="", namespace="", project="",
                 base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
             )
         return {"as_list": versions_list, "as_dict": versions_dict}
