@@ -15,6 +15,8 @@ import argparse
 import sys
 from typing import List, Optional
 
+import pkg_resources
+
 from git_changelog import templates
 from git_changelog.build import Changelog
 
@@ -28,6 +30,21 @@ class Templates(tuple):
         if isinstance(item, str):
             return item.startswith("path:") or super(Templates, self).__contains__(item)
         return False
+
+
+def get_version() -> str:
+    """
+    Return the current `git-changelog` version.
+
+    Returns:
+        The current `git-changelog` version.
+    """
+    try:
+        distribution = pkg_resources.get_distribution("git-changelog")
+    except pkg_resources.DistributionNotFound:
+        return "0.0.0"
+    else:
+        return distribution.version
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -70,7 +87,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-v",
         "--version",
         action="version",
-        version="git-changelog 0.1.0",
+        version="%(prog)s " + get_version(),
         help="Show the current version of the program and exit.",
     )
     return parser
