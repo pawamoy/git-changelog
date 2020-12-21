@@ -7,7 +7,8 @@ from git_changelog import cli
 
 def test_main():
     """Basic CLI test."""
-    assert cli.main([]) == 0
+    with pytest.raises(SystemExit):
+        cli.main([])
 
 
 def test_show_help(capsys):
