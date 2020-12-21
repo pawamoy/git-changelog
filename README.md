@@ -3,6 +3,7 @@
 [![ci](https://github.com/pawamoy/git-changelog/workflows/ci/badge.svg)](https://github.com/pawamoy/git-changelog/actions?query=workflow%3Aci)
 [![documentation](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://pawamoy.github.io/git-changelog/)
 [![pypi version](https://img.shields.io/pypi/v/git-changelog.svg)](https://pypi.org/project/git-changelog/)
+[![gitter](https://badges.gitter.im/join%20chat.svg)](https://gitter.im/git-changelog/community)
 
 Automatic Changelog generator using Jinja2 templates. From git logs to change logs.
 
