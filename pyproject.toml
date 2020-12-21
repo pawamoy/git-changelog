@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "git-changelog"
-version = "0.4.0"
+version = "0.4.1"
 description = "Automatic Changelog generator using Jinja2 templates."
 authors = ["Timothée Mazzucotelli <pawamoy@pm.me>"]
 license = "ISC License"
