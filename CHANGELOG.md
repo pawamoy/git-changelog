@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [0.4.2](https://github.com/pawamoy/git-changelog/releases/tag/0.4.2) - 2021-01-06
+
+<small>[Compare with 0.4.1](https://github.com/pawamoy/git-changelog/compare/0.4.1...0.4.2)</small>
+
+### Bug Fixes
+- Handle prerelease tags better ([4bcc451](https://github.com/pawamoy/git-changelog/commit/4bcc451059bf2e7763a4033b09894a438270b8db) by Timothée Mazzucotelli).
+
+
 ## [0.4.1](https://github.com/pawamoy/git-changelog/releases/tag/0.4.1) - 2020-12-21
 
 <small>[Compare with 0.4.0](https://github.com/pawamoy/git-changelog/compare/0.4.0...0.4.1)</small>
