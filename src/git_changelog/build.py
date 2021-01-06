@@ -1,5 +1,6 @@
 """The module responsible for building the data."""
 
+import re
 import sys
 from datetime import date
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
@@ -25,12 +26,9 @@ def bump(version: str, part: str = "patch") -> str:
     if major[0] == "v":
         prefix = "v"
         major = major[1:]
-    patch_parts = patch.split("-", 1)
-    pre = ""
-    if len(patch_parts) > 1:
-        patch, pre = patch_parts
-    else:
-        patch = patch_parts[0]
+    patch_match = re.search(r"(?P<patch>[0-9]+)(?P<pre>.*)", patch)
+    patch = patch_match["patch"]
+    pre = patch_match["pre"]
     if part == "major" and major != "0":
         major = str(int(major) + 1)
         minor = patch = "0"
