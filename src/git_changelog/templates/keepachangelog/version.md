@@ -3,7 +3,7 @@
 
 <small>[Compare with {{ version.previous_version.tag|default("first commit") }}]({{ version.compare_url }})</small>
 {%- else -%}
-## Unrealeased
+## Unreleased
 
 <small>[Compare with latest]({{ version.compare_url }})</small>
 {%- endif %}
