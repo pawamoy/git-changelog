@@ -24,24 +24,19 @@ def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
     Returns:
         The bumped version.
     """
-    major, minor, patch = version.split(".", 2)
     prefix = ""
-    if major[0] == "v":
+    if version[0] == "v":
         prefix = "v"
-        major = major[1:]
-    patch_match = re.search(r"(?P<patch>[0-9]+)(?P<pre>.*)", patch)
-    patch = patch_match["patch"]
-    pre = patch_match["pre"]
-    if part == "major" and major != "0":
-        major = str(int(major) + 1)
-        minor = patch = "0"
-    elif part == "minor" or (part == "major" and major == "0"):
-        minor = str(int(minor) + 1)
-        patch = "0"
-    elif part == "patch" and not pre:
-        patch = str(int(patch) + 1)
-    return prefix + ".".join((major, minor, patch))
+        version = version[1:]
 
+    semver_version = VersionInfo.parse(version)
+    if part == "major" and semver_version.major != 0:
+        semver_version.bump_major()
+    elif part == "minor" or (part == "major" and semver_version.major == 0):
+        semver_version.bump_minor()
+    elif part == "patch" and not semver_version.prerelease:
+        semver_version.bump_patch()
+    return prefix + str(semver_version)
 
 
 class Section:

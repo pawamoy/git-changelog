@@ -17,6 +17,7 @@ packages = [ { include = "git_changelog", from = "src" } ]
 [tool.poetry.dependencies]
 python = "^3.6"
 Jinja2 = "^2.10"
+semver = "^2.13.0"
 
 [tool.poetry.dev-dependencies]
 # formatting, quality, tests
