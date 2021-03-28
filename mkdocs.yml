@@ -50,6 +50,7 @@ plugins:
 - coverage:
     html_report_dir: build/coverage
 - mkdocstrings:
+    custom_templates: docs/templates
     watch:
     - src/git_changelog
 - macros:
