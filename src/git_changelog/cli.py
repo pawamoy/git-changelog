@@ -16,6 +16,7 @@ import sys
 from typing import List, Optional
 
 import pkg_resources
+from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
 from git_changelog.build import Changelog
@@ -23,12 +24,12 @@ from git_changelog.build import Changelog
 STYLES = ("angular", "atom", "basic")
 
 
-class Templates(tuple):
+class Templates(tuple):  # noqa: WPS600 (subclassing tuple)
     """Helper to pick a template on the command line."""
 
     def __contains__(self, item: object) -> bool:
         if isinstance(item, str):
-            return item.startswith("path:") or super(Templates, self).__contains__(item)
+            return item.startswith("path:") or super().__contains__(item)
         return False
 
 
@@ -43,8 +44,7 @@ def get_version() -> str:
         distribution = pkg_resources.get_distribution("git-changelog")
     except pkg_resources.DistributionNotFound:
         return "0.0.0"
-    else:
-        return distribution.version
+    return distribution.version
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -87,7 +87,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-v",
         "--version",
         action="version",
-        version="%(prog)s " + get_version(),
+        version="%(prog)s " + get_version(),  # noqa: WPS323 (%)
         help="Show the current version of the program and exit.",
     )
     return parser
@@ -106,30 +106,30 @@ def main(args: Optional[List[str]] = None) -> int:
         An exit code.
     """
     parser = get_parser()
-    args = parser.parse_args(args=args)
+    opts = parser.parse_args(args=args)
 
     # get template
-    if args.template.startswith("path:"):
-        path = args.template.replace("path:", "", 1)
+    if opts.template.startswith("path:"):
+        path = opts.template.replace("path:", "", 1)
         try:
             template = templates.get_custom_template(path)
-        except FileNotFoundError:
-            print("git-changelog: no such directory, " "or missing changelog.md: %s" % path, file=sys.stderr)
+        except TemplateNotFound:
+            print(f"git-changelog: no such directory, or missing changelog.md: {path}", file=sys.stderr)
             return 1
     else:
-        template = templates.get_template(args.template)
+        template = templates.get_template(opts.template)
 
     # build data
-    changelog = Changelog(args.repository, style=args.style)
+    changelog = Changelog(opts.repository, style=opts.style)
 
     # get rendered contents
     rendered = template.render(changelog=changelog)
 
     # write result in specified output
-    if args.output is sys.stdout:
+    if opts.output is sys.stdout:
         sys.stdout.write(rendered)
     else:
-        with open(args.output, "w") as stream:
+        with open(opts.output, "w") as stream:
             stream.write(rendered)
 
     return 0

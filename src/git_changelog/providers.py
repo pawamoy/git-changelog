@@ -1,6 +1,7 @@
 """Module containing the parsing utilities for git providers."""
 
 import re
+from abc import ABC, abstractmethod
 from typing import Dict, List, Match, Pattern
 
 
@@ -51,7 +52,7 @@ class RefDef:
         self.url_string = url_string
 
 
-class ProviderRefParser:
+class ProviderRefParser(ABC):
     """A base class for specific providers reference parsers."""
 
     url: str
@@ -87,8 +88,8 @@ class ProviderRefParser:
             A list of regular expressions matches.
         """
         if ref_type not in self.REF:
-            refs = [k for k in self.REF.keys() if k.startswith(ref_type)]
-            return [m for ref in refs for m in self.REF[ref].regex.finditer(text)]
+            refs = [key for key in self.REF.keys() if key.startswith(ref_type)]
+            return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
         return list(self.REF[ref_type].regex.finditer(text))
 
     def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
@@ -104,6 +105,7 @@ class ProviderRefParser:
         """
         return self.REF[ref_type].url_string.format(**match_dict)
 
+    @abstractmethod
     def get_tag_url(self, tag: str) -> str:
         """
         Get the URL for a git tag.
@@ -113,9 +115,10 @@ class ProviderRefParser:
 
         Returns:
             The tag URL.
-        """
+        """  # noqa: DAR202,DAR401
         raise NotImplementedError
 
+    @abstractmethod
     def get_compare_url(self, base: str, target: str) -> str:
         """
         Get the URL for a tag comparison.
@@ -126,7 +129,7 @@ class ProviderRefParser:
 
         Returns:
             The comparison URL.
-        """
+        """  # noqa: DAR202,DAR401
         raise NotImplementedError
 
 
@@ -137,6 +140,9 @@ class GitHub(ProviderRefParser):
     project_url: str = "{base_url}/{namespace}/{project}"
     tag_url: str = "{base_url}/{namespace}/{project}/releases/tag/{ref}"
 
+    commit_min_length = 8
+    commit_max_length = 40
+
     REF: Dict[str, RefDef] = {
         "issues": RefDef(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
@@ -145,7 +151,9 @@ class GitHub(ProviderRefParser):
         "commits": RefDef(
             regex=re.compile(
                 RefRe.BB
-                + r"(?:{np}@)?{commit}{ba}".format(np=RefRe.NP, commit=RefRe.COMMIT.format(min=7, max=40), ba=RefRe.BA),
+                + r"(?:{np}@)?{commit}{ba}".format(
+                    np=RefRe.NP, commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length), ba=RefRe.BA
+                ),
                 re.I,
             ),
             url_string="{base_url}/{namespace}/{project}/commit/{ref}",
@@ -154,7 +162,7 @@ class GitHub(ProviderRefParser):
             regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit_range}".format(
-                    np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=7, max=40)
+                    np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length)
                 ),
                 re.I,
             ),
@@ -174,7 +182,7 @@ class GitHub(ProviderRefParser):
         """
         self.namespace: str = namespace
         self.project: str = project
-        self.url: str = url
+        self.url: str = url  # noqa: WPS601 (shadowing but uses class' as default)
 
     def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
@@ -182,13 +190,13 @@ class GitHub(ProviderRefParser):
             match_dict["namespace"] = self.namespace
         if not match_dict.get("project"):
             match_dict["project"] = self.project
-        return super(GitHub, self).build_ref_url(ref_type, match_dict)
+        return super().build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102 (use parent docstring)
+    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102,WPS615
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
     def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
-        return self.build_ref_url("commits_ranges", {"ref": "%s...%s" % (base, target)})
+        return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
 
 
 class GitLab(ProviderRefParser):
@@ -197,6 +205,9 @@ class GitLab(ProviderRefParser):
     url: str = "https://gitlab.com"
     project_url: str = "{base_url}/{namespace}/{project}"
     tag_url: str = "{base_url}/{namespace}/{project}/tags/{ref}"
+
+    commit_min_length = 8
+    commit_max_length = 40
 
     REF: Dict[str, RefDef] = {
         "issues": RefDef(
@@ -242,7 +253,9 @@ class GitLab(ProviderRefParser):
         "commits": RefDef(
             regex=re.compile(
                 RefRe.BB
-                + r"(?:{np}@)?{commit}{ba}".format(np=RefRe.NP, commit=RefRe.COMMIT.format(min=8, max=40), ba=RefRe.BA),
+                + r"(?:{np}@)?{commit}{ba}".format(
+                    np=RefRe.NP, commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length), ba=RefRe.BA
+                ),
                 re.I,
             ),
             url_string="{base_url}/{namespace}/{project}/commit/{ref}",
@@ -251,7 +264,7 @@ class GitLab(ProviderRefParser):
             regex=re.compile(
                 RefRe.BB
                 + r"(?:{np}@)?{commit_range}".format(
-                    np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=8, max=40)
+                    np=RefRe.NP, commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length)
                 ),
                 re.I,
             ),
@@ -271,7 +284,7 @@ class GitLab(ProviderRefParser):
         """
         self.namespace: str = namespace
         self.project: str = project
-        self.url: str = url
+        self.url: str = url  # noqa: WPS601 (shadowing but uses class' as default)
 
     def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
@@ -281,10 +294,10 @@ class GitLab(ProviderRefParser):
             match_dict["project"] = self.project
         if ref_type.startswith("label"):
             match_dict["ref"] = match_dict["ref"].replace('"', "").replace(" ", "+")
-        return super(GitLab, self).build_ref_url(ref_type, match_dict)
+        return super().build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102 (use parent docstring)
+    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102,WPS615
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
     def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
-        return self.build_ref_url("commits_ranges", {"ref": "%s...%s" % (base, target)})
+        return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})

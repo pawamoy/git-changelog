@@ -1,6 +1,7 @@
 """Module containing the commit logic."""
 
 import re
+from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List, Pattern, Union
 
@@ -85,7 +86,7 @@ class Commit:
             self.url = provider.build_ref_url("commits", {"ref": self.hash})
         else:
             # use default "commit" url (could be wrong)
-            self.url = "%s/%s/%s/commit/%s" % (provider.url, provider.namespace, provider.project, self.hash)
+            self.url = f"{provider.url}/{provider.namespace}/{provider.project}/commit/{self.hash}"
 
         # build commit text references from its subject and body
         for ref_type in provider.REF.keys():
@@ -98,13 +99,14 @@ class Commit:
                     self.text_refs["issues_not_in_subject"].append(issue)
 
 
-class CommitStyle:
+class CommitStyle(ABC):
     """A base class for a style of commit messages."""
 
     TYPES: Dict[str, str]
     TYPE_REGEX: Pattern
     BREAK_REGEX: Pattern
 
+    @abstractmethod
     def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:
         """
         Parse the commit to extract information.
@@ -114,7 +116,7 @@ class CommitStyle:
 
         Returns:
             A dictionary containing the parsed data.
-        """
+        """  # noqa: DAR202,DAR401
         raise NotImplementedError
 
 
@@ -130,7 +132,7 @@ class BasicStyle(CommitStyle):
         "doc": "Documented",
     }
 
-    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
+    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)  # noqa: WPS323
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
@@ -144,8 +146,7 @@ class BasicStyle(CommitStyle):
         return {"type": commit_type, "is_major": is_major, "is_minor": is_minor, "is_patch": is_patch}
 
     def parse_type(self, commit_subject: str) -> str:
-        """
-        Parse the type of the commit given its subject.
+        """Parse the type of the commit given its subject.
 
         Arguments:
             commit_subject: The commit message subject.
@@ -159,11 +160,25 @@ class BasicStyle(CommitStyle):
         return ""
 
     def is_minor(self, commit_type: str) -> bool:
-        """Is this commit worth a minor bump?"""
+        """Tell if this commit is worth a minor bump.
+
+        Arguments:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a minor commit.
+        """
         return commit_type == self.TYPES["add"]
 
     def is_major(self, commit_message: str) -> bool:
-        """Is this commit worth a major bump?"""
+        """Tell if this commit is worth a major bump.
+
+        Arguments:
+            commit_message: The commit message.
+
+        Returns:
+            Whether it's a major commit.
+        """
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
@@ -184,7 +199,7 @@ class AngularStyle(CommitStyle):
         "chore": "Chore",
     }
     SUBJECT_REGEX: Pattern = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))  # noqa: WPS323 (%)
     )
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
@@ -206,8 +221,7 @@ class AngularStyle(CommitStyle):
         }
 
     def parse_subject(self, commit_subject: str) -> Dict[str, str]:
-        """
-        Parse the subject of the commit (`<type>[(scope)]: Subject`).
+        """Parse the subject of the commit (`<type>[(scope)]: Subject`).
 
         Arguments:
             commit_subject: The commit message subject.
@@ -223,11 +237,25 @@ class AngularStyle(CommitStyle):
         return {"type": "", "scope": "", "subject": commit_subject}
 
     def is_minor(self, commit_type: str) -> bool:
-        """Is this commit worth a minor bump?"""
+        """Tell if this commit is worth a minor bump.
+
+        Arguments:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a minor commit.
+        """
         return commit_type == self.TYPES["feat"]
 
     def is_major(self, commit_message: str) -> bool:
-        """Is this commit worth a major bump?"""
+        """Tell if this commit is worth a major bump.
+
+        Arguments:
+            commit_message: The commit message.
+
+        Returns:
+            Whether it's a major commit.
+        """
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
