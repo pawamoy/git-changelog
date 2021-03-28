@@ -1,1 +1,1 @@
-{!CREDITS.md!}
+{{ credits() }}

@@ -3,42 +3,54 @@ site_description: "Automatic Changelog generator using Jinja2 templates."
 site_url: "https://pawamoy.github.io/git-changelog"
 repo_url: "https://github.com/pawamoy/git-changelog"
 repo_name: "pawamoy/git-changelog"
+site_dir: "site"
 
 nav:
+- Home:
   - Overview: index.md
-  - API Reference:
-    - build.py: reference/build.md
-    - cli.py: reference/cli.md
-    - commit.py: reference/commit.md
-    - providers.py: reference/providers.md
-  - Contributing: contributing.md
-  - Code of Conduct: code_of_conduct.md
   - Changelog: changelog.md
   - Credits: credits.md
+  - License: license.md
+- Code Reference:
+  - build.py: reference/build.md
+  - cli.py: reference/cli.md
+  - commit.py: reference/commit.md
+  - providers.py: reference/providers.md
+- Development:
+  - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md
+  - Coverage report: coverage.md
 
 theme:
   name: material
+  features:
+  - navigation.tabs
   palette:
     scheme: slate
     primary: teal
     accent: purple
 
 extra_css:
-  - css/mkdocstrings.css
+- css/mkdocstrings.css
 
 markdown_extensions:
-  - admonition
-  - markdown_include.include
-  - pymdownx.emoji
-  - pymdownx.magiclink
-  - pymdownx.superfences
-  - pymdownx.tabbed
-  - pymdownx.tasklist
-  - toc:
-      permalink: "¤"
+- admonition
+- pymdownx.emoji
+- pymdownx.magiclink
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.superfences
+- pymdownx.tabbed
+- pymdownx.tasklist
+- toc:
+    permalink: "¤"
 
 plugins:
-  - search
-  - mkdocstrings:
-      watch:
-        - src/git_changelog
+- search
+- coverage:
+    html_report_dir: build/coverage
+- mkdocstrings:
+    watch:
+    - src/git_changelog
+- macros:
+    module_name: docs/macros

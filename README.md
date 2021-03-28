@@ -23,13 +23,13 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
   Guesses next version based on last commits.
 
 - Todo:
-  - [Plugin architecture][issue-7],
+  - [Plugin architecture][issue-19],
     to support more commit styles and git services.
-  - [Template context injection][issue-4],
+  - [Template context injection][issue-17],
     to furthermore customize how your changelog will be rendered.
-  - [Easy access to "Breaking Changes"][issue-1] in the templates.
-  - [Update changelog in-place][issue-2], paired with
-    [commits/dates/versions range limitation ability][issue-3].
+  - [Easy access to "Breaking Changes"][issue-14] in the templates.
+  - [Update changelog in-place][issue-15], paired with
+    [commits/dates/versions range limitation ability][issue-16].
 
 [jinja2]:                 http://jinja.pocoo.org/
 [keep-a-changelog]:       http://keepachangelog.com/en/1.0.0/
@@ -41,13 +41,11 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
 [gitlab-refs]:            https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references
 
-[issue-1]: https://gitlab.com/pawamoy/git-changelog/issues/1
-[issue-2]: https://gitlab.com/pawamoy/git-changelog/issues/2
-[issue-3]: https://gitlab.com/pawamoy/git-changelog/issues/3
-[issue-4]: https://gitlab.com/pawamoy/git-changelog/issues/4
-[issue-5]: https://gitlab.com/pawamoy/git-changelog/issues/5
-[issue-6]: https://gitlab.com/pawamoy/git-changelog/issues/6
-[issue-7]: https://gitlab.com/pawamoy/git-changelog/issues/7
+[issue-14]: https://github.com/pawamoy/git-changelog/issues/14
+[issue-15]: https://github.com/pawamoy/git-changelog/issues/15
+[issue-16]: https://github.com/pawamoy/git-changelog/issues/16
+[issue-17]: https://github.com/pawamoy/git-changelog/issues/17
+[issue-19]: https://github.com/pawamoy/git-changelog/issues/19
 
 ## Requirements
 

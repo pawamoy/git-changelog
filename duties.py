@@ -3,21 +3,17 @@
 import os
 import re
 import sys
-from itertools import chain
 from pathlib import Path
 from shutil import which
 from typing import List, Optional, Pattern
 
 import httpx
-import toml
 from duty import duty
-from jinja2 import StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
-from pip._internal.commands.show import search_packages_info  # noqa: WPS436 (no other way?)
 
 from git_changelog.build import Changelog, Version
 
-PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py"))
+PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py", "docs/macros.py"))
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
 PY_SRC = " ".join(PY_SRC_LIST)
 TESTING = os.environ.get("TESTING", "0") in {"1", "true"}
@@ -104,9 +100,9 @@ def update_changelog(
         template_url: The URL to the Jinja template used to render contents.
         commit_style: The style of commit messages to parse.
     """
-    env = SandboxedEnvironment(autoescape=True)
+    env = SandboxedEnvironment(autoescape=False)
     template = env.from_string(httpx.get(template_url).text)
-    changelog = Changelog(".", style=commit_style)  # noqa: W0621 (shadowing changelog)
+    changelog = Changelog(".", style=commit_style)
 
     if len(changelog.versions_list) == 1:
         last_version = changelog.versions_list[0]
@@ -148,13 +144,13 @@ def changelog(ctx):
 
 
 @duty(pre=["check_code_quality", "check_types", "check_docs", "check_dependencies"])
-def check(ctx):  # noqa: W0613 (no use for the context argument)
+def check(ctx):
     """
     Check it all!
 
     Arguments:
         ctx: The context instance (passed automatically).
-    """  # noqa: D400 (exclamation mark is funnier)
+    """
 
 
 @duty
@@ -166,7 +162,7 @@ def check_code_quality(ctx, files=PY_SRC):
         ctx: The context instance (passed automatically).
         files: The files to check.
     """
-    ctx.run(f"flakehell lint {files}", title="Checking code quality", pty=PTY, nofail=True, quiet=True)
+    ctx.run(f"flake8 --config=config/flake8.ini {files}", title="Checking code quality", pty=PTY)
 
 
 @duty
@@ -202,9 +198,9 @@ def check_docs(ctx):
     Arguments:
         ctx: The context instance (passed automatically).
     """
-    # pytkdocs fails on Python 3.9 for now
-    nofail = sys.version.startswith("3.9")
-    ctx.run("mkdocs build -s", title="Building documentation", pty=PTY, nofail=nofail, quiet=nofail)
+    Path("build/coverage").mkdir(parents=True, exist_ok=True)
+    Path("build/coverage/index.html").touch(exist_ok=True)
+    ctx.run("mkdocs build -s", title="Building documentation", pty=PTY)
 
 
 @duty
@@ -215,7 +211,7 @@ def check_types(ctx):
     Arguments:
         ctx: The context instance (passed automatically).
     """
-    ctx.run(f"mypy --config-file config/mypy.ini {PY_SRC}", title="Type-checking", pty=PTY, nofail=True, quiet=True)
+    ctx.run(f"mypy --config-file config/mypy.ini {PY_SRC}", title="Type-checking", pty=PTY)
 
 
 @duty(silent=True)
@@ -229,6 +225,7 @@ def clean(ctx):
     ctx.run("rm -rf .coverage*")
     ctx.run("rm -rf .mypy_cache")
     ctx.run("rm -rf .pytest_cache")
+    ctx.run("rm -rf tests/.pytest_cache")
     ctx.run("rm -rf build")
     ctx.run("rm -rf dist")
     ctx.run("rm -rf pip-wheel-metadata")
@@ -237,78 +234,7 @@ def clean(ctx):
     ctx.run("find . -name '*.rej' -delete")
 
 
-def get_credits_data() -> dict:
-    """
-    Return data used to generate the credits file.
-
-    Returns:
-        Data required to render the credits template.
-    """
-    project_dir = Path(__file__).parent.parent
-    metadata = toml.load(project_dir / "pyproject.toml")["tool"]["poetry"]
-    lock_data = toml.load(project_dir / "poetry.lock")
-    project_name = metadata["name"]
-
-    poetry_dependencies = chain(metadata["dependencies"].keys(), metadata["dev-dependencies"].keys())
-    direct_dependencies = {dep.lower() for dep in poetry_dependencies}
-    direct_dependencies.remove("python")
-    indirect_dependencies = {pkg["name"].lower() for pkg in lock_data["package"]}
-    indirect_dependencies -= direct_dependencies
-    dependencies = direct_dependencies | indirect_dependencies
-
-    packages = {}
-    for pkg in search_packages_info(dependencies):
-        pkg = {_: pkg[_] for _ in ("name", "home-page")}
-        packages[pkg["name"].lower()] = pkg
-
-    for dependency in dependencies:
-        if dependency not in packages:
-            pkg_data = httpx.get(f"https://pypi.python.org/pypi/{dependency}/json").json()["info"]
-            home_page = pkg_data["home_page"] or pkg_data["project_url"] or pkg_data["package_url"]
-            pkg_name = pkg_data["name"]
-            package = {"name": pkg_name, "home-page": home_page}
-            packages.update({pkg_name.lower(): package})
-
-    return {
-        "project_name": project_name,
-        "direct_dependencies": sorted(direct_dependencies),
-        "indirect_dependencies": sorted(indirect_dependencies),
-        "package_info": packages,
-    }
-
-
 @duty
-def docs_regen(ctx):
-    """
-    Regenerate some documentation pages.
-
-    Arguments:
-        ctx: The context instance (passed automatically).
-    """
-    url_prefix = "https://raw.githubusercontent.com/pawamoy/jinja-templates/master/"
-    regen_list = (("CREDITS.md", get_credits_data, url_prefix + "credits.md"),)
-
-    def regen() -> int:  # noqa: WPS430 (nested function)
-        """
-        Regenerate pages listed in global `REGEN` list.
-
-        Returns:
-            An exit code.
-        """
-        env = SandboxedEnvironment(undefined=StrictUndefined)
-        for target, get_data, template in regen_list:
-            print("Regenerating", target)  # noqa: WPS421 (print)
-            template_data = get_data()
-            template_text = httpx.get(template).text
-            rendered = env.from_string(template_text).render(**template_data)
-            with open(target, "w") as stream:
-                stream.write(rendered)
-        return 0
-
-    ctx.run(regen, title="Regenerating docfiles", pty=PTY)
-
-
-@duty(pre=[docs_regen])
 def docs(ctx):
     """
     Build the documentation locally.
@@ -319,7 +245,7 @@ def docs(ctx):
     ctx.run("mkdocs build", title="Building documentation")
 
 
-@duty(pre=[docs_regen])
+@duty
 def docs_serve(ctx, host="127.0.0.1", port=8000):
     """
     Serve the documentation (localhost:8000).
@@ -332,7 +258,7 @@ def docs_serve(ctx, host="127.0.0.1", port=8000):
     ctx.run(f"mkdocs serve -a {host}:{port}", title="Serving documentation", capture=False)
 
 
-@duty(pre=[docs_regen])
+@duty
 def docs_deploy(ctx):
     """
     Deploy the documentation on GitHub pages.
@@ -344,7 +270,7 @@ def docs_deploy(ctx):
 
 
 @duty
-def format(ctx):  # noqa: W0622 (we don't mind shadowing the format builtin)
+def format(ctx):
     """
     Run formatting tools on the code.
 
@@ -356,7 +282,7 @@ def format(ctx):  # noqa: W0622 (we don't mind shadowing the format builtin)
         title="Removing unused imports",
         pty=PTY,
     )
-    ctx.run(f"isort -y -rc {PY_SRC}", title="Ordering imports", pty=PTY)
+    ctx.run(f"isort {PY_SRC}", title="Ordering imports", pty=PTY)
     ctx.run(f"black {PY_SRC}", title="Formatting code", pty=PTY)
 
 
@@ -378,7 +304,7 @@ def release(ctx, version):
         ctx.run("git push --tags", title="Pushing tags", pty=False)
         ctx.run("poetry build", title="Building dist/wheel", pty=PTY)
         ctx.run("poetry publish", title="Publishing version", pty=PTY)
-        ctx.run("mkdocs gh-deploy", title="Deploying documentation", pty=PTY)
+        docs_deploy.run()  # type: ignore
 
 
 @duty(silent=True)
@@ -389,12 +315,13 @@ def coverage(ctx):
     Arguments:
         ctx: The context instance (passed automatically).
     """
+    ctx.run("coverage combine .coverage-*", nofail=True)
     ctx.run("coverage report --rcfile=config/coverage.ini", capture=False)
     ctx.run("coverage html --rcfile=config/coverage.ini")
 
 
-@duty(pre=[duty(lambda ctx: ctx.run("rm -f .coverage", silent=True))])
-def test(ctx, match=""):
+@duty
+def test(ctx, match: str = ""):
     """
     Run the test suite.
 
@@ -402,6 +329,8 @@ def test(ctx, match=""):
         ctx: The context instance (passed automatically).
         match: A pytest expression to filter selected tests.
     """
+    py_version = f"{sys.version_info.major}{sys.version_info.minor}"
+    os.environ["COVERAGE_FILE"] = f".coverage-{py_version}"
     ctx.run(
         ["pytest", "-c", "config/pytest.ini", "-n", "auto", "-k", match, "tests"],
         title="Running tests",

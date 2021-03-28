@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: 0.1.10
+_commit: 0.3.1
 _src_path: gh:pawamoy/copier-poetry
 author_email: pawamoy@pm.me
 author_fullname: "Timoth\xE9e Mazzucotelli"
@@ -16,3 +16,4 @@ python_package_import_name: git_changelog
 repository_name: git-changelog
 repository_namespace: pawamoy
 repository_provider: github.com
+use_precommit: false
