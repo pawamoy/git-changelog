@@ -1,13 +1,10 @@
 """Macros and filters made available in Markdown pages."""
 
-import functools
+import re
 from itertools import chain
 from pathlib import Path
 
-import httpx
 import toml
-from jinja2 import StrictUndefined
-from jinja2.sandbox import SandboxedEnvironment
 from pip._internal.commands.show import search_packages_info  # noqa: WPS436 (no other way?)
 
 
@@ -19,19 +16,23 @@ def get_credits_data() -> dict:
         Data required to render the credits template.
     """
     project_dir = Path(__file__).parent.parent
-    metadata = toml.load(project_dir / "pyproject.toml")["tool"]["poetry"]
-    lock_data = toml.load(project_dir / "poetry.lock")
+    metadata = toml.load(project_dir / "pyproject.toml")["project"]
+    metadata_pdm = toml.load(project_dir / "pyproject.toml")["tool"]["pdm"]
+    lock_data = toml.load(project_dir / "pdm.lock")
     project_name = metadata["name"]
 
-    poetry_dependencies = chain(metadata["dependencies"].keys(), metadata["dev-dependencies"].keys())
-    direct_dependencies = {dep.lower() for dep in poetry_dependencies}
-    direct_dependencies.remove("python")
+    all_dependencies = chain(
+        metadata.get("dependencies", []),
+        chain(*metadata.get("optional-dependencies", {}).values()),
+        chain(*metadata_pdm.get("dev-dependencies", {}).values()),
+    )
+    direct_dependencies = {re.sub(r"[^\w-].*$", "", dep) for dep in all_dependencies}
+    direct_dependencies = {dep.lower() for dep in direct_dependencies}
     indirect_dependencies = {pkg["name"].lower() for pkg in lock_data["package"]}
     indirect_dependencies -= direct_dependencies
-    dependencies = direct_dependencies | indirect_dependencies
 
     packages = {}
-    for pkg in search_packages_info(dependencies):
+    for pkg in search_packages_info(direct_dependencies | indirect_dependencies):
         pkg = {_: pkg[_] for _ in ("name", "home-page")}
         packages[pkg["name"].lower()] = pkg
 
@@ -49,22 +50,6 @@ def get_credits_data() -> dict:
     }
 
 
-@functools.lru_cache(maxsize=None)
-def get_credits():
-    """
-    Return credits as Markdown.
-
-    Returns:
-        The credits page Markdown.
-    """
-    jinja_env = SandboxedEnvironment(undefined=StrictUndefined)
-    commit = "166758a98d5e544aaa94fda698128e00733497f4"
-    template_url = f"https://raw.githubusercontent.com/pawamoy/jinja-templates/{commit}/credits.md"
-    template_data = get_credits_data()
-    template_text = httpx.get(template_url).text
-    return jinja_env.from_string(template_text).render(**template_data)
-
-
 def define_env(env):
     """
     Add macros and filters into the Jinja2 environment.
@@ -75,7 +60,13 @@ def define_env(env):
     Arguments:
         env: An object used to add macros and filters to the environment.
     """
+    env.variables.update(get_credits_data())
 
-    @env.macro  # noqa: WPS430 (nested function)
-    def credits():  # noqa: WPS430
-        return get_credits()
+    @env.macro  # noqa: WPS430
+    def cite_package(info, name):  # noqa: WPS430
+        package = info.get(name, {})
+        return f"[`{package.get('name', name)}`]({package.get('home-page', '')})"
+
+    @env.macro  # noqa: WPS430
+    def cite_packages(info, names):  # noqa: WPS430
+        return " | ".join(cite_package(info, name) for name in names)
