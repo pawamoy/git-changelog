@@ -259,6 +259,32 @@ class AngularStyle(CommitStyle):
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
+class ConventionalCommitStyle(AngularStyle):
+    """Conventional commit message style."""
+
+    TYPES: Dict[str, str] = AngularStyle.TYPES
+    SUBJECT_REGEX: Pattern = re.compile(
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"  # noqa: WPS323 (%)
+        % ("|".join(TYPES.keys()))
+    )
+
+    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:  # noqa: D102 (use parent docstring)
+        subject = self.parse_subject(commit.subject)
+        message = "\n".join([commit.subject] + commit.body)
+        is_major = self.is_major(message) or subject.get("breaking") == "!"
+        is_minor = not is_major and self.is_minor(subject["type"])
+        is_patch = not any((is_major, is_minor))
+
+        return {
+            "type": subject["type"],
+            "scope": subject["scope"],
+            "subject": subject["subject"],
+            "is_major": is_major,
+            "is_minor": is_minor,
+            "is_patch": is_patch,
+        }
+
+
 class AtomStyle(CommitStyle):
     """Atom commit message style."""
 
