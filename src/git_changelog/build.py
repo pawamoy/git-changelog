@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple, Type, Union
 
 from semver import VersionInfo
 
-from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle
+from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle, ConventionalCommitStyle
 from git_changelog.providers import GitHub, GitLab, ProviderRefParser
 
 StyleType = Optional[Union[str, CommitStyle, Type[CommitStyle]]]
@@ -142,7 +142,12 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
-    STYLE: Dict[str, Type[CommitStyle]] = {"basic": BasicStyle, "angular": AngularStyle, "atom": AtomStyle}
+    STYLE: Dict[str, Type[CommitStyle]] = {
+        "basic": BasicStyle,
+        "angular": AngularStyle,
+        "atom": AtomStyle,
+        "conventional": ConventionalCommitStyle,
+    }
 
     def __init__(  # noqa: WPS231
         self,
