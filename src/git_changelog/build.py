@@ -31,11 +31,11 @@ def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
 
     semver_version = VersionInfo.parse(version)
     if part == "major" and semver_version.major != 0:
-        semver_version.bump_major()
+        semver_version = semver_version.bump_major()
     elif part == "minor" or (part == "major" and semver_version.major == 0):
-        semver_version.bump_minor()
+        semver_version = semver_version.bump_minor()
     elif part == "patch" and not semver_version.prerelease:
-        semver_version.bump_patch()
+        semver_version = semver_version.bump_patch()
     return prefix + str(semver_version)
 
 
