@@ -21,7 +21,7 @@ from jinja2.exceptions import TemplateNotFound
 from git_changelog import templates
 from git_changelog.build import Changelog
 
-STYLES = ("angular", "atom", "basic")
+STYLES = ("angular", "atom", "conventional", "basic")
 
 
 class Templates(tuple):  # noqa: WPS600 (subclassing tuple)
