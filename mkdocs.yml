@@ -11,26 +11,39 @@ nav:
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
-- Code Reference:
-  - build.py: reference/build.md
-  - cli.py: reference/cli.md
-  - commit.py: reference/commit.md
-  - providers.py: reference/providers.md
+# defer to gen-files + literate-nav
+- Code Reference: reference/
 - Development:
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
   - Coverage report: coverage.md
+- Author's website: https://pawamoy.github.io/
 
 theme:
   name: material
+  icon:
+    logo: material/currency-sign
   features:
   - navigation.tabs
+  - navigation.top
   palette:
-    scheme: slate
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
     primary: teal
     accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
 
 extra_css:
+- css/material.css
 - css/mkdocstrings.css
 
 markdown_extensions:
@@ -47,11 +60,21 @@ markdown_extensions:
 
 plugins:
 - search
-- coverage:
-    html_report_dir: build/coverage
+- gen-files:
+    scripts:
+    - docs/gen_credits.py
+    - docs/gen_ref_nav.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- coverage
 - mkdocstrings:
     custom_templates: docs/templates
     watch:
     - src/git_changelog
-- macros:
-    module_name: docs/macros
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/pawamoy
+  - icon: fontawesome/brands/twitter
+    link: https://twitter.com/pawamoy
