@@ -5,29 +5,21 @@ div.doc-contents:not(.first) {
   margin-bottom: 80px;
 }
 
-/* Don't capitalize names. */
-h5.doc-heading {
-  text-transform: none !important;
+.doc-param-details p:nth-child(1),
+.doc-return-details p:nth-child(1) {
+  padding-bottom: 5px !important;
+  border-bottom: .05rem solid var(--md-default-fg-color--lightest);
+  margin-bottom: 5px !important;
 }
 
-/* Don't use vertical space on hidden ToC entries. */
-.hidden-toc::before {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
+.doc-param-details {
+  border-left: .05rem solid var(--md-default-fg-color--lightest);
 }
 
-/* Don't show permalink of hidden ToC entries. */
-.hidden-toc a.headerlink {
-  display: none;
+.md-typeset__table {
+  width: 100%;
 }
 
-/* Avoid breaking parameters name, etc. in table cells. */
-td code {
-  word-break: normal !important;
-}
-
-/* For pieces of Markdown rendered in table cells. */
-td p {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+table {
+  display: table !important;
 }
