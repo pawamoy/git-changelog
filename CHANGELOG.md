@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [0.5.0](https://github.com/pawamoy/git-changelog/releases/tag/0.5.0) - 2021-11-14
+
+<small>[Compare with 0.4.2](https://github.com/pawamoy/git-changelog/compare/0.4.2...0.5.0)</small>
+
+### Dependencies
+- Accept Jinja2 3.x ([9ef3259](https://github.com/pawamoy/git-changelog/commit/9ef3259bd9bce7a654c4e35c731619df37adaa21) by Timothée Mazzucotelli).
+
+### Features
+- Allow to choose conventional style from CLI ([aafa779](https://github.com/pawamoy/git-changelog/commit/aafa7793ec02af8b443576262af4e244901787dc) by Ivan Gonzalez). [PR #32](https://github.com/pawamoy/git-changelog/pull/32)
+- Add ConventionalCommit commit type ([3becce8](https://github.com/pawamoy/git-changelog/commit/3becce8d344a3985905b0af916e9bcc426760426) by Kevin Squire). [PR #30](https://github.com/pawamoy/git-changelog/pull/30)
+
+### Bug Fixes
+- Properly bump semver version ([ecc7dd4](https://github.com/pawamoy/git-changelog/commit/ecc7dd430719c90b289acf7f29adb0b82e193fa8) by Kevin Squire). References: [#31](https://github.com/pawamoy/git-changelog/issues/31)
+- Fix typo in keepachangelog template ([fa9b434](https://github.com/pawamoy/git-changelog/commit/fa9b4349c1a954a3029e5b35ac306a22fc08babe) by Alexander Schleifer). [PR #28](https://github.com/pawamoy/git-changelog/pull/28)
+
+### Code Refactoring
+- Use semver to bump version more reliably ([b68a565](https://github.com/pawamoy/git-changelog/commit/b68a565fce51f8d0e94f0f67c98dea30e421dd8f) by Timothée Mazzucotelli).
+
+
 ## [0.4.2](https://github.com/pawamoy/git-changelog/releases/tag/0.4.2) - 2021-01-06
 
 <small>[Compare with 0.4.1](https://github.com/pawamoy/git-changelog/compare/0.4.1...0.4.2)</small>
