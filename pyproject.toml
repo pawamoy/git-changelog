@@ -24,7 +24,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "Jinja2~=2.10",
+    "Jinja2>=2.10,<4",
     "semver~=2.13",
 ]
 
