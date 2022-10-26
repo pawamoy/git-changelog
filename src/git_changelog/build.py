@@ -1,6 +1,7 @@
 """The module responsible for building the data."""
 
 import datetime
+import os
 import sys
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
 from typing import Dict, List, Optional, Tuple, Type, Union
@@ -242,7 +243,8 @@ class Changelog:
         Returns:
             The origin remote URL.
         """
-        git_url = self.run_git("config", "--get", "remote.origin.url").rstrip("\n")
+        remote = "remote." + os.environ.get("GIT_CHANGELOG_REMOTE", "origin") + ".url"
+        git_url = self.run_git("config", "--get", remote).rstrip("\n")
         if git_url.startswith("git@"):
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
         if git_url.endswith(".git"):
