@@ -243,7 +243,7 @@ class Changelog:
         Returns:
             The origin remote URL.
         """
-        remote = 'remote.' + os.environ.get('GIT_CHANGELOG_REMOTE', 'origin') + '.url'
+        remote = "remote." + os.environ.get("GIT_CHANGELOG_REMOTE", "origin") + ".url"
         git_url = self.run_git("config", "--get", remote).rstrip("\n")
         if git_url.startswith("git@"):
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
