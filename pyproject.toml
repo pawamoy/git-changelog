@@ -52,6 +52,7 @@ Funding = "https://github.com/sponsors/pawamoy"
 [project.scripts]
 git-changelog = "git_changelog.cli:main"
 
+[project.optional-dependencies]
 [tool.pdm]
 version = {source = "scm"}
 
@@ -107,6 +108,7 @@ typing = [
     "mypy>=0.910",
     "types-markdown>=3.3",
     "types-toml>=0.10",
+    "types-setuptools>=65.5.0.2",
 ]
 security = ["safety>=2"]
 
