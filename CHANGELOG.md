@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [0.6.0](https://github.com/pawamoy/git-changelog/releases/tag/0.6.0) - 2022-10-26
+
+<small>[Compare with 0.5.0](https://github.com/pawamoy/git-changelog/compare/0.5.0...0.6.0)</small>
+
+### Features
+- Add GIT_CHANGELOG_REMOTE variable ([9b9b3fc](https://github.com/pawamoy/git-changelog/commit/9b9b3fc172be4909b47e2bf97d74e6ec68fab882) by Lukáš Zapletal). [PR #35](https://github.com/pawamoy/git-changelog/issues/35)
+
+
 ## [0.5.0](https://github.com/pawamoy/git-changelog/releases/tag/0.5.0) - 2021-11-14
 
 <small>[Compare with 0.4.2](https://github.com/pawamoy/git-changelog/compare/0.4.2...0.5.0)</small>
