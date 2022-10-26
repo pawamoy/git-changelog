@@ -10,9 +10,6 @@ from typing import List, Optional, Pattern
 from urllib.request import urlopen
 
 from duty import duty
-from jinja2.sandbox import SandboxedEnvironment
-
-from git_changelog.build import Changelog
 
 PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py", "docs"))
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
@@ -53,9 +50,10 @@ def update_changelog(
         version_regex: A regular expression to find currently documented versions in the file.
         template_url: The URL to the Jinja template used to render contents.
     """
+    from jinja2.sandbox import SandboxedEnvironment
+
     from git_changelog.build import Changelog
     from git_changelog.commit import AngularStyle
-    from jinja2.sandbox import SandboxedEnvironment
 
     AngularStyle.DEFAULT_RENDER.insert(0, AngularStyle.TYPES["build"])
     env = SandboxedEnvironment(autoescape=False)
