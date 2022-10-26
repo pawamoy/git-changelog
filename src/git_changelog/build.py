@@ -226,7 +226,7 @@ class Changelog:
                     base=last_version.previous_version.tag, target=last_version.planned_tag
                 )
 
-    def run_git(self, *args) -> str:
+    def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
 
         Arguments:
