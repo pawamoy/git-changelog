@@ -6,7 +6,7 @@ build-backend = "pdm.pep517.api"
 name = "git-changelog"
 description = "Automatic Changelog generator using Jinja2 templates."
 authors = [{name = "Timothée Mazzucotelli", email = "pawamoy@pm.me"}]
-license-expression = "ISC"
+license = "ISC"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = [
