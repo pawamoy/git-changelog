@@ -1,8 +1,8 @@
 """The module responsible for building the data."""
 
 import datetime
-import sys
 import os
+import sys
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
 from typing import Dict, List, Optional, Tuple, Type, Union
 
