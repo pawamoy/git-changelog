@@ -4,6 +4,7 @@ site_url: "https://pawamoy.github.io/git-changelog"
 repo_url: "https://github.com/pawamoy/git-changelog"
 repo_name: "pawamoy/git-changelog"
 site_dir: "site"
+watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/git_changelog]
 
 nav:
 - Home:
@@ -25,6 +26,7 @@ theme:
     logo: material/currency-sign
   features:
   - navigation.tabs
+  - navigation.tabs.sticky
   - navigation.top
   palette:
   - media: "(prefers-color-scheme: light)"
@@ -48,29 +50,30 @@ extra_css:
 
 markdown_extensions:
 - admonition
+- callouts
 - pymdownx.emoji
 - pymdownx.magiclink
 - pymdownx.snippets:
     check_paths: true
 - pymdownx.superfences
-- pymdownx.tabbed
+- pymdownx.tabbed:
+    alternate_style: true
 - pymdownx.tasklist
 - toc:
     permalink: "¤"
 
 plugins:
 - search
+- markdown-exec
 - gen-files:
     scripts:
-    - docs/gen_credits.py
     - docs/gen_ref_nav.py
 - literate-nav:
     nav_file: SUMMARY.md
 - coverage
+- section-index
 - mkdocstrings:
     custom_templates: docs/templates
-    watch:
-    - src/git_changelog
 
 extra:
   social:

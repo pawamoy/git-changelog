@@ -14,21 +14,21 @@ cd git-changelog
 make setup
 ```
 
-!!! note
-    If it fails for some reason,
-    you'll need to install
-    [PDM](https://github.com/pdm-project/pdm)
-    manually.
-
-    You can install it with:
-
-    ```bash
-    python3 -m pip install --user pipx
-    pipx install pdm
-    ```
-
-    Now you can try running `make setup` again,
-    or simply `pdm install`.
+> NOTE:
+> If it fails for some reason,
+> you'll need to install
+> [PDM](https://github.com/pdm-project/pdm)
+> manually.
+> 
+> You can install it with:
+> 
+> ```bash
+> python3 -m pip install --user pipx
+> pipx install pdm
+> ```
+> 
+> Now you can try running `make setup` again,
+> or simply `pdm install`.
 
 You now have the dependencies installed.
 
@@ -57,17 +57,14 @@ As usual:
 1. create a new branch: `git checkout -b feature-or-bugfix-name`
 1. edit the code and/or the documentation
 
-If you updated the documentation or the project dependencies:
-
-1. run `make docs-regen`
-1. run `make docs-serve`,
-   go to http://localhost:8000 and check that everything looks good
-
 **Before committing:**
 
 1. run `make format` to auto-format the code
 1. run `make check` to check everything (fix any warning)
 1. run `make test` to run the tests (fix any issue)
+1. if you updated the documentation or the project dependencies:
+    1. run `make docs-serve`
+    1. go to http://localhost:8000 and check that everything looks good
 1. follow our [commit message convention](#commit-message-convention)
 
 If you are unsure about how to fix or ignore a warning,
