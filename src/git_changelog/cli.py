@@ -15,11 +15,15 @@ import argparse
 import sys
 from typing import List, Optional
 
-import pkg_resources
 from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
 from git_changelog.build import Changelog
+
+if sys.version_info < (3, 8):
+    import importlib_metadata as metadata
+else:
+    from importlib import metadata  # noqa: WPS440
 
 STYLES = ("angular", "atom", "conventional", "basic")
 
@@ -41,10 +45,9 @@ def get_version() -> str:
         The current `git-changelog` version.
     """
     try:
-        distribution = pkg_resources.get_distribution("git-changelog")
-    except pkg_resources.DistributionNotFound:
+        return metadata.version("git-changelog")
+    except metadata.PackageNotFoundError:
         return "0.0.0"
-    return distribution.version
 
 
 def get_parser() -> argparse.ArgumentParser:

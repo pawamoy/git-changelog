@@ -37,6 +37,7 @@ classifiers = [
 dependencies = [
     "Jinja2>=2.10,<4",
     "semver~=2.13",
+    "importlib-metadata; python_version < '3.8'",
 ]
 
 [project.urls]

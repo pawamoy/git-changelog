@@ -22,3 +22,8 @@ def test_show_help(capsys):
         cli.main(["-h"])
     captured = capsys.readouterr()
     assert "git-changelog" in captured.out
+
+
+def test_get_version():
+    """Get self version."""
+    assert cli.get_version()
