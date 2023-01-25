@@ -8,8 +8,10 @@
 <small>[Compare with latest]({{ version.compare_url }})</small>
 {%- endif %}
 
-{% for type, section in version.sections_dict|dictsort -%}
-{%- if type and type in changelog.style.DEFAULT_RENDER -%}
+{% for type in changelog.style.DEFAULT_RENDER %}
+{%- if type in version.sections_dict -%}
+{%- with section = version.sections_dict[type] -%}
 {% include 'section.md' with context %}
-{% endif -%}
+{%- endwith -%}
+{%- endif -%}
 {%- endfor -%}
