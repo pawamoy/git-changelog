@@ -1,8 +1,10 @@
 """Module containing the parsing utilities for git providers."""
 
+from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
-from typing import Dict, List, Match, Pattern
+from typing import Match, Pattern
 
 
 class RefRe:
@@ -58,9 +60,9 @@ class ProviderRefParser(ABC):
     url: str
     namespace: str
     project: str
-    REF: Dict[str, RefDef] = {}
+    REF: dict[str, RefDef] = {}
 
-    def get_refs(self, ref_type: str, text: str) -> List[Ref]:
+    def get_refs(self, ref_type: str, text: str) -> list[Ref]:
         """
         Find all references in the given text.
 
@@ -76,7 +78,7 @@ class ProviderRefParser(ABC):
             for match in self.parse_refs(ref_type, text)
         ]
 
-    def parse_refs(self, ref_type: str, text: str) -> List[Match]:
+    def parse_refs(self, ref_type: str, text: str) -> list[Match]:
         """
         Parse references in the given text.
 
@@ -92,7 +94,7 @@ class ProviderRefParser(ABC):
             return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
         return list(self.REF[ref_type].regex.finditer(text))
 
-    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
         """
         Build the URL for a reference type and a dictionary of matched groups.
 
@@ -143,7 +145,7 @@ class GitHub(ProviderRefParser):
     commit_min_length = 8
     commit_max_length = 40
 
-    REF: Dict[str, RefDef] = {
+    REF: dict[str, RefDef] = {
         "issues": RefDef(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
@@ -184,7 +186,7 @@ class GitHub(ProviderRefParser):
         self.project: str = project
         self.url: str = url  # noqa: WPS601 (shadowing but uses class' as default)
 
-    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -209,7 +211,7 @@ class GitLab(ProviderRefParser):
     commit_min_length = 8
     commit_max_length = 40
 
-    REF: Dict[str, RefDef] = {
+    REF: dict[str, RefDef] = {
         "issues": RefDef(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
@@ -286,7 +288,7 @@ class GitLab(ProviderRefParser):
         self.project: str = project
         self.url: str = url  # noqa: WPS601 (shadowing but uses class' as default)
 
-    def build_ref_url(self, ref_type: str, match_dict: Dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace

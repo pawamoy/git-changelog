@@ -13,7 +13,7 @@ TEMPLATE_URL = "https://raw.githubusercontent.com/pawamoy/jinja-templates/master
 COMMIT_STYLE = "angular"
 
 
-def latest(lines: List[str], regex: Pattern) -> Optional[str]:
+def latest(lines: list[str], regex: Pattern) -> str | None:
     """
     Return the last released version.
 
@@ -31,7 +31,7 @@ def latest(lines: List[str], regex: Pattern) -> Optional[str]:
     return None
 
 
-def unreleased(versions: List[Version], last_release: str) -> List[Version]:
+def unreleased(versions: list[Version], last_release: str) -> list[Version]:
     """
     Return the most recent versions down to latest release.
 
@@ -48,7 +48,7 @@ def unreleased(versions: List[Version], last_release: str) -> List[Version]:
     return versions
 
 
-def read_changelog(filepath: str) -> List[str]:
+def read_changelog(filepath: str) -> list[str]:
     """
     Read the changelog file.
 
@@ -62,7 +62,7 @@ def read_changelog(filepath: str) -> List[str]:
         return changelog_file.read().splitlines(keepends=False)
 
 
-def write_changelog(filepath: str, lines: List[str]) -> None:
+def write_changelog(filepath: str, lines: list[str]) -> None:
     """
     Write the changelog file.
 

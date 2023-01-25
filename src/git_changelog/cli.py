@@ -11,9 +11,10 @@
 
 """Module that contains the command line application."""
 
+from __future__ import annotations
+
 import argparse
 import sys
-from typing import List, Optional
 
 from jinja2.exceptions import TemplateNotFound
 
@@ -96,7 +97,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(args: Optional[List[str]] = None) -> int:
+def main(args: list[str] | None = None) -> int:
     """
     Run the main program.
 

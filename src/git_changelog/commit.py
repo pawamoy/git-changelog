@@ -1,9 +1,11 @@
 """Module containing the commit logic."""
 
+from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Pattern, Union
+from typing import Any, Pattern
 
 from git_changelog.providers import ProviderRefParser, Ref
 
@@ -22,7 +24,7 @@ class Commit:
         committer_date: str = "",
         refs: str = "",
         subject: str = "",
-        body: List[str] = None,
+        body: list[str] | None = None,
         url: str = "",
     ):
         """
@@ -49,7 +51,7 @@ class Commit:
         self.committer_email: str = committer_email
         self.committer_date: datetime = datetime.utcfromtimestamp(float(committer_date))
         self.subject: str = subject
-        self.body: List[str] = body or []
+        self.body: list[str] = body or []
         self.url: str = url
 
         tag = ""
@@ -61,8 +63,8 @@ class Commit:
         self.tag: str = tag
         self.version: str = tag
 
-        self.text_refs: Dict[str, List[Ref]] = {}
-        self.style: Dict[str, Any] = {}
+        self.text_refs: dict[str, list[Ref]] = {}
+        self.style: dict[str, Any] = {}
 
     def update_with_style(self, style: "CommitStyle") -> None:
         """
@@ -102,12 +104,12 @@ class Commit:
 class CommitStyle(ABC):
     """A base class for a style of commit messages."""
 
-    TYPES: Dict[str, str]
+    TYPES: dict[str, str]
     TYPE_REGEX: Pattern
     BREAK_REGEX: Pattern
 
     @abstractmethod
-    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
         """
         Parse the commit to extract information.
 
@@ -123,7 +125,7 @@ class CommitStyle(ABC):
 class BasicStyle(CommitStyle):
     """Basic commit message style."""
 
-    TYPES: Dict[str, str] = {
+    TYPES: dict[str, str] = {
         "add": "Added",
         "fix": "Fixed",
         "change": "Changed",
@@ -136,7 +138,7 @@ class BasicStyle(CommitStyle):
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
-    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)
@@ -185,7 +187,7 @@ class BasicStyle(CommitStyle):
 class AngularStyle(CommitStyle):
     """Angular commit message style."""
 
-    TYPES: Dict[str, str] = {
+    TYPES: dict[str, str] = {
         "build": "Build",
         "ci": "CI",
         "perf": "Performance Improvements",
@@ -204,7 +206,7 @@ class AngularStyle(CommitStyle):
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
     DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
 
-    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message)
@@ -220,7 +222,7 @@ class AngularStyle(CommitStyle):
             "is_patch": is_patch,
         }
 
-    def parse_subject(self, commit_subject: str) -> Dict[str, str]:
+    def parse_subject(self, commit_subject: str) -> dict[str, str]:
         """Parse the subject of the commit (`<type>[(scope)]: Subject`).
 
         Arguments:
@@ -262,13 +264,13 @@ class AngularStyle(CommitStyle):
 class ConventionalCommitStyle(AngularStyle):
     """Conventional commit message style."""
 
-    TYPES: Dict[str, str] = AngularStyle.TYPES
+    TYPES: dict[str, str] = AngularStyle.TYPES
     SUBJECT_REGEX: Pattern = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"  # noqa: WPS323 (%)
         % ("|".join(TYPES.keys()))
     )
 
-    def parse_commit(self, commit: Commit) -> Dict[str, Union[str, bool]]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject] + commit.body)
         is_major = self.is_major(message) or subject.get("breaking") == "!"
@@ -288,7 +290,7 @@ class ConventionalCommitStyle(AngularStyle):
 class AtomStyle(CommitStyle):
     """Atom commit message style."""
 
-    TYPES: Dict[str, str] = {
+    TYPES: dict[str, str] = {
         ":art:": "",  # when improving the format/structure of the code
         ":racehorse:": "",  # when improving performance
         ":non-potable_water:": "",  # when plugging memory leaks

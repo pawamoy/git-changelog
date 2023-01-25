@@ -1,17 +1,19 @@
 """The module responsible for building the data."""
 
+from __future__ import annotations
+
 import datetime
 import os
 import sys
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
-from typing import Dict, List, Optional, Tuple, Type, Union
+from typing import Type, Union
 
 from semver import VersionInfo
 
 from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle, ConventionalCommitStyle
 from git_changelog.providers import GitHub, GitLab, ProviderRefParser
 
-StyleType = Optional[Union[str, CommitStyle, Type[CommitStyle]]]
+StyleType = Union[str, CommitStyle, Type[CommitStyle]]
 
 
 def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
@@ -43,7 +45,7 @@ def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
 class Section:
     """A list of commits grouped by section_type."""
 
-    def __init__(self, section_type: str = "", commits: List[Commit] = None):
+    def __init__(self, section_type: str = "", commits: list[Commit] | None = None):
         """
         Initialization method.
 
@@ -52,7 +54,7 @@ class Section:
             commits: The list of commits.
         """
         self.type: str = section_type
-        self.commits: List[Commit] = commits or []
+        self.commits: list[Commit] = commits or []
 
 
 class Version:
@@ -61,9 +63,9 @@ class Version:
     def __init__(
         self,
         tag: str = "",
-        date: Optional[datetime.date] = None,
-        sections: List[Section] = None,
-        commits: List[Commit] = None,
+        date: datetime.date | None = None,
+        sections: list[Section] | None = None,
+        commits: list[Commit] | None = None,
         url: str = "",
         compare_url: str = "",
     ):
@@ -81,17 +83,17 @@ class Version:
         self.tag = tag
         self.date = date
 
-        self.sections_list: List[Section] = sections or []
-        self.sections_dict: Dict[str, Section] = {section.type: section for section in self.sections_list}
-        self.commits: List[Commit] = commits or []
+        self.sections_list: list[Section] = sections or []
+        self.sections_dict: dict[str, Section] = {section.type: section for section in self.sections_list}
+        self.commits: list[Commit] = commits or []
         self.url: str = url
         self.compare_url: str = compare_url
-        self.previous_version: Union[Version, None] = None
-        self.next_version: Union[Version, None] = None
-        self.planned_tag: Optional[str] = None
+        self.previous_version: Version | None = None
+        self.next_version: Version | None = None
+        self.planned_tag: str | None = None
 
     @property
-    def typed_sections(self) -> List[Section]:
+    def typed_sections(self) -> list[Section]:
         """Return typed sections only.
 
         Returns:
@@ -100,7 +102,7 @@ class Version:
         return [section for section in self.sections_list if section.type]
 
     @property
-    def untyped_section(self) -> Optional[Section]:
+    def untyped_section(self) -> Section | None:
         """Return untyped section if any.
 
         Returns:
@@ -143,7 +145,7 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
-    STYLE: Dict[str, Type[CommitStyle]] = {
+    STYLE: dict[str, Type[CommitStyle]] = {
         "basic": BasicStyle,
         "angular": AngularStyle,
         "atom": AtomStyle,
@@ -153,8 +155,8 @@ class Changelog:
     def __init__(  # noqa: WPS231
         self,
         repository: str,
-        provider: Optional[ProviderRefParser] = None,
-        style: StyleType = None,
+        provider: ProviderRefParser | None = None,
+        style: StyleType | None = None,
     ):
         """
         Initialization method.
@@ -194,7 +196,7 @@ class Changelog:
 
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
-        self.commits: List[Commit] = self.parse_commits()
+        self.commits: list[Commit] = self.parse_commits()
 
         # apply dates to commits and group them by version
         dates = self.apply_versions_to_commits()
@@ -259,7 +261,7 @@ class Changelog:
         """
         return self.run_git("log", "--date=unix", "--format=" + self.FORMAT)
 
-    def parse_commits(self) -> List[Commit]:
+    def parse_commits(self) -> list[Commit]:
         """Parse the output of 'git log' into a list of commits.
 
         Returns:
@@ -306,7 +308,7 @@ class Changelog:
 
         return commits
 
-    def apply_versions_to_commits(self) -> Dict[str, datetime.date]:
+    def apply_versions_to_commits(self) -> dict[str, datetime.date]:
         """Iterate on the commits to apply them a date.
 
         Returns:
@@ -323,8 +325,8 @@ class Changelog:
         return versions_dates
 
     def group_commits_by_version(  # noqa: WPS231
-        self, dates: Dict[str, datetime.date]
-    ) -> Tuple[List[Version], Dict[str, Version]]:
+        self, dates: dict[str, datetime.date]
+    ) -> tuple[list[Version], dict[str, Version]]:
         """Iterate on commits to group them by version.
 
         Arguments:
@@ -335,7 +337,7 @@ class Changelog:
         """
         versions_list = []
         versions_dict = {}
-        versions_types_dict: Dict[str, Dict[str, Section]] = {}
+        versions_types_dict: dict[str, dict[str, Section]] = {}
         next_version = None
         for commit in self.commits:
             if commit.version not in versions_dict:

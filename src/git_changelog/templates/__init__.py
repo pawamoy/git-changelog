@@ -1,5 +1,7 @@
 """The subpackage containing the builtin templates."""
 
+from __future__ import annotations
+
 import os
 
 from jinja2 import Environment, FileSystemLoader, Template
