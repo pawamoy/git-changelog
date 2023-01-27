@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime
 import os
 import sys
+from contextlib import suppress
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
 from typing import Type, Union
 
@@ -215,18 +216,20 @@ class Changelog:
                     break
                 elif commit.style["is_minor"]:
                     minor = True
-            if major:
-                planned_tag = bump(last_tag, "major")
-            elif minor:
-                planned_tag = bump(last_tag, "minor")
-            else:
-                planned_tag = bump(last_tag, "patch")
-            last_version.planned_tag = planned_tag
-            if self.provider:
-                last_version.url = self.provider.get_tag_url(tag=planned_tag)
-                last_version.compare_url = self.provider.get_compare_url(
-                    base=last_version.previous_version.tag, target=last_version.planned_tag
-                )
+            # never fail on non-semver versions
+            with suppress(ValueError):
+                if major:
+                    planned_tag = bump(last_tag, "major")
+                elif minor:
+                    planned_tag = bump(last_tag, "minor")
+                else:
+                    planned_tag = bump(last_tag, "patch")
+                last_version.planned_tag = planned_tag
+                if self.provider:
+                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
+                    last_version.compare_url = self.provider.get_compare_url(
+                        base=last_version.previous_version.tag, target=last_version.planned_tag
+                    )
 
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
