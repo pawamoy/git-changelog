@@ -275,6 +275,14 @@ class Changelog:
         commits = []
         pos = 0
         while pos < size:
+            # build body
+            nbl_index = 9
+            body = []
+            while lines[pos + nbl_index] != self.MARKER:
+                body.append(lines[pos + nbl_index].strip("\r"))
+                nbl_index += 1
+
+            # build commit
             commit = Commit(
                 commit_hash=lines[pos],
                 author_name=lines[pos + 1],
@@ -285,15 +293,8 @@ class Changelog:
                 committer_date=lines[pos + 6],
                 refs=lines[pos + 7],
                 subject=lines[pos + 8],
-                body=[lines[pos + 9]],
+                body=body,
             )
-
-            # append body lines
-            nbl_index = 10
-            while lines[pos + nbl_index] != self.MARKER:
-                commit.body.append(lines[pos + nbl_index])
-                nbl_index += 1
-            pos += nbl_index + 1
 
             # expand commit object with provider parsing
             if self.provider:
