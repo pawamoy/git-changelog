@@ -24,13 +24,13 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
   Guesses next version based on last commits.
 
 - Todo:
-  - [Plugin architecture][issue-19],
-    to support more commit styles and git services.
-  - [Template context injection][issue-17],
-    to furthermore customize how your changelog will be rendered.
-  - [Easy access to "Breaking Changes"][issue-14] in the templates.
-  - [Update changelog in-place][issue-15], paired with
-    [commits/dates/versions range limitation ability][issue-16].
+    - [Plugin architecture][issue-19],
+      to support more commit styles and git services.
+    - [Template context injection][issue-17],
+      to furthermore customize how your changelog will be rendered.
+    - [Easy access to "Breaking Changes"][issue-14] in the templates.
+    - [Update changelog in-place][issue-15], paired with
+      [commits/dates/versions range limitation ability][issue-16].
 
 [jinja2]:                 http://jinja.pocoo.org/
 [keep-a-changelog]:       http://keepachangelog.com/en/1.0.0/
@@ -65,8 +65,9 @@ pipx install git-changelog
 ## Usage (command-line)
 
 ```
-usage: git-changelog [-h] [-o OUTPUT] [-s {angular,atom,basic}]
-                     [-t {angular,keepachangelog}] [-v]
+usage: git-changelog [-h] [-o OUTPUT] [-R]
+                     [-s {angular,atom,conventional,basic}]
+                     [-t {angular,keepachangelog}] [-T] [-v]
                      REPOSITORY
 
 Command line tool for git-changelog Python package.
@@ -78,12 +79,15 @@ optional arguments:
   -h, --help            Show this help message and exit.
   -o OUTPUT, --output OUTPUT
                         Output to given file. Default: stdout.
-  -s {angular,atom,basic}, --style {angular,atom,basic}
-                        The commit style to match against.
+  -R, --no-parse-refs   Do not parse provider-specific references in commit
+                        messages (issues, PRs, etc.).
+  -s {angular,atom,conventional,basic}, --style {angular,atom,conventional,basic}
+                        The commit style to match against. Default: basic.
   -t {angular,keepachangelog}, --template {angular,keepachangelog}
                         The Jinja2 template to use. Prefix with "path:" to
                         specify the path to a directory containing a file
                         named "changelog.md".
+  -T, --trailers        Parse Git trailers in the commit message. See
+                        https://git-scm.com/docs/git-interpret-trailers.
   -v, --version         Show the current version of the program and exit.
-
 ```
