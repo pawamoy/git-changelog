@@ -18,10 +18,10 @@ class Commit:
         commit_hash: str,
         author_name: str = "",
         author_email: str = "",
-        author_date: str = "",
+        author_date: str | datetime = "",
         committer_name: str = "",
         committer_email: str = "",
-        committer_date: str = "",
+        committer_date: str | datetime = "",
         refs: str = "",
         subject: str = "",
         body: list[str] | None = None,
@@ -34,22 +34,31 @@ class Commit:
             commit_hash: The commit hash.
             author_name: The author name.
             author_email: The author email.
-            author_date: The authoring date.
+            author_date: The authoring date (datetime or UTC timestamp).
             committer_name: The committer name.
             committer_email: The committer email.
-            committer_date: The committing date.
+            committer_date: The committing date (datetime or UTC timestamp).
             refs: The commit refs.
             subject: The commit message subject.
             body: The commit message body.
             url: The commit URL.
         """
+        if not author_date:
+            author_date = datetime.now()
+        elif isinstance(author_date, str):
+            author_date = datetime.utcfromtimestamp(float(author_date))
+        if not committer_date:
+            committer_date = datetime.now()
+        elif isinstance(committer_date, str):
+            committer_date = datetime.utcfromtimestamp(float(committer_date))
+
         self.hash: str = commit_hash
         self.author_name: str = author_name
         self.author_email: str = author_email
-        self.author_date: datetime = datetime.utcfromtimestamp(float(author_date))
+        self.author_date: datetime = author_date
         self.committer_name: str = committer_name
         self.committer_email: str = committer_email
-        self.committer_date: datetime = datetime.utcfromtimestamp(float(committer_date))
+        self.committer_date: datetime = committer_date
         self.subject: str = subject
         self.body: list[str] = body or []
         self.url: str = url
