@@ -159,6 +159,7 @@ class Changelog:
         provider: ProviderRefParser | None = None,
         style: StyleType | None = None,
         parse_provider_refs: bool = True,
+        parse_trailers: bool = False,
     ):
         """
         Initialization method.
@@ -168,9 +169,11 @@ class Changelog:
             provider: The provider to use (github.com, gitlab.com, etc.).
             style: The commit style to use (angular, atom, etc.).
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
+            parse_trailers: Whether to parse Git trailers in the commit messages.
         """
         self.repository: str = repository
         self.parse_provider_refs: bool = parse_provider_refs
+        self.parse_trailers: bool = parse_trailers
 
         # set provider
         if not provider:
@@ -297,6 +300,7 @@ class Changelog:
                 refs=lines[pos + 7],
                 subject=lines[pos + 8],
                 body=body,
+                parse_trailers=self.parse_trailers,
             )
 
             # expand commit object with provider parsing

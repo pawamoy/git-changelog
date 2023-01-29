@@ -101,6 +101,14 @@ def get_parser() -> argparse.ArgumentParser:
         'to a directory containing a file named "changelog.md".',
     )
     parser.add_argument(
+        "-T",
+        "--trailers",
+        action="store_true",
+        default=False,
+        dest="parse_trailers",
+        help="Parse Git trailers in the commit message. See https://git-scm.com/docs/git-interpret-trailers.",
+    )
+    parser.add_argument(
         "-v",
         "--version",
         action="version",
@@ -141,6 +149,7 @@ def main(args: list[str] | None = None) -> int:
         opts.repository,
         style=opts.style,
         parse_provider_refs=opts.parse_refs,
+        parse_trailers=opts.parse_trailers,
     )
 
     # get rendered contents

@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import os
+from urllib.parse import urlparse
 
 from jinja2 import Environment, FileSystemLoader, Template
+
+
+def _filter_is_url(value: str) -> bool:
+    return bool(urlparse(value).scheme)
 
 
 def get_path() -> str:
@@ -25,7 +30,9 @@ def get_env(path: str) -> Environment:
     Returns:
         The Jinja environment.
     """
-    return Environment(loader=FileSystemLoader(path))  # noqa: S701 (we are OK with not auto-escaping)
+    env = Environment(loader=FileSystemLoader(path))  # noqa: S701 (we are OK with not auto-escaping)
+    env.filters.update({"is_url": _filter_is_url})
+    return env
 
 
 def get_custom_template(path: str) -> Template:

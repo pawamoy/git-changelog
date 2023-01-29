@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from datetime import datetime
 from typing import Any, Pattern
 
@@ -13,7 +14,7 @@ from git_changelog.providers import ProviderRefParser, Ref
 class Commit:
     """A class to represent a commit."""
 
-    def __init__(
+    def __init__(  # noqa: WPS231
         self,
         commit_hash: str,
         author_name: str = "",
@@ -26,6 +27,7 @@ class Commit:
         subject: str = "",
         body: list[str] | None = None,
         url: str = "",
+        parse_trailers: bool = False,
     ):
         """
         Initialization method.
@@ -42,6 +44,7 @@ class Commit:
             subject: The commit message subject.
             body: The commit message body.
             url: The commit URL.
+            parse_trailers: Whether to parse Git trailers.
         """
         if not author_date:
             author_date = datetime.now()
@@ -74,6 +77,12 @@ class Commit:
 
         self.text_refs: dict[str, list[Ref]] = {}
         self.style: dict[str, Any] = {}
+
+        self.trailers: dict[str, str] = {}
+        self.body_without_trailers = self.body
+
+        if parse_trailers:
+            self._parse_trailers()
 
     def update_with_style(self, style: "CommitStyle") -> None:
         """
@@ -110,6 +119,24 @@ class Commit:
                 for issue in self.text_refs["issues"]:
                     if issue.ref not in self.subject:
                         self.text_refs["issues_not_in_subject"].append(issue)
+
+    def _parse_trailers(self) -> None:
+        last_blank_line = -1
+        for index, line in enumerate(self.body):
+            if not line:
+                last_blank_line = index
+        with suppress(ValueError):
+            trailers = self._parse_trailers_block(self.body[last_blank_line + 1 :])
+            if trailers:
+                self.trailers.update(trailers)
+                self.body_without_trailers = self.body[:last_blank_line]
+
+    def _parse_trailers_block(self, lines: list[str]) -> dict[str, str]:
+        trailers = {}
+        for line in lines:
+            title, value = line.split(": ", 1)
+            trailers[title] = value.strip()
+        return trailers  # or raise ValueError due to split unpacking
 
 
 class CommitStyle(ABC):
