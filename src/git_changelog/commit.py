@@ -200,16 +200,20 @@ class AngularStyle(CommitStyle):
 
     TYPES: dict[str, str] = {
         "build": "Build",
-        "ci": "CI",
-        "perf": "Performance Improvements",
+        "chore": "Chore",
+        "ci": "Continuous Integration",
+        "deps": "Dependencies",
+        "doc": "Docs",
+        "docs": "Docs",
         "feat": "Features",
         "fix": "Bug Fixes",
-        "revert": "Reverts",
-        "docs": "Docs",
-        "style": "Style",
+        "perf": "Performance Improvements",
+        "ref": "Code Refactoring",
         "refactor": "Code Refactoring",
+        "revert": "Reverts",
+        "style": "Style",
         "test": "Tests",
-        "chore": "Chore",
+        "tests": "Tests",
     }
     SUBJECT_REGEX: Pattern = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))  # noqa: WPS323 (%)
