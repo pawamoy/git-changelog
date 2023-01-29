@@ -84,7 +84,12 @@ def get_parser() -> argparse.ArgumentParser:
         help="Do not parse provider-specific references in commit messages (issues, PRs, etc.).",
     )
     parser.add_argument(
-        "-s", "--style", choices=STYLES, default="basic", dest="style", help="The commit style to match against."
+        "-s",
+        "--style",
+        choices=STYLES,
+        default="basic",
+        dest="style",
+        help="The commit style to match against. Default: basic.",
     )
     parser.add_argument(
         "-t",
