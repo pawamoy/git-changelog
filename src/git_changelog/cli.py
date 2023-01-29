@@ -76,6 +76,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Output to given file. Default: stdout.",
     )
     parser.add_argument(
+        "-R",
+        "--no-parse-refs",
+        action="store_false",
+        dest="parse_refs",
+        default=True,
+        help="Do not parse provider-specific references in commit messages (issues, PRs, etc.).",
+    )
+    parser.add_argument(
         "-s", "--style", choices=STYLES, default="basic", dest="style", help="The commit style to match against."
     )
     parser.add_argument(
@@ -124,7 +132,11 @@ def main(args: list[str] | None = None) -> int:
         template = templates.get_template(opts.template)
 
     # build data
-    changelog = Changelog(opts.repository, style=opts.style)
+    changelog = Changelog(
+        opts.repository,
+        style=opts.style,
+        parse_provider_refs=opts.parse_refs,
+    )
 
     # get rendered contents
     rendered = template.render(changelog=changelog)

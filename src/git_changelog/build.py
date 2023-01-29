@@ -158,6 +158,7 @@ class Changelog:
         repository: str,
         provider: ProviderRefParser | None = None,
         style: StyleType | None = None,
+        parse_provider_refs: bool = True,
     ):
         """
         Initialization method.
@@ -166,8 +167,10 @@ class Changelog:
             repository: The repository (directory) for which to build the changelog.
             provider: The provider to use (github.com, gitlab.com, etc.).
             style: The commit style to use (angular, atom, etc.).
+            parse_provider_refs: Whether to parse provider-specific references in the commit messages.
         """
         self.repository: str = repository
+        self.parse_provider_refs: bool = parse_provider_refs
 
         # set provider
         if not provider:
@@ -298,7 +301,7 @@ class Changelog:
 
             # expand commit object with provider parsing
             if self.provider:
-                commit.update_with_provider(self.provider)
+                commit.update_with_provider(self.provider, self.parse_provider_refs)
 
             elif self.remote_url:
                 # set the commit url based on remote_url (could be wrong)

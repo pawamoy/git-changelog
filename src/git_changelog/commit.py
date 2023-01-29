@@ -84,12 +84,13 @@ class Commit:
         """
         self.style.update(style.parse_commit(self))
 
-    def update_with_provider(self, provider: ProviderRefParser) -> None:
+    def update_with_provider(self, provider: ProviderRefParser, parse_refs: bool = True) -> None:  # noqa: WPS231
         """
         Apply the provider-parsed data to this commit.
 
         Arguments:
             provider: The provider to use.
+            parse_refs: Whether to parse references for this provider.
         """
         # set the commit url based on provider
         # FIXME: hardcoded 'commits'
@@ -100,14 +101,15 @@ class Commit:
             self.url = f"{provider.url}/{provider.namespace}/{provider.project}/commit/{self.hash}"
 
         # build commit text references from its subject and body
-        for ref_type in provider.REF.keys():
-            self.text_refs[ref_type] = provider.get_refs(ref_type, "\n".join([self.subject] + self.body))
+        if parse_refs:
+            for ref_type in provider.REF.keys():
+                self.text_refs[ref_type] = provider.get_refs(ref_type, "\n".join([self.subject] + self.body))
 
-        if "issues" in self.text_refs:
-            self.text_refs["issues_not_in_subject"] = []
-            for issue in self.text_refs["issues"]:
-                if issue.ref not in self.subject:
-                    self.text_refs["issues_not_in_subject"].append(issue)
+            if "issues" in self.text_refs:
+                self.text_refs["issues_not_in_subject"] = []
+                for issue in self.text_refs["issues"]:
+                    if issue.ref not in self.subject:
+                        self.text_refs["issues_not_in_subject"].append(issue)
 
 
 class CommitStyle(ABC):
