@@ -9,9 +9,9 @@
 {%- endif %}
 
 {% for type in changelog.style.DEFAULT_RENDER %}
-{%- if type in version.sections_dict -%}
-{%- with section = version.sections_dict[type] -%}
-{% include 'section.md' with context %}
-{%- endwith -%}
-{%- endif -%}
-{%- endfor -%}
+{%- if type in version.sections_dict %}
+{%- with section = version.sections_dict[type] %}
+{%- include 'section.md' with context %}
+{% endwith %}
+{%- endif %}
+{%- endfor %}
