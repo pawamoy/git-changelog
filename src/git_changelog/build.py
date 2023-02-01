@@ -155,11 +155,13 @@ class Changelog:
 
     def __init__(  # noqa: WPS231
         self,
-        repository: str,
+        repository: str | Path,
         provider: ProviderRefParser | None = None,
         style: StyleType | None = None,
         parse_provider_refs: bool = True,
         parse_trailers: bool = False,
+        sections: list[str] | None = None,
+        bump_latest: bool = True,
     ):
         """
         Initialization method.
@@ -171,7 +173,7 @@ class Changelog:
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
         """
-        self.repository: str = repository
+        self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
 
@@ -201,41 +203,29 @@ class Changelog:
             style = style()
         self.style: CommitStyle = style
 
+        # set sections
+        if sections:
+            sections = [self.style.TYPES[section] for section in sections]
+        else:
+            sections = self.style.DEFAULT_RENDER
+        self.sections = sections
+
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
         self.commits: list[Commit] = self.parse_commits()
 
         # apply dates to commits and group them by version
-        dates = self.apply_versions_to_commits()
-        v_list, v_dict = self.group_commits_by_version(dates)
+        dates = self._apply_versions_to_commits()
+        v_list, v_dict = self._group_commits_by_version(dates)
         self.versions_list = v_list
         self.versions_dict = v_dict
 
-        # guess the next version number based on last version and recent commits
-        last_version = self.versions_list[0]
-        if not last_version.tag and last_version.previous_version:
-            last_tag = last_version.previous_version.tag
-            major = minor = False  # noqa: WPS429
-            for commit in last_version.commits:
-                if commit.style["is_major"]:
-                    major = True
-                    break
-                elif commit.style["is_minor"]:
-                    minor = True
-            # never fail on non-semver versions
-            with suppress(ValueError):
-                if major:
-                    planned_tag = bump(last_tag, "major")
-                elif minor:
-                    planned_tag = bump(last_tag, "minor")
-                else:
-                    planned_tag = bump(last_tag, "patch")
-                last_version.planned_tag = planned_tag
-                if self.provider:
-                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
-                    last_version.compare_url = self.provider.get_compare_url(
-                        base=last_version.previous_version.tag, target=last_version.planned_tag
-                    )
+        # try to guess the new version by bumping the latest one
+        if bump_latest:
+            self._bump_latest()
+
+        # fix a single, initial version to 0.1.0
+        self._fix_single_version()
 
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
@@ -303,12 +293,14 @@ class Changelog:
                 parse_trailers=self.parse_trailers,
             )
 
+            pos += nbl_index + 1
+
             # expand commit object with provider parsing
             if self.provider:
                 commit.update_with_provider(self.provider, self.parse_provider_refs)
 
+            # set the commit url based on remote_url (could be wrong)
             elif self.remote_url:
-                # set the commit url based on remote_url (could be wrong)
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
             # expand commit object with style parsing
@@ -319,12 +311,7 @@ class Changelog:
 
         return commits
 
-    def apply_versions_to_commits(self) -> dict[str, datetime.date]:
-        """Iterate on the commits to apply them a date.
-
-        Returns:
-            A dictionary with versions as keys and dates as values.
-        """
+    def _apply_versions_to_commits(self) -> dict[str, datetime.date]:
         versions_dates = {"": datetime.date.today()}
         version = None
         for commit in self.commits:
@@ -335,17 +322,9 @@ class Changelog:
                 commit.version = version
         return versions_dates
 
-    def group_commits_by_version(  # noqa: WPS231
+    def _group_commits_by_version(  # noqa: WPS231
         self, dates: dict[str, datetime.date]
     ) -> tuple[list[Version], dict[str, Version]]:
-        """Iterate on commits to group them by version.
-
-        Arguments:
-            dates: A dictionary with versions as keys and their dates as values.
-
-        Returns:
-            A tuple containing the versions as a list and the versions as a dictionary.
-        """
         versions_list = []
         versions_dict = {}
         versions_types_dict: dict[str, dict[str, Section]] = {}
@@ -378,3 +357,38 @@ class Changelog:
                 base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
             )
         return versions_list, versions_dict
+
+    def _bump_latest(self) -> None:
+        # guess the next version number based on last version and recent commits
+        last_version = self.versions_list[0]
+        if not last_version.tag and last_version.previous_version:
+            last_tag = last_version.previous_version.tag
+            major = minor = False  # noqa: WPS429
+            for commit in last_version.commits:
+                if commit.style["is_major"]:
+                    major = True
+                    break
+                elif commit.style["is_minor"]:
+                    minor = True
+            # never fail on non-semver versions
+            with suppress(ValueError):
+                if major:
+                    planned_tag = bump(last_tag, "major")
+                elif minor:
+                    planned_tag = bump(last_tag, "minor")
+                else:
+                    planned_tag = bump(last_tag, "patch")
+                last_version.planned_tag = planned_tag
+                if self.provider:
+                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
+                    last_version.compare_url = self.provider.get_compare_url(
+                        base=last_version.previous_version.tag, target=last_version.planned_tag
+                    )
+
+    def _fix_single_version(self) -> None:
+        last_version = self.versions_list[0]
+        if len(self.versions_list) == 1 and last_version.planned_tag is None:
+            planned_tag = "0.1.0"
+            last_version.tag = planned_tag
+            last_version.url += planned_tag
+            last_version.compare_url = last_version.compare_url.replace("HEAD", planned_tag)

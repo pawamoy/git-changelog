@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
 from typing import Any, Pattern
@@ -145,6 +146,7 @@ class CommitStyle(ABC):
     TYPES: dict[str, str]
     TYPE_REGEX: Pattern
     BREAK_REGEX: Pattern
+    DEFAULT_RENDER: list[str]
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
@@ -158,6 +160,30 @@ class CommitStyle(ABC):
             A dictionary containing the parsed data.
         """  # noqa: DAR202,DAR401
         raise NotImplementedError
+
+    @classmethod
+    def _format_sections_help(cls):
+        reversed_map = defaultdict(list)
+        for section_type, section_title in cls.TYPES.items():
+            reversed_map[section_title].append(section_type)
+        default_sections = cls.DEFAULT_RENDER
+        default = "- " + "\n- ".join(f"{', '.join(reversed_map[title])}: {title}" for title in default_sections)
+        additional = "- " + "\n- ".join(
+            f"{', '.join(types)}: {title}" for title, types in reversed_map.items() if title not in default_sections
+        )
+        return re.sub(
+            r"\n *",
+            "\n",
+            f"""
+            {cls.__name__.replace('Style', '').upper()} STYLE
+
+            Default sections:
+            {default}
+
+            Additional sections:
+            {additional}
+            """,
+        )
 
 
 class BasicStyle(CommitStyle):
@@ -174,7 +200,7 @@ class BasicStyle(CommitStyle):
 
     TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)  # noqa: WPS323
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
-    DEFAULT_RENDER = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
+    DEFAULT_RENDER: list[str] = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
         commit_type = self.parse_type(commit.subject)
@@ -246,7 +272,7 @@ class AngularStyle(CommitStyle):
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))  # noqa: WPS323 (%)
     )
     BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
-    DEFAULT_RENDER = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
+    DEFAULT_RENDER: list[str] = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
         subject = self.parse_subject(commit.subject)
@@ -307,6 +333,7 @@ class ConventionalCommitStyle(AngularStyle):
     """Conventional commit message style."""
 
     TYPES: dict[str, str] = AngularStyle.TYPES
+    DEFAULT_RENDER: list[str] = AngularStyle.DEFAULT_RENDER
     SUBJECT_REGEX: Pattern = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"  # noqa: WPS323 (%)
         % ("|".join(TYPES.keys()))

@@ -5,6 +5,30 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [0.7.0](https://github.com/pawamoy/git-changelog/releases/tag/0.7.0) - 2023-02-02
+
+<small>[Compare with 0.6.0](https://github.com/pawamoy/git-changelog/compare/0.6.0...0.7.0)</small>
+
+### Features
+
+- Support Git trailers, render them in Keep A Changelog template ([cdf17c0](https://github.com/pawamoy/git-changelog/commit/cdf17c0302d4beaf933e237e2d838a2b8546688d) by Timothée Mazzucotelli).
+- Allow disabling parsing of provider-specific references ([cf41a97](https://github.com/pawamoy/git-changelog/commit/cf41a97d3aefabc3d97160e540417fa6d276b25f) by Timothée Mazzucotelli).
+
+### Bug Fixes
+
+- Fix spacing in keepachangelog templates ([cf5117a](https://github.com/pawamoy/git-changelog/commit/cf5117a27fc28503a12bc133c5ed663628b02740) by Timothée Mazzucotelli).
+- Don't crash when trying to parse the latest tag as semver ([e90aa2b](https://github.com/pawamoy/git-changelog/commit/e90aa2be1c94fa792f26b82e0db86b10924a8c83) by Timothée Mazzucotelli).
+- Keep a Changelog template: don't capitalize commit summary ([87348ed](https://github.com/pawamoy/git-changelog/commit/87348ed1503b043d6bfae2e113c09f7c9c166501) by Timothée Mazzucotelli).
+- Keep a Changelog template: respect sections order (don't sort) ([f645e62](https://github.com/pawamoy/git-changelog/commit/f645e62bf49ed61601ba095715f9098b6935ad2f) by Timothée Mazzucotelli).
+- Use `importlib.metadata` instead of `pkg_resources` to get current version ([79109d0](https://github.com/pawamoy/git-changelog/commit/79109d0f4e55f821bb8c8299477c7d0693435445) by Timothée Mazzucotelli).
+
+### Code Refactoring
+
+- Detect more commit types (Karma/Angular), rework section titles ([f751736](https://github.com/pawamoy/git-changelog/commit/f75173681bbdd22b7da1928f2e5369018bf56313) by Timothée Mazzucotelli).
+- Allow passing datetimes, UTC timestamps as strings, or nothing when creating commit ([34460ab](https://github.com/pawamoy/git-changelog/commit/34460ab79b95754343874701d8287064b8280402) by Timothée Mazzucotelli).
+- Build body before instantiating commit ([37de53f](https://github.com/pawamoy/git-changelog/commit/37de53f022a2cfd9f2b9a4f50e56bd1c0cb1c580) by Timothée Mazzucotelli).
+
+
 ## [0.6.0](https://github.com/pawamoy/git-changelog/releases/tag/0.6.0) - 2022-10-26
 
 <small>[Compare with 0.5.0](https://github.com/pawamoy/git-changelog/compare/0.5.0...0.6.0)</small>
