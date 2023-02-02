@@ -14,12 +14,15 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
+from typing import Pattern, TextIO
 
 from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
-from git_changelog.build import Changelog
+from git_changelog.build import Changelog, Version
+from git_changelog.commit import AngularStyle, BasicStyle, CommitStyle, ConventionalCommitStyle
 
 if sys.version_info < (3, 8):
     import importlib_metadata as metadata
@@ -155,8 +158,11 @@ def get_parser() -> argparse.ArgumentParser:
         help="Do not parse provider-specific references in commit messages (issues, PRs, etc.).",
     )
     parser.add_argument(
+        "-c",
         "-s",
         "--style",
+        "--commit-style",
+        "--convention",
         choices=STYLES,
         default="basic",
         dest="style",
@@ -182,6 +188,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-T",
         "--trailers",
+        "--git-trailers",
         action="store_true",
         default=False,
         dest="parse_trailers",
@@ -227,33 +234,126 @@ def main(args: list[str] | None = None) -> int:
     parser = get_parser()
     opts = parser.parse_args(args=args)
 
+    try:
+        build_and_render(
+            repository=opts.repository,
+            template=opts.template,
+            style=opts.style,
+            parse_refs=opts.parse_refs,
+            parse_trailers=opts.parse_trailers,
+            sections=opts.sections,
+            in_place=opts.in_place,
+            output=opts.output,
+            version_regex=opts.version_regex,
+            marker_line=opts.marker_line,
+            bump_latest=opts.bump_latest,
+        )
+    except ValueError as error:
+        print(f"git-changelog: {error}", file=sys.stderr)
+        return 1
+
+    return 0
+
+
+def build_and_render(  # noqa: WPS231
+    repository: str,
+    template: str,
+    style: str | CommitStyle,
+    parse_refs: bool = True,
+    parse_trailers: bool = False,
+    sections: list[str] | None = None,
+    in_place: bool = False,
+    output: str | TextIO | None = None,
+    version_regex: str | None = None,
+    marker_line: str | None = None,
+    bump_latest: bool = True,
+) -> tuple[Changelog, str]:
+    """Build a changelog and render it.
+
+    This function returns the changelog instance and the rendered contents,
+    but also updates the specified output file (side-effect) or writes to stdout.
+
+    Parameters:
+        repository: Path to a local repository.
+        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
+        style: Name of a commit message style/convention.
+        parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+        parse_trailers: Whether to parse Git trailers.
+        sections: Sections to render (features, bug fixes, etc.).
+        in_place: Whether to update the changelog in-place.
+        output: Output/changelog file.
+        version_regex: Regular expression to match versions in an existing changelog file.
+        marker_line: Marker line used to insert contents in an existing changelog.
+        bump_latest: Whether to try and bump the latest version to guess the new one.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The built changelog and the rendered contents.
+    """
     # get template
-    if opts.template.startswith("path:"):
-        path = opts.template.replace("path:", "", 1)
+    if template.startswith("path:"):
+        path = template.replace("path:", "", 1)
         try:
-            template = templates.get_custom_template(path)
+            jinja_template = templates.get_custom_template(path)
         except TemplateNotFound:
-            print(f"git-changelog: no such directory, or missing changelog.md: {path}", file=sys.stderr)
-            return 1
+            raise ValueError(f"No such file: {path}")
+
+        # handle misconfiguration early
+        if in_place and (version_regex is None or marker_line is None):
+            raise ValueError(
+                "Writing in-place with custom templates requires both --version-regex and --marker-line options"
+            )
     else:
-        template = templates.get_template(opts.template)
+        jinja_template = templates.get_template(template)
+
+    if output is None:
+        output = sys.stdout
+
+    # handle misconfiguration early
+    if in_place and output is sys.stdout:
+        raise ValueError("Cannot write in-place to stdout")
 
     # build data
     changelog = Changelog(
-        opts.repository,
-        style=opts.style,
-        parse_provider_refs=opts.parse_refs,
-        parse_trailers=opts.parse_trailers,
+        repository,
+        style=style,
+        parse_provider_refs=parse_refs,
+        parse_trailers=parse_trailers,
+        sections=sections,
+        bump_latest=bump_latest,
     )
 
-    # get rendered contents
-    rendered = template.render(changelog=changelog)
+    # render new entries in-place
+    if in_place:
+        with open(output, "r") as changelog_file:  # type: ignore[arg-type]
+            lines = changelog_file.read().splitlines()
 
-    # write result in specified output
-    if opts.output is sys.stdout:
-        sys.stdout.write(rendered)
+        builtin_template = template in {"angular", "keepachangelog"}
+        if version_regex is None or builtin_template:
+            version_regex = r"^## \[v?(?P<version>[^\]]+)"
+        if marker_line is None or builtin_template:
+            marker_line = "<!-- insertion marker -->"
+
+        last_released = _latest(lines, re.compile(version_regex))
+        if last_released:
+            changelog.versions_list = _unreleased(changelog.versions_list, last_released)
+        rendered = jinja_template.render(changelog=changelog, inplace=True)
+        lines[lines.index(marker_line)] = rendered
+
+        with open(output, "w") as changelog_file:  # type: ignore[arg-type]  # noqa: WPS440
+            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
+
+    # overwrite output file
     else:
-        with open(opts.output, "w") as stream:
-            stream.write(rendered)
+        rendered = jinja_template.render(changelog=changelog)
 
-    return 0
+        # write result in specified output
+        if output is sys.stdout:
+            sys.stdout.write(rendered)
+        else:
+            with open(output, "w") as stream:  # type: ignore[arg-type]
+                stream.write(rendered)
+
+    return changelog, rendered
