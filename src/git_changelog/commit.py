@@ -12,6 +12,14 @@ from typing import Any, Pattern
 from git_changelog.providers import ProviderRefParser, Ref
 
 
+def _clean_body(lines: list[str]):
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    return lines
+
+
 class Commit:
     """A class to represent a commit."""
 
@@ -64,7 +72,7 @@ class Commit:
         self.committer_email: str = committer_email
         self.committer_date: datetime = committer_date
         self.subject: str = subject
-        self.body: list[str] = body or []
+        self.body: list[str] = _clean_body(body) if body else []
         self.url: str = url
 
         tag = ""
