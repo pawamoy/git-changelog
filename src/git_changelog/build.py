@@ -217,8 +217,8 @@ class Changelog:
         self.commits: list[Commit] = self.parse_commits()
 
         # apply dates to commits and group them by version
-        dates = self.apply_versions_to_commits()
-        v_list, v_dict = self.group_commits_by_version(dates)
+        dates = self._apply_versions_to_commits()
+        v_list, v_dict = self._group_commits_by_version(dates)
         self.versions_list = v_list
         self.versions_dict = v_dict
 
@@ -308,12 +308,7 @@ class Changelog:
 
         return commits
 
-    def apply_versions_to_commits(self) -> dict[str, datetime.date]:
-        """Iterate on the commits to apply them a date.
-
-        Returns:
-            A dictionary with versions as keys and dates as values.
-        """
+    def _apply_versions_to_commits(self) -> dict[str, datetime.date]:
         versions_dates = {"": datetime.date.today()}
         version = None
         for commit in self.commits:
@@ -324,17 +319,9 @@ class Changelog:
                 commit.version = version
         return versions_dates
 
-    def group_commits_by_version(  # noqa: WPS231
+    def _group_commits_by_version(  # noqa: WPS231
         self, dates: dict[str, datetime.date]
     ) -> tuple[list[Version], dict[str, Version]]:
-        """Iterate on commits to group them by version.
-
-        Arguments:
-            dates: A dictionary with versions as keys and their dates as values.
-
-        Returns:
-            A tuple containing the versions as a list and the versions as a dictionary.
-        """
         versions_list = []
         versions_dict = {}
         versions_types_dict: dict[str, dict[str, Section]] = {}
