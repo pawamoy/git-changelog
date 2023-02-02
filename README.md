@@ -29,8 +29,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
     - [Template context injection][issue-17],
       to furthermore customize how your changelog will be rendered.
     - [Easy access to "Breaking Changes"][issue-14] in the templates.
-    - [Update changelog in-place][issue-15], paired with
-      [commits/dates/versions range limitation ability][issue-16].
+    - [Commits/dates/versions range limitation ability][issue-16].
 
 [jinja2]:                 http://jinja.pocoo.org/
 [keep-a-changelog]:       http://keepachangelog.com/en/1.0.0/
@@ -65,29 +64,116 @@ pipx install git-changelog
 ## Usage (command-line)
 
 ```
-usage: git-changelog [-h] [-o OUTPUT] [-R]
-                     [-s {angular,atom,conventional,basic}]
+usage: git-changelog [-b] [-h] [-i] [-g VERSION_REGEX] [-m MARKER_LINE]
+                     [-o OUTPUT] [-R] [-c {angular,atom,conventional,basic}]
+                     [-S SECTIONS [SECTIONS ...]]
                      [-t {angular,keepachangelog}] [-T] [-v]
-                     REPOSITORY
+                     [REPOSITORY]
 
-Command line tool for git-changelog Python package.
+Automatic Changelog generator using Jinja2 templates.
+
+This tool parses your commit messages to extract useful data
+that is then rendered using Jinja2 templates, for example to
+a changelog file formatted in Markdown.
+
+Each Git tag will be treated as a version of your project.
+Each version contains a set of commits, and will be an entry
+in your changelog. Commits in each version will be grouped
+by sections, depending on the commit style you follow.
+
+BASIC STYLE
+
+Default sections:
+- add: Added
+- fix: Fixed
+- change: Changed
+- remove: Removed
+
+Additional sections:
+- merge: Merged
+- doc: Documented
+
+ANGULAR STYLE
+
+Default sections:
+- feat: Features
+- fix: Bug Fixes
+- revert: Reverts
+- ref, refactor: Code Refactoring
+- perf: Performance Improvements
+
+Additional sections:
+- build: Build
+- chore: Chore
+- ci: Continuous Integration
+- deps: Dependencies
+- doc, docs: Docs
+- style: Style
+- test, tests: Tests
+
+CONVENTIONALCOMMIT STYLE
+
+Default sections:
+- feat: Features
+- fix: Bug Fixes
+- revert: Reverts
+- ref, refactor: Code Refactoring
+- perf: Performance Improvements
+
+Additional sections:
+- build: Build
+- chore: Chore
+- ci: Continuous Integration
+- deps: Dependencies
+- doc, docs: Docs
+- style: Style
+- test, tests: Tests
 
 positional arguments:
   REPOSITORY            The repository path, relative or absolute.
 
-optional arguments:
+options:
+  -b, --bump            Guess the new latest version by bumping the previous
+                        one based on the set of unreleased commits. For
+                        example, if a commit contains breaking changes, bump
+                        the major number (or the minor number for 0.x
+                        versions). Else if there are new features, bump the
+                        minor number. Else just bump the patch number.
   -h, --help            Show this help message and exit.
+  -i, --in-place        Insert new entries (versions missing from changelog)
+                        in-place. An output file must be specified. With
+                        custom templates, you must pass two additional
+                        arguments: --version-regex and --marker-line. When
+                        writing in-place, an 'inplace' variable will be
+                        injected in the Jinja context, allowing to adapt the
+                        generated contents (for example to skip changelog
+                        headers or footers).
+  -g, --version-regex VERSION_REGEX
+                        A regular expression to match versions in the existing
+                        changelog (used to find the latest release) when
+                        writing in-place. The regular expression must be a
+                        Python regex with a 'version' named group.
+  -m, --marker-line MARKER_LINE
+                        A marker line at which to insert new entries (versions
+                        missing from changelog). If two marker lines are
+                        present in the changelog, the contents between those
+                        two lines will be overwritten (useful to update an
+                        'Unreleased' entry for example).
   -o OUTPUT, --output OUTPUT
                         Output to given file. Default: stdout.
   -R, --no-parse-refs   Do not parse provider-specific references in commit
                         messages (issues, PRs, etc.).
-  -s {angular,atom,conventional,basic}, --style {angular,atom,conventional,basic}
+  -c, -s, --style, --commit-style,  --convention {angular,atom,conventional,basic}
                         The commit style to match against. Default: basic.
-  -t {angular,keepachangelog}, --template {angular,keepachangelog}
+  -S, --sections SECTIONS [SECTIONS ...]
+                        The sections to render. See the available sections for
+                        each supported style in the description.
+  -t, --template {angular,keepachangelog}
                         The Jinja2 template to use. Prefix with "path:" to
                         specify the path to a directory containing a file
                         named "changelog.md".
-  -T, --trailers        Parse Git trailers in the commit message. See
+  -T, --trailers, --git-trailers
+                        Parse Git trailers in the commit message. See
                         https://git-scm.com/docs/git-interpret-trailers.
   -v, --version         Show the current version of the program and exit.
 ```
