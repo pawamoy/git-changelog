@@ -292,6 +292,8 @@ class Changelog:
                 parse_trailers=self.parse_trailers,
             )
 
+            pos += nbl_index + 1
+
             # expand commit object with provider parsing
             if self.provider:
                 commit.update_with_provider(self.provider, self.parse_provider_refs)
