@@ -298,8 +298,8 @@ class Changelog:
             if self.provider:
                 commit.update_with_provider(self.provider, self.parse_provider_refs)
 
-            elif self.remote_url:
                 # set the commit url based on remote_url (could be wrong)
+            elif self.remote_url:
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
             # expand commit object with style parsing
