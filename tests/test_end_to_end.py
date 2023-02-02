@@ -95,3 +95,32 @@ def test_rendering_custom_sections(repo):
         if section_type != "feat":
             assert section_title not in rendered
 
+
+def test_rendering_in_place(repo):  # noqa: WPS218
+    """Render changelog in-place.
+
+    Parameters:
+        repo: Path to a temporary repository.
+    """
+    _, rendered = build_and_render(
+        str(repo),
+        style="angular",
+        bump_latest=False,
+        output=repo.joinpath("changelog.md").as_posix(),
+        template="keepachangelog",
+    )
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 2
+    assert "Unreleased" in rendered
+    latest_tag = "91.6.14"
+    assert latest_tag not in rendered
+    _git("-C", repo, "tag", latest_tag)
+    _, rendered = build_and_render(
+        str(repo),
+        style="angular",
+        bump_latest=True,
+        output=repo.joinpath("changelog.md").as_posix(),
+        template="keepachangelog",
+    )
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
+    assert "Unreleased" not in rendered
+    assert latest_tag in rendered

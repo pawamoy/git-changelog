@@ -102,6 +102,43 @@ def get_parser() -> argparse.ArgumentParser:
         "-h", "--help", action="help", default=argparse.SUPPRESS, help="Show this help message and exit."
     )
     parser.add_argument(
+        "-i",
+        "--in-place",
+        action="store_true",
+        dest="in_place",
+        default=False,
+        help="Insert new entries (versions missing from changelog) in-place. "
+        "An output file must be specified. With custom templates, "
+        "you must pass two additional arguments: --version-regex and --marker-line. "
+        "When writing in-place, an 'inplace' variable "
+        "will be injected in the Jinja context, "
+        "allowing to adapt the generated contents "
+        "(for example to skip changelog headers or footers).",
+    )
+    parser.add_argument(
+        "-g",
+        "--version-regex",
+        action="store",
+        dest="version_regex",
+        default=None,
+        help="A regular expression to match versions in the existing changelog "
+        "(used to find the latest release) when writing in-place. "
+        "The regular expression must be a Python regex with a 'version' named group. ",
+    )
+
+    parser.add_argument(
+        "-m",
+        "--marker-line",
+        action="store",
+        dest="marker_line",
+        default=None,
+        help="A marker line at which to insert new entries "
+        "(versions missing from changelog). "
+        "If two marker lines are present in the changelog, "
+        "the contents between those two lines will be overwritten "
+        "(useful to update an 'Unreleased' entry for example).",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         action="store",
@@ -158,6 +195,21 @@ def get_parser() -> argparse.ArgumentParser:
         help="Show the current version of the program and exit.",
     )
     return parser
+
+
+def _latest(lines: list[str], regex: Pattern) -> str | None:
+    for line in lines:
+        match = regex.search(line)
+        if match:
+            return match.groupdict()["version"]
+    return None
+
+
+def _unreleased(versions: list[Version], last_release: str):
+    for index, version in enumerate(versions):
+        if version.tag == last_release:
+            return versions[:index]
+    return versions
 
 
 def main(args: list[str] | None = None) -> int:
