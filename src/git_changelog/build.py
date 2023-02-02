@@ -6,6 +6,7 @@ import datetime
 import os
 import sys
 from contextlib import suppress
+from pathlib import Path
 from subprocess import check_output  # noqa: S404 (we trust the commands we run)
 from typing import Type, Union
 
@@ -155,7 +156,7 @@ class Changelog:
 
     def __init__(  # noqa: WPS231
         self,
-        repository: str,
+        repository: str | Path,
         provider: ProviderRefParser | None = None,
         style: StyleType | None = None,
         parse_provider_refs: bool = True,
@@ -175,7 +176,7 @@ class Changelog:
             sections: The sections to render (features, bug fixes, etc.).
             bump_latest: Whether to try and bump latest version to guess new one.
         """
-        self.repository: str = repository
+        self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
 

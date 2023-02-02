@@ -84,7 +84,9 @@ def get_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument("repository", metavar="REPOSITORY", help="The repository path, relative or absolute.")
+    parser.add_argument(
+        "repository", metavar="REPOSITORY", nargs="?", default=".", help="The repository path, relative or absolute."
+    )
 
     parser.add_argument(
         "-b",
