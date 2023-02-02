@@ -102,11 +102,12 @@ def test_rendering_in_place(repo):  # noqa: WPS218
     Parameters:
         repo: Path to a temporary repository.
     """
+    output = repo.joinpath("changelog.md")
     _, rendered = build_and_render(
         str(repo),
         style="angular",
         bump_latest=False,
-        output=repo.joinpath("changelog.md").as_posix(),
+        output=output.as_posix(),
         template="keepachangelog",
     )
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 2
@@ -118,9 +119,11 @@ def test_rendering_in_place(repo):  # noqa: WPS218
         str(repo),
         style="angular",
         bump_latest=True,
-        output=repo.joinpath("changelog.md").as_posix(),
+        output=output.as_posix(),
         template="keepachangelog",
+        in_place=True,
     )
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
+    output.unlink()
