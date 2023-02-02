@@ -87,6 +87,16 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument("repository", metavar="REPOSITORY", help="The repository path, relative or absolute.")
 
     parser.add_argument(
+        "-b",
+        "--bump",
+        action="store_true",
+        dest="bump_latest",
+        default=True,
+        help="Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
+        "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
+        "Else if there are new features, bump the minor number. Else just bump the patch number.",
+    )
+    parser.add_argument(
         "-h", "--help", action="help", default=argparse.SUPPRESS, help="Show this help message and exit."
     )
     parser.add_argument(

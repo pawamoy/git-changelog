@@ -161,6 +161,7 @@ class Changelog:
         parse_provider_refs: bool = True,
         parse_trailers: bool = False,
         sections: list[str] | None = None,
+        bump_latest: bool = True,
     ):
         """
         Initialization method.
@@ -172,6 +173,7 @@ class Changelog:
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
             sections: The sections to render (features, bug fixes, etc.).
+            bump_latest: Whether to try and bump latest version to guess new one.
         """
         self.repository: str = repository
         self.parse_provider_refs: bool = parse_provider_refs
@@ -220,31 +222,9 @@ class Changelog:
         self.versions_list = v_list
         self.versions_dict = v_dict
 
-        # guess the next version number based on last version and recent commits
-        last_version = self.versions_list[0]
-        if not last_version.tag and last_version.previous_version:
-            last_tag = last_version.previous_version.tag
-            major = minor = False  # noqa: WPS429
-            for commit in last_version.commits:
-                if commit.style["is_major"]:
-                    major = True
-                    break
-                elif commit.style["is_minor"]:
-                    minor = True
-            # never fail on non-semver versions
-            with suppress(ValueError):
-                if major:
-                    planned_tag = bump(last_tag, "major")
-                elif minor:
-                    planned_tag = bump(last_tag, "minor")
-                else:
-                    planned_tag = bump(last_tag, "patch")
-                last_version.planned_tag = planned_tag
-                if self.provider:
-                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
-                    last_version.compare_url = self.provider.get_compare_url(
-                        base=last_version.previous_version.tag, target=last_version.planned_tag
-                    )
+        # try to guess the new version by bumping the latest one
+        if bump_latest:
+            self._bump_latest()
 
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
@@ -387,3 +367,30 @@ class Changelog:
                 base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
             )
         return versions_list, versions_dict
+
+    def _bump_latest(self) -> None:  # noqa: WPS231
+        # guess the next version number based on last version and recent commits
+        last_version = self.versions_list[0]
+        if not last_version.tag and last_version.previous_version:
+            last_tag = last_version.previous_version.tag
+            major = minor = False  # noqa: WPS429
+            for commit in last_version.commits:
+                if commit.style["is_major"]:
+                    major = True
+                    break
+                elif commit.style["is_minor"]:
+                    minor = True
+            # never fail on non-semver versions
+            with suppress(ValueError):
+                if major:
+                    planned_tag = bump(last_tag, "major")
+                elif minor:
+                    planned_tag = bump(last_tag, "minor")
+                else:
+                    planned_tag = bump(last_tag, "patch")
+                last_version.planned_tag = planned_tag
+                if self.provider:
+                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
+                    last_version.compare_url = self.provider.get_compare_url(
+                        base=last_version.previous_version.tag, target=last_version.planned_tag
+                    )

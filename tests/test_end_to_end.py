@@ -57,6 +57,32 @@ def git_repo(tmp_path_factory) -> Iterator[Path]:
     yield tmp_path
     shutil.rmtree(tmp_path)
 
+
+def test_bumping_latest(repo):
+    """Bump latest version.
+
+    Parameters:
+        repo: Path to a temporary repository.
+    """
+    changelog = Changelog(repo, style=AngularStyle, bump_latest=True)
+    # features, no breaking changes: minor bumped
+    assert changelog.versions_list[0].planned_tag == bump(VERSIONS[-2], "minor")
+    rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
+    assert "Unreleased" not in rendered
+
+
+def test_not_bumping_latest(repo):
+    """Don't bump latest version.
+
+    Parameters:
+        repo: Path to a temporary repository.
+    """
+    changelog = Changelog(repo, style=AngularStyle, bump_latest=False)
+    assert changelog.versions_list[0].planned_tag is None
+    rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
+    assert "Unreleased" in rendered
+
+
 def test_rendering_custom_sections(repo):
     """Render custom sections.
 
