@@ -96,13 +96,14 @@ def test_rendering_custom_sections(repo):
             assert section_title not in rendered
 
 
-def test_rendering_in_place(repo):  # noqa: WPS218
+def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     """Render changelog in-place.
 
     Parameters:
         repo: Path to a temporary repository.
+        tmp_path: A temporary path to write the changelog into.
     """
-    output = repo.joinpath("changelog.md")
+    output = tmp_path.joinpath("changelog.md")
     _, rendered = build_and_render(
         str(repo),
         style="angular",
@@ -126,4 +127,4 @@ def test_rendering_in_place(repo):  # noqa: WPS218
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
-    output.unlink()
+    _git("-C", repo, "tag", "-d", latest_tag)
