@@ -227,6 +227,9 @@ class Changelog:
         if bump_latest:
             self._bump_latest()
 
+        # fix a single, initial version to 0.1.0
+        self._fix_single_version()
+
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
 
@@ -299,7 +302,7 @@ class Changelog:
             if self.provider:
                 commit.update_with_provider(self.provider, self.parse_provider_refs)
 
-                # set the commit url based on remote_url (could be wrong)
+            # set the commit url based on remote_url (could be wrong)
             elif self.remote_url:
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
@@ -384,3 +387,11 @@ class Changelog:
                     last_version.compare_url = self.provider.get_compare_url(
                         base=last_version.previous_version.tag, target=last_version.planned_tag
                     )
+
+    def _fix_single_version(self) -> None:
+        last_version = self.versions_list[0]
+        if len(self.versions_list) == 1 and last_version.planned_tag is None:
+            planned_tag = "0.1.0"
+            last_version.tag = planned_tag
+            last_version.url += planned_tag
+            last_version.compare_url = last_version.compare_url.replace("HEAD", planned_tag)
