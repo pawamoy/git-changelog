@@ -160,6 +160,7 @@ class Changelog:
         style: StyleType | None = None,
         parse_provider_refs: bool = True,
         parse_trailers: bool = False,
+        sections: list[str] | None = None,
     ):
         """
         Initialization method.
@@ -170,6 +171,7 @@ class Changelog:
             style: The commit style to use (angular, atom, etc.).
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
+            sections: The sections to render (features, bug fixes, etc.).
         """
         self.repository: str = repository
         self.parse_provider_refs: bool = parse_provider_refs
@@ -200,6 +202,13 @@ class Changelog:
         elif not isinstance(style, CommitStyle) and issubclass(style, CommitStyle):
             style = style()
         self.style: CommitStyle = style
+
+        # set sections
+        if sections:
+            sections = [self.style.TYPES[section] for section in sections]
+        else:
+            sections = self.style.DEFAULT_RENDER
+        self.sections = sections
 
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()

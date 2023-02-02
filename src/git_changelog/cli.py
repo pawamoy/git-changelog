@@ -59,7 +59,29 @@ def get_parser() -> argparse.ArgumentParser:
         An argparse parser.
     """
     parser = argparse.ArgumentParser(
-        add_help=False, prog="git-changelog", description="Command line tool for git-changelog Python package."
+        add_help=False,
+        prog="git-changelog",
+        description=re.sub(
+            r"\n *",
+            "\n",
+            f"""
+            Automatic Changelog generator using Jinja2 templates.
+
+            This tool parses your commit messages to extract useful data
+            that is then rendered using Jinja2 templates, for example to
+            a changelog file formatted in Markdown.
+
+            Each Git tag will be treated as a version of your project.
+            Each version contains a set of commits, and will be an entry
+            in your changelog. Commits in each version will be grouped
+            by sections, depending on the commit style you follow.
+
+            {BasicStyle._format_sections_help()}
+            {AngularStyle._format_sections_help()}
+            {ConventionalCommitStyle._format_sections_help()}
+            """,  # noqa: WPS437
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument("repository", metavar="REPOSITORY", help="The repository path, relative or absolute.")
@@ -90,6 +112,14 @@ def get_parser() -> argparse.ArgumentParser:
         default="basic",
         dest="style",
         help="The commit style to match against. Default: basic.",
+    )
+    parser.add_argument(
+        "-S",
+        "--sections",
+        nargs="+",
+        default=None,
+        dest="sections",
+        help="The sections to render. See the available sections for each supported style in the description.",
     )
     parser.add_argument(
         "-t",
