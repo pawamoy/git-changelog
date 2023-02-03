@@ -29,6 +29,8 @@ if sys.version_info < (3, 8):
 else:
     from importlib import metadata  # noqa: WPS440
 
+DEFAULT_VERSION_REGEX = r"^## \[v?(?P<version>[^\]]+)"
+DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
 STYLES = ("angular", "atom", "conventional", "basic")
 
 
@@ -110,7 +112,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=False,
         help="Insert new entries (versions missing from changelog) in-place. "
         "An output file must be specified. With custom templates, "
-        "you must pass two additional arguments: --version-regex and --marker-line. "
+        "you can pass two additional arguments: --version-regex and --marker-line. "
         "When writing in-place, an 'in_place' variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
@@ -121,7 +123,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--version-regex",
         action="store",
         dest="version_regex",
-        default=None,
+        default=DEFAULT_VERSION_REGEX,
         help="A regular expression to match versions in the existing changelog "
         "(used to find the latest release) when writing in-place. "
         "The regular expression must be a Python regex with a 'version' named group. ",
@@ -132,7 +134,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--marker-line",
         action="store",
         dest="marker_line",
-        default=None,
+        default=DEFAULT_MARKER_LINE,
         help="A marker line at which to insert new entries "
         "(versions missing from changelog). "
         "If two marker lines are present in the changelog, "
@@ -261,8 +263,8 @@ def build_and_render(  # noqa: WPS231
     sections: list[str] | None = None,
     in_place: bool = False,
     output: str | TextIO | None = None,
-    version_regex: str | None = None,
-    marker_line: str | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
@@ -296,12 +298,6 @@ def build_and_render(  # noqa: WPS231
             jinja_template = templates.get_custom_template(path)
         except TemplateNotFound:
             raise ValueError(f"No such file: {path}")
-
-        # handle misconfiguration early
-        if in_place and (version_regex is None or marker_line is None):
-            raise ValueError(
-                "Writing in-place with custom templates requires both --version-regex and --marker-line options"
-            )
     else:
         jinja_template = templates.get_template(template)
 
@@ -328,11 +324,10 @@ def build_and_render(  # noqa: WPS231
         with open(output, "r") as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
-        builtin_template = template in {"angular", "keepachangelog"}
-        if version_regex is None or builtin_template:
-            version_regex = r"^## \[v?(?P<version>[^\]]+)"
-        if marker_line is None or builtin_template:
-            marker_line = "<!-- insertion marker -->"
+        # prepare version regex and marker line
+        if template in {"angular", "keepachangelog"}:
+            version_regex = DEFAULT_VERSION_REGEX
+            marker_line = DEFAULT_MARKER_LINE
 
         # only keep new entries (missing from changelog)
         last_released = _latest(lines, re.compile(version_regex))
