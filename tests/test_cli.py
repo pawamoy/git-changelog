@@ -11,8 +11,7 @@ def test_main():
 
 
 def test_show_help(capsys):
-    """
-    Show help.
+    """Show help.
 
     Arguments:
         capsys: Pytest fixture to capture output.

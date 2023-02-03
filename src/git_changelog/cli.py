@@ -42,8 +42,7 @@ class Templates(tuple):  # noqa: WPS600 (subclassing tuple)
 
 
 def get_version() -> str:
-    """
-    Return the current `git-changelog` version.
+    """Return the current `git-changelog` version.
 
     Returns:
         The current `git-changelog` version.
@@ -55,8 +54,7 @@ def get_version() -> str:
 
 
 def get_parser() -> argparse.ArgumentParser:
-    """
-    Return the CLI argument parser.
+    """Return the CLI argument parser.
 
     Returns:
         An argparse parser.
@@ -228,8 +226,7 @@ def _unreleased(versions: list[Version], last_release: str):
 
 
 def main(args: list[str] | None = None) -> int:
-    """
-    Run the main program.
+    """Run the main program.
 
     This function is executed when you type `git-changelog` or `python -m git_changelog`.
 

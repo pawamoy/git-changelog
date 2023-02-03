@@ -21,8 +21,7 @@ PTY = not WINDOWS and not CI
 
 @duty
 def changelog(ctx):
-    """
-    Update the changelog in-place with latest commits.
+    """Update the changelog in-place with latest commits.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -47,8 +46,7 @@ def changelog(ctx):
 
 @duty(pre=["check_quality", "check_types", "check_docs", "check_dependencies"])
 def check(ctx):
-    """
-    Check it all!
+    """Check it all!
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -57,8 +55,7 @@ def check(ctx):
 
 @duty
 def check_quality(ctx, files=PY_SRC):
-    """
-    Check the code quality.
+    """Check the code quality.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -69,8 +66,7 @@ def check_quality(ctx, files=PY_SRC):
 
 @duty
 def check_dependencies(ctx):
-    """
-    Check for vulnerabilities in dependencies.
+    """Check for vulnerabilities in dependencies.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -118,8 +114,7 @@ def check_dependencies(ctx):
 
 @duty
 def check_docs(ctx):
-    """
-    Check if the documentation builds correctly.
+    """Check if the documentation builds correctly.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -142,8 +137,7 @@ def check_types(ctx):  # noqa: WPS231
 
 @duty(silent=True)
 def clean(ctx):
-    """
-    Delete temporary files.
+    """Delete temporary files.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -163,8 +157,7 @@ def clean(ctx):
 
 @duty
 def docs(ctx):
-    """
-    Build the documentation locally.
+    """Build the documentation locally.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -174,8 +167,7 @@ def docs(ctx):
 
 @duty
 def docs_serve(ctx, host="127.0.0.1", port=8000):
-    """
-    Serve the documentation (localhost:8000).
+    """Serve the documentation (localhost:8000).
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -187,8 +179,7 @@ def docs_serve(ctx, host="127.0.0.1", port=8000):
 
 @duty
 def docs_deploy(ctx):
-    """
-    Deploy the documentation on GitHub pages.
+    """Deploy the documentation on GitHub pages.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -198,8 +189,7 @@ def docs_deploy(ctx):
 
 @duty
 def format(ctx):
-    """
-    Run formatting tools on the code.
+    """Run formatting tools on the code.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -215,8 +205,7 @@ def format(ctx):
 
 @duty
 def release(ctx, version):
-    """
-    Release a new Python package.
+    """Release a new Python package.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -235,8 +224,7 @@ def release(ctx, version):
 
 @duty(silent=True)
 def coverage(ctx):
-    """
-    Report coverage as text and HTML.
+    """Report coverage as text and HTML.
 
     Arguments:
         ctx: The context instance (passed automatically).
@@ -248,8 +236,7 @@ def coverage(ctx):
 
 @duty
 def test(ctx, match: str = ""):
-    """
-    Run the test suite.
+    """Run the test suite.
 
     Arguments:
         ctx: The context instance (passed automatically).
