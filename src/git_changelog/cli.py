@@ -324,6 +324,7 @@ def build_and_render(  # noqa: WPS231
 
     # render new entries in-place
     if in_place:
+        # read current changelog lines
         with open(output, "r") as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
@@ -333,12 +334,26 @@ def build_and_render(  # noqa: WPS231
         if marker_line is None or builtin_template:
             marker_line = "<!-- insertion marker -->"
 
+        # only keep new entries (missing from changelog)
         last_released = _latest(lines, re.compile(version_regex))
         if last_released:
             changelog.versions_list = _unreleased(changelog.versions_list, last_released)
-        rendered = jinja_template.render(changelog=changelog, inplace=True)
-        lines[lines.index(marker_line)] = rendered
 
+        # render new entries
+        rendered = jinja_template.render(changelog=changelog, in_place=True).rstrip("\n") + "\n"
+
+        # find marker line(s) in current changelog
+        marker = lines.index(marker_line)
+        try:
+            marker2 = lines[marker + 1 :].index(marker_line)
+        except ValueError:
+            # apply new entries at marker line
+            lines[marker] = rendered
+        else:
+            # apply new entries between marker lines
+            lines[marker : marker + marker2 + 2] = [rendered]  # noqa: WPS362
+
+        # write back updated changelog lines
         with open(output, "w") as changelog_file:  # type: ignore[arg-type]  # noqa: WPS440
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 

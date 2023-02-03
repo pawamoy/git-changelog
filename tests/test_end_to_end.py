@@ -116,7 +116,7 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     latest_tag = "91.6.14"
     assert latest_tag not in rendered
     _git("-C", repo, "tag", latest_tag)
-    _, rendered = build_and_render(
+    build_and_render(
         str(repo),
         style="angular",
         bump_latest=True,
@@ -124,6 +124,7 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
         template="keepachangelog",
         in_place=True,
     )
+    rendered = output.read_text()
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
