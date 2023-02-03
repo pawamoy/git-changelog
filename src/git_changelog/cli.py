@@ -111,7 +111,7 @@ def get_parser() -> argparse.ArgumentParser:
         help="Insert new entries (versions missing from changelog) in-place. "
         "An output file must be specified. With custom templates, "
         "you must pass two additional arguments: --version-regex and --marker-line. "
-        "When writing in-place, an 'inplace' variable "
+        "When writing in-place, an 'in_place' variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
         "(for example to skip changelog headers or footers).",
