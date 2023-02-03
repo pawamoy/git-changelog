@@ -159,10 +159,10 @@ class Changelog:
         repository: str | Path,
         provider: ProviderRefParser | None = None,
         style: StyleType | None = None,
-        parse_provider_refs: bool = True,
+        parse_provider_refs: bool = False,
         parse_trailers: bool = False,
         sections: list[str] | None = None,
-        bump_latest: bool = True,
+        bump_latest: bool = False,
     ):
         """
         Initialization method.

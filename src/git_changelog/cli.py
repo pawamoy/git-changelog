@@ -92,20 +92,12 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-b",
         "--bump",
-        action="store_false",
+        action="store_true",
         dest="bump_latest",
-        default=True,
-        help="(default behavior) Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
+        default=False,
+        help="Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
         "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
         "Else if there are new features, bump the minor number. Else just bump the patch number.",
-    )
-    parser.add_argument(
-        "-B",
-        "--no-bump",
-        action="store_false",
-        dest="bump_latest",
-        default=True,
-        help="Don't guess new version. Templates will usually render 'Unreleased' instead.",
     )
     parser.add_argument(
         "-h", "--help", action="help", default=argparse.SUPPRESS, help="Show this help message and exit."
@@ -156,12 +148,12 @@ def get_parser() -> argparse.ArgumentParser:
         help="Output to given file. Default: stdout.",
     )
     parser.add_argument(
-        "-R",
-        "--no-parse-refs",
-        action="store_false",
+        "-r",
+        "--parse-refs",
+        action="store_true",
         dest="parse_refs",
-        default=True,
-        help="Do not parse provider-specific references in commit messages (issues, PRs, etc.).",
+        default=False,
+        help="Parse provider-specific references in commit messages (GitHub/GitLab issues, PRs, etc.).",
     )
     parser.add_argument(
         "-c",
@@ -264,14 +256,14 @@ def build_and_render(  # noqa: WPS231
     repository: str,
     template: str,
     style: str | CommitStyle,
-    parse_refs: bool = True,
+    parse_refs: bool = False,
     parse_trailers: bool = False,
     sections: list[str] | None = None,
     in_place: bool = False,
     output: str | TextIO | None = None,
     version_regex: str | None = None,
     marker_line: str | None = None,
-    bump_latest: bool = True,
+    bump_latest: bool = False,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
