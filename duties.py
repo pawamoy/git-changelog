@@ -38,6 +38,7 @@ def changelog(ctx):
             "parse_trailers": True,
             "parse_refs": False,
             "sections": ("build", "deps", "feat", "fix", "refactor"),
+            "bump_latest": True,
             "in_place": True,
         },
         title="Updating changelog",
