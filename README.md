@@ -22,6 +22,9 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 - Understands [Semantic Versioning][semantic-versioning]:
   major/minor/patch for versions and commits.
   Guesses next version based on last commits.
+- Parses [Git trailers][git-trailers], allowing to reference
+  issues, PRs, etc., in your commit messages
+  in a clean, provider-agnostic way.
 
 - Todo:
     - [Plugin architecture][issue-19],
@@ -41,6 +44,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [conventional-commit]:    https://www.conventionalcommits.org/en/v1.0.0/
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
 [gitlab-refs]:            https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references
+[git-trailers]:           https://git-scm.com/docs/git-interpret-trailers
 
 [issue-14]: https://github.com/pawamoy/git-changelog/issues/14
 [issue-15]: https://github.com/pawamoy/git-changelog/issues/15
@@ -142,9 +146,9 @@ options:
   -h, --help            Show this help message and exit.
   -i, --in-place        Insert new entries (versions missing from changelog)
                         in-place. An output file must be specified. With
-                        custom templates, you must pass two additional
+                        custom templates, you can pass two additional
                         arguments: --version-regex and --marker-line. When
-                        writing in-place, an 'inplace' variable will be
+                        writing in-place, an 'in_place' variable will be
                         injected in the Jinja context, allowing to adapt the
                         generated contents (for example to skip changelog
                         headers or footers).
@@ -161,8 +165,8 @@ options:
                         'Unreleased' entry for example).
   -o OUTPUT, --output OUTPUT
                         Output to given file. Default: stdout.
-  -R, --no-parse-refs   Do not parse provider-specific references in commit
-                        messages (issues, PRs, etc.).
+  -r, --parse-refs      Parse provider-specific references in commit
+                        messages (GitHub/GitLab issues, PRs, etc.).
   -c, -s, --style, --commit-style,  --convention {angular,atom,conventional,basic}
                         The commit style to match against. Default: basic.
   -S, --sections SECTIONS [SECTIONS ...]
