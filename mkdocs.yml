@@ -28,6 +28,8 @@ theme:
   - navigation.tabs
   - navigation.tabs.sticky
   - navigation.top
+  - search.highlight
+  - search.suggest
   palette:
   - media: "(prefers-color-scheme: light)"
     scheme: default
@@ -69,7 +71,7 @@ plugins:
     scripts:
     - docs/gen_ref_nav.py
 - literate-nav:
-    nav_file: SUMMARY.md
+    nav_file: SUMMARY.txt
 - coverage
 - section-index
 - mkdocstrings:

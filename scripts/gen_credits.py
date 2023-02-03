@@ -21,6 +21,7 @@ lock_pkgs = {pkg["name"].lower(): pkg for pkg in lock_data["package"]}
 project_name = project["name"]
 regex = re.compile(r"(?P<dist>[\w.-]+)(?P<spec>.*)$")
 
+
 def get_license(pkg_name):
     try:
         data = metadata(pkg_name)
@@ -40,6 +41,7 @@ def get_license(pkg_name):
         license = "ISC"
     return license or "?"
 
+
 def get_deps(base_deps):
     deps = {}
     for dep in base_deps:
@@ -55,11 +57,12 @@ def get_deps(base_deps):
                 for pkg_dependency in lock_pkgs[pkg_name].get("dependencies", []):
                     parsed = regex.match(pkg_dependency).groupdict()
                     dep_name = parsed["dist"].lower()
-                    if dep_name not in deps:
+                    if dep_name not in deps and dep_name != project["name"]:
                         deps[dep_name] = {"license": get_license(dep_name), **parsed, **lock_pkgs[dep_name]}
                         again = True
 
     return deps
+
 
 dev_dependencies = get_deps(chain(*pdm.get("dev-dependencies", {}).values()))
 prod_dependencies = get_deps(

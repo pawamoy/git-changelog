@@ -32,8 +32,8 @@ jobs:
       with:
         python-version: "3.8"
 
-    - name: Resolve dependencies
-      run: pdm lock
+    - name: Resolving dependencies
+      run: pdm lock -v
 
     - name: Install dependencies
       run: pdm install -G duty -G docs -G quality -G typing -G security
@@ -75,6 +75,9 @@ jobs:
       uses: pdm-project/setup-pdm@main
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Resolving dependencies
+      run: pdm lock -v
 
     - name: Install dependencies
       run: pdm install --no-editable -G duty -G tests
