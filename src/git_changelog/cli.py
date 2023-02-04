@@ -93,7 +93,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "-b",
-        "--bump",
+        "--bump-latest",
         action="store_true",
         dest="bump_latest",
         default=False,
