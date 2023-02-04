@@ -159,7 +159,6 @@ def get_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-c",
-        "-s",
         "--style",
         "--commit-style",
         "--convention",
@@ -169,7 +168,7 @@ def get_parser() -> argparse.ArgumentParser:
         help="The commit convention to match against. Default: basic.",
     )
     parser.add_argument(
-        "-S",
+        "-s",
         "--sections",
         nargs="+",
         default=None,
