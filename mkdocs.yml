@@ -74,8 +74,7 @@ plugins:
     nav_file: SUMMARY.txt
 - coverage
 - section-index
-- mkdocstrings:
-    custom_templates: docs/templates
+- mkdocstrings
 
 extra:
   social:
