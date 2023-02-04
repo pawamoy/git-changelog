@@ -55,6 +55,10 @@ def get_version() -> str:
         return "0.0.0"
 
 
+def _comma_separated_list(value: str) -> list[str]:
+    return value.split(",")
+
+
 def get_parser() -> argparse.ArgumentParser:
     """Return the CLI argument parser.
 
@@ -170,10 +174,12 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-s",
         "--sections",
-        nargs="+",
+        action="store",
+        type=_comma_separated_list,
         default=None,
         dest="sections",
-        help="The sections to render. See the available sections for each supported convention in the description.",
+        help="A comma-separated list of sections to render. "
+        "See the available sections for each supported convention in the description.",
     )
     parser.add_argument(
         "-t",

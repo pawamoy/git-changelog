@@ -25,3 +25,21 @@ def test_show_help(capsys):
 def test_get_version():
     """Get self version."""
     assert cli.get_version()
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        (".", "-s", "feat,fix"),
+        ("-s", "feat,fix", "."),
+    ],
+)
+def test_passing_repository_and_sections(tmp_path, args):
+    """Render the changelog of given repository, choosing sections.
+
+    Parameters:
+        tmp_path: A temporary path to write the changelog into.
+        args: Command line arguments.
+    """
+    ch = tmp_path.joinpath("ch.md")
+    assert cli.main([*args, "-o", ch.as_posix(), "-c", "angular"]) == 0
