@@ -33,7 +33,7 @@ def changelog(ctx):
         kwargs={
             "repository": ".",
             "output": "CHANGELOG.md",
-            "style": "angular",
+            "convention": "angular",
             "template": "keepachangelog",
             "parse_trailers": True,
             "parse_refs": False,

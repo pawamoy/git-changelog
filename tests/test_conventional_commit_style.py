@@ -1,17 +1,17 @@
-"""Tests for the conventional commit style."""
+"""Tests for the conventional commit convention."""
 
-from git_changelog.commit import Commit, ConventionalCommitStyle
+from git_changelog.commit import Commit, ConventionalCommitConvention
 
 
-def test_conventional_style_breaking_change():
+def test_conventional_convention_breaking_change():
     """Breaking change (singular) is correctly identified."""
     subject = "feat: this is a new breaking feature"
     body = ["BREAKING CHANGE: there is a breaking feature in this code"]
     commit = Commit(
         commit_hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645"
     )
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] is None
     assert commit_dict["is_major"]
@@ -19,15 +19,15 @@ def test_conventional_style_breaking_change():
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_breaking_changes():
+def test_conventional_convention_breaking_changes():
     """Breaking changes (plural) are correctly identified."""
     subject = "feat: this is a new breaking feature"
     body = ["BREAKING CHANGES: there is a breaking feature in this code"]
     commit = Commit(
         commit_hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645"
     )
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] is None
     assert commit_dict["is_major"]
@@ -35,15 +35,15 @@ def test_conventional_style_breaking_changes():
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_subject_breaking_change():  # noqa: WPS118
+def test_conventional_convention_subject_breaking_change():  # noqa: WPS118
     """Breaking change in the subject (!) are correctly identified."""
     subject = "feat!: this is a new breaking feature"
     body = ["There is a breaking feature in this code"]
     commit = Commit(
         commit_hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645"
     )
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] is None
     assert commit_dict["is_major"]
@@ -51,15 +51,15 @@ def test_conventional_style_subject_breaking_change():  # noqa: WPS118
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_subject_breaking_change_with_scope():  # noqa: WPS118
+def test_conventional_convention_subject_breaking_change_with_scope():  # noqa: WPS118
     """Breaking change in the subject (!) with scope are correctly identified."""
     subject = "feat(scope)!: this is a new breaking feature"
     body = ["There is a breaking feature in this code"]
     commit = Commit(
         commit_hash="aaaaaaa", subject=subject, body=body, author_date="1574340645", committer_date="1574340645"
     )
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] == "scope"
     assert commit_dict["is_major"]
@@ -67,12 +67,12 @@ def test_conventional_style_subject_breaking_change_with_scope():  # noqa: WPS11
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_feat():
+def test_conventional_convention_feat():
     """Feature commit is correctly identified."""
     subject = "feat: this is a new feature"
     commit = Commit(commit_hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] is None
     assert not commit_dict["is_major"]
@@ -80,12 +80,12 @@ def test_conventional_style_feat():
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_feat_with_scope():
+def test_conventional_convention_feat_with_scope():
     """Feature commit is correctly identified."""
     subject = "feat(scope): this is a new feature"
     commit = Commit(commit_hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Features"
     assert commit_dict["scope"] == "scope"
     assert not commit_dict["is_major"]
@@ -93,12 +93,12 @@ def test_conventional_style_feat_with_scope():
     assert not commit_dict["is_patch"]
 
 
-def test_conventional_style_fix():
+def test_conventional_convention_fix():
     """Bug fix commit is correctly identified."""
     subject = "fix: this is a bug fix"
     commit = Commit(commit_hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Bug Fixes"
     assert commit_dict["scope"] is None
     assert not commit_dict["is_major"]
@@ -106,12 +106,12 @@ def test_conventional_style_fix():
     assert commit_dict["is_patch"]
 
 
-def test_conventional_style_fix_with_scope():
+def test_conventional_convention_fix_with_scope():
     """Bug fix commit is correctly identified."""
     subject = "fix(scope): this is a bug fix"
     commit = Commit(commit_hash="aaaaaaa", subject=subject, author_date="1574340645", committer_date="1574340645")
-    style = ConventionalCommitStyle()
-    commit_dict = style.parse_commit(commit)
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
     assert commit_dict["type"] == "Bug Fixes"
     assert commit_dict["scope"] == "scope"
     assert not commit_dict["is_major"]

@@ -12,10 +12,17 @@ from typing import Type, Union
 
 from semver import VersionInfo
 
-from git_changelog.commit import AngularStyle, AtomStyle, BasicStyle, Commit, CommitStyle, ConventionalCommitStyle
+from git_changelog.commit import (
+    AngularConvention,
+    AtomConvention,
+    BasicConvention,
+    Commit,
+    CommitConvention,
+    ConventionalCommitConvention,
+)
 from git_changelog.providers import GitHub, GitLab, ProviderRefParser
 
-StyleType = Union[str, CommitStyle, Type[CommitStyle]]
+ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
 def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
@@ -147,18 +154,18 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
-    STYLE: dict[str, Type[CommitStyle]] = {
-        "basic": BasicStyle,
-        "angular": AngularStyle,
-        "atom": AtomStyle,
-        "conventional": ConventionalCommitStyle,
+    CONVENTION: dict[str, Type[CommitConvention]] = {
+        "basic": BasicConvention,
+        "angular": AngularConvention,
+        "atom": AtomConvention,
+        "conventional": ConventionalCommitConvention,
     }
 
     def __init__(  # noqa: WPS231
         self,
         repository: str | Path,
         provider: ProviderRefParser | None = None,
-        style: StyleType | None = None,
+        convention: ConventionType | None = None,
         parse_provider_refs: bool = False,
         parse_trailers: bool = False,
         sections: list[str] | None = None,
@@ -170,7 +177,7 @@ class Changelog:
         Arguments:
             repository: The repository (directory) for which to build the changelog.
             provider: The provider to use (github.com, gitlab.com, etc.).
-            style: The commit style to use (angular, atom, etc.).
+            convention: The commit convention to use (angular, atom, etc.).
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
             sections: The sections to render (features, bug fixes, etc.).
@@ -193,24 +200,27 @@ class Changelog:
             self.remote_url: str = remote_url
         self.provider = provider
 
-        # set style
-        if isinstance(style, str):
+        # set convention
+        if isinstance(convention, str):
             try:
-                style = self.STYLE[style]()
+                convention = self.CONVENTION[convention]()
             except KeyError:
-                print(f"git-changelog: no such style available: {style}, using default style", file=sys.stderr)
-                style = BasicStyle()
-        elif style is None:
-            style = BasicStyle()
-        elif not isinstance(style, CommitStyle) and issubclass(style, CommitStyle):
-            style = style()
-        self.style: CommitStyle = style
+                print(
+                    f"git-changelog: no such convention available: {convention}, using default convention",
+                    file=sys.stderr,
+                )
+                convention = BasicConvention()
+        elif convention is None:
+            convention = BasicConvention()
+        elif not isinstance(convention, CommitConvention) and issubclass(convention, CommitConvention):
+            convention = convention()
+        self.convention: CommitConvention = convention
 
         # set sections
         if sections:
-            sections = [self.style.TYPES[section] for section in sections]
+            sections = [self.convention.TYPES[section] for section in sections]
         else:
-            sections = self.style.DEFAULT_RENDER
+            sections = self.convention.DEFAULT_RENDER
         self.sections = sections
 
         # get git log and parse it into list of commits
@@ -306,9 +316,9 @@ class Changelog:
             elif self.remote_url:
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
-            # expand commit object with style parsing
-            if self.style:
-                commit.update_with_style(self.style)
+            # expand commit object with convention parsing
+            if self.convention:
+                commit.update_with_convention(self.convention)
 
             commits.append(commit)
 
@@ -349,12 +359,12 @@ class Changelog:
                 versions_list.append(version)
                 versions_types_dict[commit.version] = {}
             versions_dict[commit.version].commits.append(commit)
-            if "type" in commit.style and commit.style["type"] not in versions_types_dict[commit.version]:
-                section = Section(section_type=commit.style["type"])
-                versions_types_dict[commit.version][commit.style["type"]] = section
+            if "type" in commit.convention and commit.convention["type"] not in versions_types_dict[commit.version]:
+                section = Section(section_type=commit.convention["type"])
+                versions_types_dict[commit.version][commit.convention["type"]] = section
                 versions_dict[commit.version].sections_list.append(section)
                 versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
-            versions_types_dict[commit.version][commit.style["type"]].commits.append(commit)
+            versions_types_dict[commit.version][commit.convention["type"]].commits.append(commit)
         if next_version is not None and self.provider:
             next_version.compare_url = self.provider.get_compare_url(
                 base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
@@ -368,10 +378,10 @@ class Changelog:
             last_tag = last_version.previous_version.tag
             major = minor = False  # noqa: WPS429
             for commit in last_version.commits:
-                if commit.style["is_major"]:
+                if commit.convention["is_major"]:
                     major = True
                     break
-                elif commit.style["is_minor"]:
+                elif commit.convention["is_minor"]:
                     minor = True
             # never fail on non-semver versions
             with suppress(ValueError):

@@ -85,7 +85,7 @@ class Commit:
         self.version: str = tag
 
         self.text_refs: dict[str, list[Ref]] = {}
-        self.style: dict[str, Any] = {}
+        self.convention: dict[str, Any] = {}
 
         self.trailers: dict[str, str] = {}
         self.body_without_trailers = self.body
@@ -93,14 +93,14 @@ class Commit:
         if parse_trailers:
             self._parse_trailers()
 
-    def update_with_style(self, style: "CommitStyle") -> None:
+    def update_with_convention(self, convention: CommitConvention) -> None:
         """
-        Apply the style-parsed data to this commit.
+        Apply the convention-parsed data to this commit.
 
         Arguments:
-            style: The style to use.
+            convention: The convention to use.
         """
-        self.style.update(style.parse_commit(self))
+        self.convention.update(convention.parse_commit(self))
 
     def update_with_provider(self, provider: ProviderRefParser, parse_refs: bool = True) -> None:  # noqa: WPS231
         """
@@ -148,8 +148,8 @@ class Commit:
         return trailers  # or raise ValueError due to split unpacking
 
 
-class CommitStyle(ABC):
-    """A base class for a style of commit messages."""
+class CommitConvention(ABC):
+    """A base class for a convention of commit messages."""
 
     TYPES: dict[str, str]
     TYPE_REGEX: Pattern
@@ -183,7 +183,7 @@ class CommitStyle(ABC):
             r"\n *",
             "\n",
             f"""
-            {cls.__name__.replace('Style', '').upper()} STYLE
+            {cls.__name__.replace('Convention', '').upper()} CONVENTION
 
             Default sections:
             {default}
@@ -194,8 +194,8 @@ class CommitStyle(ABC):
         )
 
 
-class BasicStyle(CommitStyle):
-    """Basic commit message style."""
+class BasicConvention(CommitConvention):
+    """Basic commit message convention."""
 
     TYPES: dict[str, str] = {
         "add": "Added",
@@ -256,8 +256,8 @@ class BasicStyle(CommitStyle):
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
-class AngularStyle(CommitStyle):
-    """Angular commit message style."""
+class AngularConvention(CommitConvention):
+    """Angular commit message convention."""
 
     TYPES: dict[str, str] = {
         "build": "Build",
@@ -337,11 +337,11 @@ class AngularStyle(CommitStyle):
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
-class ConventionalCommitStyle(AngularStyle):
-    """Conventional commit message style."""
+class ConventionalCommitConvention(AngularConvention):
+    """Conventional commit message convention."""
 
-    TYPES: dict[str, str] = AngularStyle.TYPES
-    DEFAULT_RENDER: list[str] = AngularStyle.DEFAULT_RENDER
+    TYPES: dict[str, str] = AngularConvention.TYPES
+    DEFAULT_RENDER: list[str] = AngularConvention.DEFAULT_RENDER
     SUBJECT_REGEX: Pattern = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"  # noqa: WPS323 (%)
         % ("|".join(TYPES.keys()))
@@ -364,8 +364,8 @@ class ConventionalCommitStyle(AngularStyle):
         }
 
 
-class AtomStyle(CommitStyle):
-    """Atom commit message style."""
+class AtomConvention(CommitConvention):
+    """Atom commit message convention."""
 
     TYPES: dict[str, str] = {
         ":art:": "",  # when improving the format/structure of the code

@@ -15,7 +15,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
   Built-in [Keep a Changelog][keep-a-changelog] and [Angular][angular] templates
   (also see [Conventional Changelog][conventional-changelog]).
 - Commit styles/conventions parsing.
-  Built-in [Angular][angular-style], [Conventional Commit][conventional-commit], [Atom][atom-style] and basic styles.
+  Built-in [Angular][angular-convention], [Conventional Commit][conventional-commit], [Atom][atom-convention] and basic conventions.
 - Git service/provider agnostic,
   plus references parsing (issues, commits, etc.).
   Built-in [GitHub][github-refs] and [Gitlab][gitlab-refs] support.
@@ -28,7 +28,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 
 - Todo:
     - [Plugin architecture][issue-19],
-      to support more commit styles and git services.
+      to support more commit conventions and git services.
     - [Template context injection][issue-17],
       to furthermore customize how your changelog will be rendered.
     - [Easy access to "Breaking Changes"][issue-14] in the templates.
@@ -39,8 +39,8 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [angular]:                https://github.com/angular/angular/blob/master/CHANGELOG.md
 [conventional-changelog]: https://github.com/conventional-changelog/conventional-changelog
 [semantic-versioning]:    http://semver.org/spec/v2.0.0.html
-[atom-style]:             https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages
-[angular-style]:          https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
+[atom-convention]:        https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages
+[angular-convention]:     https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
 [conventional-commit]:    https://www.conventionalcommits.org/en/v1.0.0/
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
 [gitlab-refs]:            https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references
@@ -83,9 +83,9 @@ a changelog file formatted in Markdown.
 Each Git tag will be treated as a version of your project.
 Each version contains a set of commits, and will be an entry
 in your changelog. Commits in each version will be grouped
-by sections, depending on the commit style you follow.
+by sections, depending on the commit convention you follow.
 
-BASIC STYLE
+BASIC CONVENTION
 
 Default sections:
 - add: Added
@@ -97,7 +97,7 @@ Additional sections:
 - merge: Merged
 - doc: Documented
 
-ANGULAR STYLE
+ANGULAR CONVENTION
 
 Default sections:
 - feat: Features
@@ -115,7 +115,7 @@ Additional sections:
 - style: Style
 - test, tests: Tests
 
-CONVENTIONALCOMMIT STYLE
+CONVENTIONALCOMMIT CONVENTION
 
 Default sections:
 - feat: Features
@@ -168,10 +168,10 @@ options:
   -r, --parse-refs      Parse provider-specific references in commit
                         messages (GitHub/GitLab issues, PRs, etc.).
   -c, -s, --style, --commit-style,  --convention {angular,atom,conventional,basic}
-                        The commit style to match against. Default: basic.
+                        The commit convention to match against. Default: basic.
   -S, --sections SECTIONS [SECTIONS ...]
                         The sections to render. See the available sections for
-                        each supported style in the description.
+                        each supported convention in the description.
   -t, --template {angular,keepachangelog}
                         The Jinja2 template to use. Prefix with "path:" to
                         specify the path to a directory containing a file

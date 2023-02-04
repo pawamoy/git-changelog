@@ -13,7 +13,7 @@ import pytest
 from git_changelog import Changelog
 from git_changelog.build import bump
 from git_changelog.cli import build_and_render
-from git_changelog.commit import AngularStyle
+from git_changelog.commit import AngularConvention
 from git_changelog.templates import get_template
 
 VERSIONS = ("0.1.0", "0.2.0", "0.2.1", "1.0.0", "1.1.0", "")
@@ -49,7 +49,7 @@ def git_repo(tmp_path_factory) -> Iterator[Path]:
     git("config", "user.email", "dummy@example.com")
     git("remote", "add", "origin", "git@github.com:example/example")
     for version in VERSIONS:
-        for section in AngularStyle.TYPES.keys():
+        for section in AngularConvention.TYPES.keys():
             commit(section)
             commit(section)
         if version:
@@ -64,7 +64,7 @@ def test_bumping_latest(repo):
     Parameters:
         repo: Path to a temporary repository.
     """
-    changelog = Changelog(repo, style=AngularStyle, bump_latest=True)
+    changelog = Changelog(repo, convention=AngularConvention, bump_latest=True)
     # features, no breaking changes: minor bumped
     assert changelog.versions_list[0].planned_tag == bump(VERSIONS[-2], "minor")
     rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
@@ -77,7 +77,7 @@ def test_not_bumping_latest(repo):
     Parameters:
         repo: Path to a temporary repository.
     """
-    changelog = Changelog(repo, style=AngularStyle, bump_latest=False)
+    changelog = Changelog(repo, convention=AngularConvention, bump_latest=False)
     assert changelog.versions_list[0].planned_tag is None
     rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
     assert "Unreleased" in rendered
@@ -89,9 +89,9 @@ def test_rendering_custom_sections(repo):
     Parameters:
         repo: Path to a temporary repository.
     """
-    changelog = Changelog(repo, style=AngularStyle, sections=["feat"])
+    changelog = Changelog(repo, convention=AngularConvention, sections=["feat"])
     rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
-    for section_type, section_title in AngularStyle.TYPES.items():
+    for section_type, section_title in AngularConvention.TYPES.items():
         if section_type != "feat":
             assert section_title not in rendered
 
@@ -106,7 +106,7 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     output = tmp_path.joinpath("changelog.md")
     _, rendered = build_and_render(
         str(repo),
-        style="angular",
+        convention="angular",
         bump_latest=False,
         output=output.as_posix(),
         template="keepachangelog",
@@ -118,7 +118,7 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     _git("-C", repo, "tag", latest_tag)
     build_and_render(
         str(repo),
-        style="angular",
+        convention="angular",
         bump_latest=True,
         output=output.as_posix(),
         template="keepachangelog",

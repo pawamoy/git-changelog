@@ -22,7 +22,7 @@ from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
 from git_changelog.build import Changelog, Version
-from git_changelog.commit import AngularStyle, BasicStyle, CommitStyle, ConventionalCommitStyle
+from git_changelog.commit import AngularConvention, BasicConvention, CommitConvention, ConventionalCommitConvention
 
 if sys.version_info < (3, 8):
     import importlib_metadata as metadata
@@ -31,7 +31,7 @@ else:
 
 DEFAULT_VERSION_REGEX = r"^## \[v?(?P<version>[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
-STYLES = ("angular", "atom", "conventional", "basic")
+CONVENTIONS = ("angular", "atom", "conventional", "basic")
 
 
 class Templates(tuple):  # noqa: WPS600 (subclassing tuple)
@@ -77,11 +77,11 @@ def get_parser() -> argparse.ArgumentParser:
             Each Git tag will be treated as a version of your project.
             Each version contains a set of commits, and will be an entry
             in your changelog. Commits in each version will be grouped
-            by sections, depending on the commit style you follow.
+            by sections, depending on the commit convention you follow.
 
-            {BasicStyle._format_sections_help()}
-            {AngularStyle._format_sections_help()}
-            {ConventionalCommitStyle._format_sections_help()}
+            {BasicConvention._format_sections_help()}
+            {AngularConvention._format_sections_help()}
+            {ConventionalCommitConvention._format_sections_help()}
             """,  # noqa: WPS437
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -163,10 +163,10 @@ def get_parser() -> argparse.ArgumentParser:
         "--style",
         "--commit-style",
         "--convention",
-        choices=STYLES,
+        choices=CONVENTIONS,
         default="basic",
-        dest="style",
-        help="The commit style to match against. Default: basic.",
+        dest="convention",
+        help="The commit convention to match against. Default: basic.",
     )
     parser.add_argument(
         "-S",
@@ -174,7 +174,7 @@ def get_parser() -> argparse.ArgumentParser:
         nargs="+",
         default=None,
         dest="sections",
-        help="The sections to render. See the available sections for each supported style in the description.",
+        help="The sections to render. See the available sections for each supported convention in the description.",
     )
     parser.add_argument(
         "-t",
@@ -237,7 +237,7 @@ def main(args: list[str] | None = None) -> int:
         build_and_render(
             repository=opts.repository,
             template=opts.template,
-            style=opts.style,
+            convention=opts.convention,
             parse_refs=opts.parse_refs,
             parse_trailers=opts.parse_trailers,
             sections=opts.sections,
@@ -257,7 +257,7 @@ def main(args: list[str] | None = None) -> int:
 def build_and_render(  # noqa: WPS231
     repository: str,
     template: str,
-    style: str | CommitStyle,
+    convention: str | CommitConvention,
     parse_refs: bool = False,
     parse_trailers: bool = False,
     sections: list[str] | None = None,
@@ -275,7 +275,7 @@ def build_and_render(  # noqa: WPS231
     Parameters:
         repository: Path to a local repository.
         template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
-        style: Name of a commit message style/convention.
+        convention: Name of a commit message style/convention.
         parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
         parse_trailers: Whether to parse Git trailers.
         sections: Sections to render (features, bug fixes, etc.).
@@ -311,7 +311,7 @@ def build_and_render(  # noqa: WPS231
     # build data
     changelog = Changelog(
         repository,
-        style=style,
+        convention=convention,
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
         sections=sections,
