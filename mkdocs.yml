@@ -9,6 +9,7 @@ watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/git_changelog]
 nav:
 - Home:
   - Overview: index.md
+  - Usage: usage.md
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
