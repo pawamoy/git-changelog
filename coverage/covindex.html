@@ -11,31 +11,44 @@
 <header>
     <div class="content">
         <h1>Coverage report:
-            <span class="pc_cov">65.98%</span>
+            <span class="pc_cov">89.12%</span>
         </h1>
-        <div id="help_panel_wrapper">
+        <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
                 <img id="keyboard_icon" src="keybd_closed.png" alt="Show/hide keyboard shortcuts" />
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
-                <div>
-                    <p class="keyhelp">
+                <div class="keyhelp">
+                    <p>
                         <kbd>n</kbd>
                         <kbd>s</kbd>
                         <kbd>m</kbd>
                         <kbd>x</kbd>
                         <kbd>b</kbd>
                         <kbd>p</kbd>
-                        <kbd>c</kbd> &nbsp; change column sorting
+                        <kbd>c</kbd>
+                        &nbsp; change column sorting
+                    </p>
+                    <p>
+                        <kbd>[</kbd>
+                        <kbd>]</kbd>
+                        &nbsp; prev/next file
+                    </p>
+                    <p>
+                        <kbd>?</kbd> &nbsp; show/hide this help
                     </p>
                 </div>
             </div>
-        </div>
+        </aside>
         <form id="filter_container">
             <input id="filter" type="text" value="" placeholder="filter..." />
         </form>
+        <p class="text">
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
+            created at 2023-02-04 20:36 +0100
+        </p>
     </div>
 </header>
 <main id="index">
@@ -54,39 +67,48 @@
         <tbody>
             <tr class="file">
                 <td class="name left"><a href="d_6e1d82568f61fc4d_build_py.html">src/git_changelog/build.py</a></td>
-                <td>172</td>
-                <td>128</td>
+                <td>192</td>
+                <td>21</td>
                 <td>0</td>
-                <td>72</td>
-                <td>1</td>
-                <td class="right" data-ratio="51 244">20.90%</td>
+                <td>80</td>
+                <td>17</td>
+                <td class="right" data-ratio="228 272">83.82%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_6e1d82568f61fc4d_cli_py.html">src/git_changelog/cli.py</a></td>
-                <td>47</td>
-                <td>20</td>
+                <td>101</td>
+                <td>19</td>
                 <td>0</td>
-                <td>8</td>
-                <td>0</td>
-                <td class="right" data-ratio="27 55">49.09%</td>
+                <td>26</td>
+                <td>7</td>
+                <td class="right" data-ratio="99 127">77.95%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_6e1d82568f61fc4d_commit_py.html">src/git_changelog/commit.py</a></td>
-                <td>103</td>
-                <td>16</td>
+                <td>150</td>
+                <td>9</td>
                 <td>0</td>
-                <td>18</td>
-                <td>3</td>
-                <td class="right" data-ratio="92 121">76.03%</td>
+                <td>48</td>
+                <td>5</td>
+                <td class="right" data-ratio="176 198">88.89%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_6e1d82568f61fc4d_providers_py.html">src/git_changelog/providers.py</a></td>
-                <td>89</td>
-                <td>8</td>
+                <td>88</td>
+                <td>7</td>
                 <td>0</td>
                 <td>18</td>
                 <td>1</td>
-                <td class="right" data-ratio="94 107">87.85%</td>
+                <td class="right" data-ratio="94 106">88.68%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_695d5ae180c13dd8___init___py.html">src/git_changelog/templates/__init__.py</a></td>
+                <td>15</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="13 15">86.67%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_a44f0ac069e85531_conftest_py.html">tests/conftest.py</a></td>
@@ -117,12 +139,21 @@
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_a44f0ac069e85531_test_cli_py.html">tests/test_cli.py</a></td>
-                <td>10</td>
+                <td>14</td>
                 <td>0</td>
                 <td>0</td>
-                <td>4</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="14 14">100.00%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_a44f0ac069e85531_test_commit_py.html">tests/test_commit.py</a></td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="5 5">100.00%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_a44f0ac069e85531_test_conventional_commit_style_py.html">tests/test_conventional_commit_style.py</a></td>
@@ -134,33 +165,42 @@
                 <td class="right" data-ratio="85 85">100.00%</td>
             </tr>
             <tr class="file">
+                <td class="name left"><a href="d_a44f0ac069e85531_test_end_to_end_py.html">tests/test_end_to_end.py</a></td>
+                <td>69</td>
+                <td>0</td>
+                <td>0</td>
+                <td>10</td>
+                <td>0</td>
+                <td class="right" data-ratio="79 79">100.00%</td>
+            </tr>
+            <tr class="file">
                 <td class="name left"><a href="d_a44f0ac069e85531_test_providers_py.html">tests/test_providers.py</a></td>
-                <td>12</td>
+                <td>10</td>
                 <td>0</td>
                 <td>0</td>
                 <td>4</td>
                 <td>0</td>
-                <td class="right" data-ratio="16 16">100.00%</td>
+                <td class="right" data-ratio="14 14">100.00%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_a44f0ac069e85531_test_version_py.html">tests/test_version.py</a></td>
-                <td>61</td>
+                <td>8</td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
-                <td class="right" data-ratio="61 61">100.00%</td>
+                <td class="right" data-ratio="8 8">100.00%</td>
             </tr>
         </tbody>
         <tfoot>
             <tr class="total">
                 <td class="name left">Total</td>
-                <td>649</td>
-                <td>172</td>
+                <td>807</td>
+                <td>58</td>
                 <td>0</td>
-                <td>124</td>
-                <td>5</td>
-                <td class="right" data-ratio="510 773">65.98%</td>
+                <td>186</td>
+                <td>30</td>
+                <td class="right" data-ratio="885 993">89.12%</td>
             </tr>
         </tfoot>
     </table>
@@ -171,10 +211,17 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.1.2</a>,
-            created at 2021-11-14 16:32 +0100
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
+            created at 2023-02-04 20:36 +0100
         </p>
     </div>
+    <aside class="hidden">
+        <a id="prevFileLink" class="nav" href="d_a44f0ac069e85531_test_version_py.html"/>
+        <a id="nextFileLink" class="nav" href="d_6e1d82568f61fc4d_build_py.html"/>
+        <button type="button" class="button_prev_file" data-shortcut="["/>
+        <button type="button" class="button_next_file" data-shortcut="]"/>
+        <button type="button" class="button_show_hide_help" data-shortcut="?"/>
+    </aside>
 </footer>
 </body>
 </html>
