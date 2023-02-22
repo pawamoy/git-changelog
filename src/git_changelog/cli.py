@@ -18,6 +18,7 @@ import re
 import sys
 from importlib import metadata
 from typing import TYPE_CHECKING, Pattern, TextIO
+from typing import Any, Dict, Pattern, Sequence, TextIO, Type
 
 from jinja2.exceptions import TemplateNotFound
 
@@ -29,6 +30,8 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
+from git_changelog.commit import AngularConvention, BasicConvention, CommitConvention, ConventionalCommitConvention
+from git_changelog.providers import GitHub, GitLab, ProviderRefParser
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -45,6 +48,34 @@ class Templates(tuple):  # (subclassing tuple)
         if isinstance(item, str):
             return item.startswith("path:") or super().__contains__(item)
         return False
+
+
+class ProviderAction(argparse.Action):
+    """An action for argparse arguments."""
+
+    providers: Dict[str, Type[ProviderRefParser]] = {
+        "github": GitHub,
+        "gitlab": GitLab,
+    }
+
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
+    ) -> None:
+        """Convert a command-line option into a value from a provided dictionary.
+
+        Parameters:
+            parser: The ArgumentParser object which contains this action.
+            namespace: The Namespace object that will be returned by argparse.
+            values: The dictionary used to find the appropriate value.
+            option_string: The option string that was used to invoke this action.
+
+        """
+        if isinstance(values, str):
+            setattr(namespace, self.dest, self.providers.get(values, self.default))
 
 
 def get_version() -> str:
@@ -166,6 +197,15 @@ def get_parser() -> argparse.ArgumentParser:
         help="Output to given file. Default: stdout.",
     )
     parser.add_argument(
+        "-p",
+        "--provider",
+        action=ProviderAction,
+        dest="provider",
+        default=None,
+        choices=ProviderAction.providers.keys(),
+        help="Explicitly specify the repository provider.",
+    )
+    parser.add_argument(
         "-r",
         "--parse-refs",
         action="store_true",
@@ -272,6 +312,7 @@ def build_and_render(
     marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
+    provider: Type[ProviderRefParser] | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -282,6 +323,7 @@ def build_and_render(
         repository: Path to a local repository.
         template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
         convention: Name of a commit message style/convention.
+        provider: Provider class used by this repository.
         parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
         parse_trailers: Whether to parse Git trailers.
         sections: Sections to render (features, bug fixes, etc.).
@@ -318,6 +360,7 @@ def build_and_render(
     # build data
     changelog = Changelog(
         repository,
+        provider=provider,
         convention=convention,
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
@@ -484,6 +527,7 @@ def main(args: list[str] | None = None) -> int:
             convention=opts.convention,
             parse_refs=opts.parse_refs,
             parse_trailers=opts.parse_trailers,
+            provider=opts.provider,
             sections=opts.sections,
             in_place=opts.in_place,
             output=opts.output,
