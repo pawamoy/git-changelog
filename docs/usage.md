@@ -69,7 +69,7 @@ build_and_render(
     parse_trailers=True,
     parse_refs=False,
     sections=("build", "deps", "feat", "fix", "refactor"),
-    bump_latest=True,
+    bump_to="next",
     in_place=True,
 )
 ```
@@ -220,10 +220,15 @@ will bump the MINOR part of the latest tag. Other types will bump the PATCH part
 Commits containing breaking changes will bump the MAJOR part, unless MAJOR is 0,
 in which case they'll only bump the MINOR part.
 
-To tell *git-changelog* to try and guess the new version, use the `-b` or `--bump-latest` CLI option:
+To tell *git-changelog* to try and guess the new version, use the `--bump-to` CLI option:
 
 ```bash
-git-changelog --bump
+git-changelog --bump-to next
+```
+
+You can also specify a version to bump to directly:
+```bash
+git-changelog --bump-to [major|minor|patch|<version>]
 ```
 
 ## Parse additional information in commit messages

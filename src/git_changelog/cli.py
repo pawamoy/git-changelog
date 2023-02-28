@@ -344,7 +344,7 @@ def build_and_render(
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
         sections=sections,
-        bump_latest=bump_latest,
+        bump_to=bump_to,
     )
 
     # remove empty versions from changelog data

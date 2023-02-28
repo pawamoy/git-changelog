@@ -144,6 +144,11 @@ options:
                         versions). Else if there are new features, bump the
                         minor number. Else just bump the patch number.
                         Default: False.
+                        Cannot be used with --bump-to
+  --bump-to BUMP_TO     Specify the bump from latest version for the set of
+                        unreleased commits. Can be one of 'major', 'minor',
+                        'patch' or a valid semver version (eg. 1.2.3).
+                        Cannot be used with --bump-latest.
   -h, --help            Show this help message and exit.
   -i, --in-place        Insert new entries (versions missing from changelog)
                         in-place. An output file must be specified. With
