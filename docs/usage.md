@@ -298,10 +298,10 @@ Example of how the previous trailers are rendered:
     [Part of epic #5](https://agile-software.com/super/project/epics/5),
 ```
 
-To enable Git trailers parsing, use the `-T` or `--parse-trailers` CLI option:
+To enable Git trailers parsing, use the `-T` or `--trailers` CLI option:
 
 ```bash
-git-changelog --parse-trailers
+git-changelog --trailers
 ```
 
 ## Update changelog in place
