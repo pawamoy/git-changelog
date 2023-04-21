@@ -5,19 +5,18 @@ DUTY = $(shell [ -n "${VIRTUAL_ENV}" ] || echo pdm run) duty
 
 args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
 check_quality_args = files
-docs_serve_args = host port
+docs_args = host port
 release_args = version
 test_args = match
 
 BASIC_DUTIES = \
 	changelog \
+	check-api \
 	check-dependencies \
 	clean \
 	coverage \
 	docs \
 	docs-deploy \
-	docs-regen \
-	docs-serve \
 	format \
 	release
 
@@ -41,8 +40,8 @@ setup:
 
 .PHONY: check
 check:
-	@bash scripts/multirun.sh duty check-quality check-types check-docs
-	@$(DUTY) check-dependencies
+	@pdm multirun duty check-quality check-types check-docs
+	@$(DUTY) check-dependencies check-api
 
 .PHONY: $(BASIC_DUTIES)
 $(BASIC_DUTIES):
@@ -50,4 +49,4 @@ $(BASIC_DUTIES):
 
 .PHONY: $(QUALITY_DUTIES)
 $(QUALITY_DUTIES):
-	@bash scripts/multirun.sh duty $@ $(call args,$@)
+	@pdm multirun duty $@ $(call args,$@)

@@ -1,5 +1,4 @@
-"""
-git-changelog package.
+"""git-changelog package.
 
 Automatic Changelog generator using Jinja2 templates.
 """

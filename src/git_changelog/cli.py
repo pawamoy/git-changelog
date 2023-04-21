@@ -1,3 +1,5 @@
+"""Module that contains the command line application."""
+
 # Why does this file exist, and why not put this in `__main__`?
 #
 # You might be tempted to import things from `__main__` later,
@@ -8,8 +10,6 @@
 #   `git_changelog.__main__` in `sys.modules`.
 # - When you import `__main__` it will get executed again (as a module) because
 #   there's no `git_changelog.__main__` in `sys.modules`.
-
-"""Module that contains the command line application."""
 
 from __future__ import annotations
 
@@ -22,7 +22,12 @@ from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
 from git_changelog.build import Changelog, Version
-from git_changelog.commit import AngularConvention, BasicConvention, CommitConvention, ConventionalCommitConvention
+from git_changelog.commit import (
+    AngularConvention,
+    BasicConvention,
+    CommitConvention,
+    ConventionalCommitConvention,
+)
 
 if sys.version_info < (3, 8):
     import importlib_metadata as metadata
@@ -92,7 +97,11 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "repository", metavar="REPOSITORY", nargs="?", default=".", help="The repository path, relative or absolute."
+        "repository",
+        metavar="REPOSITORY",
+        nargs="?",
+        default=".",
+        help="The repository path, relative or absolute.",
     )
 
     parser.add_argument(
@@ -106,7 +115,11 @@ def get_parser() -> argparse.ArgumentParser:
         "Else if there are new features, bump the minor number. Else just bump the patch number.",
     )
     parser.add_argument(
-        "-h", "--help", action="help", default=argparse.SUPPRESS, help="Show this help message and exit."
+        "-h",
+        "--help",
+        action="help",
+        default=argparse.SUPPRESS,
+        help="Show this help message and exit.",
     )
     parser.add_argument(
         "-i",
@@ -337,10 +350,15 @@ def build_and_render(  # noqa: WPS231
         # only keep new entries (missing from changelog)
         last_released = _latest(lines, re.compile(version_regex))
         if last_released:
-            changelog.versions_list = _unreleased(changelog.versions_list, last_released)
+            changelog.versions_list = _unreleased(
+                changelog.versions_list, last_released
+            )
 
         # render new entries
-        rendered = jinja_template.render(changelog=changelog, in_place=True).rstrip("\n") + "\n"
+        rendered = (
+            jinja_template.render(changelog=changelog, in_place=True).rstrip("\n")
+            + "\n"
+        )
 
         # find marker line(s) in current changelog
         marker = lines.index(marker_line)

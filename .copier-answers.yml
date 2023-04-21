@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: 0.10.11
+_commit: 0.12.1
 _src_path: gh:pawamoy/copier-pdm
 author_email: pawamoy@pm.me
 author_fullname: Timothée Mazzucotelli
@@ -16,5 +16,4 @@ python_package_import_name: git_changelog
 repository_name: git-changelog
 repository_namespace: pawamoy
 repository_provider: github.com
-use_precommit: false
 
