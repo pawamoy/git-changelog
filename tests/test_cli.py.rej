@@ -1,0 +1,7 @@
+diff a/tests/test_cli.py b/tests/test_cli.py	(rejected hunks)
+@@ -13,4 +13,3 @@ def test_main():
+ def test_show_help(capsys):
+-    """
+-    Show help.
++    """Show help.
+ 

@@ -11,6 +11,7 @@ pip-wheel-metadata/
 .mypy_cache/
 site/
 pdm.lock
-.pdm.toml
+pdm.toml
+.pdm-python
 __pypackages__/
 .venv/

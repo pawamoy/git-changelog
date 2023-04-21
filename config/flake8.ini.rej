@@ -1,0 +1,11 @@
+diff a/config/flake8.ini b/config/flake8.ini	(rejected hunks)
+@@ -56,2 +56,4 @@ ignore =
+     WPS110
++    # upper-case constant in class
++    WPS115
+     # redundant with W0622 (builtin override), which is more precise about line number
+@@ -94,2 +96,4 @@ ignore =
+     WPS336
++    # unnecessary raw string
++    WPS360
+     # noqa overuse

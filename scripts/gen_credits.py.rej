@@ -1,0 +1,13 @@
+diff a/scripts/gen_credits.py b/scripts/gen_credits.py	(rejected hunks)
+@@ -23,2 +23,3 @@ regex = re.compile(r"(?P<dist>[\w.-]+)(?P<spec>.*)$")
+ 
++
+ def get_license(pkg_name):
+@@ -42,2 +43,3 @@ def get_license(pkg_name):
+ 
++
+ def get_deps(base_deps):
+@@ -63,2 +65,3 @@ def get_deps(base_deps):
+ 
++
+ dev_dependencies = get_deps(chain(*pdm.get("dev-dependencies", {}).values()))

@@ -1,0 +1,7 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -71,5 +82,2 @@ format = [
+ ]
+-maintain = [
+-    "git-changelog>=0.4",
+-]
+ quality = [
