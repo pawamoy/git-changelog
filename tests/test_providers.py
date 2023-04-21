@@ -1,5 +1,7 @@
 """Test providers references parsing."""
 
+from __future__ import annotations
+
 import git_changelog
 
 text = """
@@ -25,15 +27,15 @@ Some milestones: %2, %version1, %"awesome version"
 """
 
 
-def test_github_issue_parsing():
-    """GitHub issues are correctly parsed."""  # noqa: D403 (first word *is* correctly capitalized)
+def test_github_issue_parsing() -> None:
+    """GitHub issues are correctly parsed."""  # (first word *is* correctly capitalized)
     github = git_changelog.GitHub("pawamoy", "git-changelog")
-    for ref in github.REF.keys():
+    for ref in github.REF:
         assert github.get_refs(ref, text)
 
 
-def test_gitlab_issue_parsing():
-    """GitLab issues are correctly parsed."""  # noqa: D403 (first word *is* correctly capitalized)
+def test_gitlab_issue_parsing() -> None:
+    """GitLab issues are correctly parsed."""  # (first word *is* correctly capitalized)
     gitlab = git_changelog.GitLab("pawamoy", "git-changelog")
-    for ref in gitlab.REF.keys():
+    for ref in gitlab.REF:
         assert gitlab.get_refs(ref, text)

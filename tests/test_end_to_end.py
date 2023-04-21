@@ -1,12 +1,13 @@
 """End-to-end tests."""
 
+from __future__ import annotations
+
 import random
 import re
 import shutil
-import subprocess  # noqa: S404
+import subprocess
 from functools import partial
-from pathlib import Path
-from typing import Iterator
+from typing import TYPE_CHECKING, Iterator
 
 import pytest
 
@@ -16,23 +17,29 @@ from git_changelog.cli import build_and_render
 from git_changelog.commit import AngularConvention
 from git_changelog.templates import get_template
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 VERSIONS = ("0.1.0", "0.2.0", "0.2.1", "1.0.0", "1.1.0", "")
 KEEP_A_CHANGELOG = get_template("keepachangelog")
 
 
-def _git(*args) -> str:
-    return subprocess.check_output([shutil.which("git") or "git", *args], text=True)  # noqa: S603
+def _git(*args: str) -> str:
+    return subprocess.check_output(
+        [shutil.which("git") or "git", *args],  # noqa: S603
+        text=True,
+    )
 
 
-def _commit(repo, filename, section):
+def _commit(repo: Path, filename: str, section: str) -> None:
     with repo.joinpath(filename).open("a") as fh:
         fh.write(str(random.randint(0, 1)))  # noqa: S311
-    _git("-C", repo, "add", "-A")
-    _git("-C", repo, "commit", "-m", f"{section}: Commit with '{section}' type")
+    _git("-C", str(repo), "add", "-A")
+    _git("-C", str(repo), "commit", "-m", f"{section}: Commit with '{section}' type")
 
 
 @pytest.fixture(scope="module", name="repo")
-def git_repo(tmp_path_factory) -> Iterator[Path]:
+def git_repo(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Path]:
     """Pytest fixture setting up a temporary Git repository.
 
     Parameters:
@@ -49,7 +56,7 @@ def git_repo(tmp_path_factory) -> Iterator[Path]:
     git("config", "user.email", "dummy@example.com")
     git("remote", "add", "origin", "git@github.com:example/example")
     for version in VERSIONS:
-        for section in AngularConvention.TYPES.keys():
+        for section in AngularConvention.TYPES:
             commit(section)
             commit(section)
         if version:
@@ -58,7 +65,7 @@ def git_repo(tmp_path_factory) -> Iterator[Path]:
     shutil.rmtree(tmp_path)
 
 
-def test_bumping_latest(repo):
+def test_bumping_latest(repo: Path) -> None:
     """Bump latest version.
 
     Parameters:
@@ -71,7 +78,7 @@ def test_bumping_latest(repo):
     assert "Unreleased" not in rendered
 
 
-def test_not_bumping_latest(repo):
+def test_not_bumping_latest(repo: Path) -> None:
     """Don't bump latest version.
 
     Parameters:
@@ -83,7 +90,7 @@ def test_not_bumping_latest(repo):
     assert "Unreleased" in rendered
 
 
-def test_rendering_custom_sections(repo):
+def test_rendering_custom_sections(repo: Path) -> None:
     """Render custom sections.
 
     Parameters:
@@ -96,7 +103,7 @@ def test_rendering_custom_sections(repo):
             assert section_title not in rendered
 
 
-def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
+def test_rendering_in_place(repo: Path, tmp_path: Path) -> None:
     """Render changelog in-place.
 
     Parameters:
@@ -115,7 +122,7 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     assert "Unreleased" in rendered
     latest_tag = "91.6.14"
     assert latest_tag not in rendered
-    _git("-C", repo, "tag", latest_tag)
+    _git("-C", str(repo), "tag", latest_tag)
     build_and_render(
         str(repo),
         convention="angular",
@@ -128,4 +135,4 @@ def test_rendering_in_place(repo, tmp_path):  # noqa: WPS218
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
-    _git("-C", repo, "tag", "-d", latest_tag)
+    _git("-C", str(repo), "tag", "-d", latest_tag)

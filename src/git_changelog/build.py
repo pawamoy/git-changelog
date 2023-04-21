@@ -6,9 +6,8 @@ import datetime
 import os
 import sys
 from contextlib import suppress
-from pathlib import Path
-from subprocess import check_output  # noqa: S404 (we trust the commands we run)
-from typing import Type, Union
+from subprocess import check_output  # (we trust the commands we run)
+from typing import TYPE_CHECKING, Type, Union
 
 from semver import VersionInfo
 
@@ -22,12 +21,14 @@ from git_changelog.commit import (
 )
 from git_changelog.providers import GitHub, GitLab, ProviderRefParser
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
-def bump(version: str, part: str = "patch") -> str:  # noqa: WPS231
-    """
-    Bump a version.
+def bump(version: str, part: str = "patch") -> str:
+    """Bump a version.
 
     Arguments:
         version: The version to bump.
@@ -55,8 +56,7 @@ class Section:
     """A list of commits grouped by section_type."""
 
     def __init__(self, section_type: str = "", commits: list[Commit] | None = None):
-        """
-        Initialization method.
+        """Initialization method.
 
         Arguments:
             section_type: The section section_type.
@@ -78,8 +78,7 @@ class Version:
         url: str = "",
         compare_url: str = "",
     ):
-        """
-        Initialization method.
+        """Initialization method.
 
         Arguments:
             tag: The version tag.
@@ -143,7 +142,7 @@ class Changelog:
 
     MARKER: str = "--GIT-CHANGELOG MARKER--"
     FORMAT: str = (
-        r"%H%n"  # commit commit_hash  # noqa: WPS323
+        r"%H%n"  # commit commit_hash
         r"%an%n"  # author name
         r"%ae%n"  # author email
         r"%ad%n"  # author date
@@ -154,16 +153,17 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
-    CONVENTION: dict[str, Type[CommitConvention]] = {
+    CONVENTION: dict[str, type[CommitConvention]] = {
         "basic": BasicConvention,
         "angular": AngularConvention,
         "atom": AtomConvention,
         "conventional": ConventionalCommitConvention,
     }
 
-    def __init__(  # noqa: WPS231
+    def __init__(
         self,
         repository: str | Path,
+        *,
         provider: ProviderRefParser | None = None,
         convention: ConventionType | None = None,
         parse_provider_refs: bool = False,
@@ -171,8 +171,7 @@ class Changelog:
         sections: list[str] | None = None,
         bump_latest: bool = False,
     ):
-        """
-        Initialization method.
+        """Initialization method.
 
         Arguments:
             repository: The repository (directory) for which to build the changelog.
@@ -205,7 +204,7 @@ class Changelog:
             try:
                 convention = self.CONVENTION[convention]()
             except KeyError:
-                print(
+                print(  # noqa: T201
                     f"git-changelog: no such convention available: {convention}, using default convention",
                     file=sys.stderr,
                 )
@@ -217,10 +216,9 @@ class Changelog:
         self.convention: CommitConvention = convention
 
         # set sections
-        if sections:
-            sections = [self.convention.TYPES[section] for section in sections]
-        else:
-            sections = self.convention.DEFAULT_RENDER
+        sections = (
+            [self.convention.TYPES[section] for section in sections] if sections else self.convention.DEFAULT_RENDER
+        )
         self.sections = sections
 
         # get git log and parse it into list of commits
@@ -251,7 +249,7 @@ class Changelog:
         """
         return check_output(["git", *args], cwd=self.repository).decode("utf8")  # noqa: S603,S607
 
-    def get_remote_url(self) -> str:  # noqa: WPS615
+    def get_remote_url(self) -> str:
         """Get the git remote URL for the repository.
 
         Returns:
@@ -310,7 +308,7 @@ class Changelog:
 
             # expand commit object with provider parsing
             if self.provider:
-                commit.update_with_provider(self.provider, self.parse_provider_refs)
+                commit.update_with_provider(self.provider, parse_refs=self.parse_provider_refs)
 
             # set the commit url based on remote_url (could be wrong)
             elif self.remote_url:
@@ -325,7 +323,7 @@ class Changelog:
         return commits
 
     def _apply_versions_to_commits(self) -> dict[str, datetime.date]:
-        versions_dates = {"": datetime.date.today()}
+        versions_dates = {"": datetime.date.today()}  # noqa: DTZ011
         version = None
         for commit in self.commits:
             if commit.version:
@@ -335,8 +333,9 @@ class Changelog:
                 commit.version = version
         return versions_dates
 
-    def _group_commits_by_version(  # noqa: WPS231
-        self, dates: dict[str, datetime.date]
+    def _group_commits_by_version(
+        self,
+        dates: dict[str, datetime.date],
     ) -> tuple[list[Version], dict[str, Version]]:
         versions_list = []
         versions_dict = {}
@@ -353,7 +352,8 @@ class Changelog:
                     next_version.previous_version = version
                     if self.provider:
                         next_version.compare_url = self.provider.get_compare_url(
-                            base=version.tag, target=next_version.tag or "HEAD"
+                            base=version.tag,
+                            target=next_version.tag or "HEAD",
                         )
                 next_version = version
                 versions_list.append(version)
@@ -367,21 +367,22 @@ class Changelog:
             versions_types_dict[commit.version][commit.convention["type"]].commits.append(commit)
         if next_version is not None and self.provider:
             next_version.compare_url = self.provider.get_compare_url(
-                base=versions_list[-1].commits[-1].hash, target=next_version.tag or "HEAD"
+                base=versions_list[-1].commits[-1].hash,
+                target=next_version.tag or "HEAD",
             )
         return versions_list, versions_dict
 
-    def _bump_latest(self) -> None:  # noqa: WPS231
+    def _bump_latest(self) -> None:
         # guess the next version number based on last version and recent commits
         last_version = self.versions_list[0]
         if not last_version.tag and last_version.previous_version:
             last_tag = last_version.previous_version.tag
-            major = minor = False  # noqa: WPS429
+            major = minor = False
             for commit in last_version.commits:
                 if commit.convention["is_major"]:
                     major = True
                     break
-                elif commit.convention["is_minor"]:
+                if commit.convention["is_minor"]:
                     minor = True
             # never fail on non-semver versions
             with suppress(ValueError):
@@ -395,7 +396,8 @@ class Changelog:
                 if self.provider:
                     last_version.url = self.provider.get_tag_url(tag=planned_tag)
                     last_version.compare_url = self.provider.get_compare_url(
-                        base=last_version.previous_version.tag, target=last_version.planned_tag
+                        base=last_version.previous_version.tag,
+                        target=last_version.planned_tag,
                     )
 
     def _fix_single_version(self) -> None:

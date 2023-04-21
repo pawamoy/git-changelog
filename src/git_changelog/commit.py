@@ -7,12 +7,13 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
-from typing import Any, Pattern
+from typing import TYPE_CHECKING, Any, Pattern
 
-from git_changelog.providers import ProviderRefParser, Ref
+if TYPE_CHECKING:
+    from git_changelog.providers import ProviderRefParser, Ref
 
 
-def _clean_body(lines: list[str]):
+def _clean_body(lines: list[str]) -> list[str]:
     while lines and not lines[0].strip():
         lines.pop(0)
     while lines and not lines[-1].strip():
@@ -23,7 +24,7 @@ def _clean_body(lines: list[str]):
 class Commit:
     """A class to represent a commit."""
 
-    def __init__(  # noqa: WPS231
+    def __init__(
         self,
         commit_hash: str,
         author_name: str = "",
@@ -36,10 +37,10 @@ class Commit:
         subject: str = "",
         body: list[str] | None = None,
         url: str = "",
+        *,
         parse_trailers: bool = False,
     ):
-        """
-        Initialization method.
+        """Initialization method.
 
         Arguments:
             commit_hash: The commit hash.
@@ -56,13 +57,13 @@ class Commit:
             parse_trailers: Whether to parse Git trailers.
         """
         if not author_date:
-            author_date = datetime.now()
+            author_date = datetime.now()  # noqa: DTZ005
         elif isinstance(author_date, str):
-            author_date = datetime.utcfromtimestamp(float(author_date))
+            author_date = datetime.utcfromtimestamp(float(author_date))  # noqa: DTZ004
         if not committer_date:
-            committer_date = datetime.now()
+            committer_date = datetime.now()  # noqa: DTZ005
         elif isinstance(committer_date, str):
-            committer_date = datetime.utcfromtimestamp(float(committer_date))
+            committer_date = datetime.utcfromtimestamp(float(committer_date))  # noqa: DTZ004
 
         self.hash: str = commit_hash
         self.author_name: str = author_name
@@ -77,7 +78,7 @@ class Commit:
 
         tag = ""
         for ref in refs.split(","):
-            ref = ref.strip()
+            ref = ref.strip()  # noqa: PLW2901
             if ref.startswith("tag: "):
                 tag = ref.replace("tag: ", "")
                 break
@@ -94,17 +95,19 @@ class Commit:
             self._parse_trailers()
 
     def update_with_convention(self, convention: CommitConvention) -> None:
-        """
-        Apply the convention-parsed data to this commit.
+        """Apply the convention-parsed data to this commit.
 
         Arguments:
             convention: The convention to use.
         """
         self.convention.update(convention.parse_commit(self))
 
-    def update_with_provider(self, provider: ProviderRefParser, parse_refs: bool = True) -> None:  # noqa: WPS231
-        """
-        Apply the provider-parsed data to this commit.
+    def update_with_provider(
+        self,
+        provider: ProviderRefParser,
+        parse_refs: bool = True,  # noqa: FBT001,FBT002
+    ) -> None:
+        """Apply the provider-parsed data to this commit.
 
         Arguments:
             provider: The provider to use.
@@ -120,8 +123,11 @@ class Commit:
 
         # build commit text references from its subject and body
         if parse_refs:
-            for ref_type in provider.REF.keys():
-                self.text_refs[ref_type] = provider.get_refs(ref_type, "\n".join([self.subject] + self.body))
+            for ref_type in provider.REF:
+                self.text_refs[ref_type] = provider.get_refs(
+                    ref_type,
+                    "\n".join([self.subject, *self.body]),
+                )
 
             if "issues" in self.text_refs:
                 self.text_refs["issues_not_in_subject"] = []
@@ -158,19 +164,18 @@ class CommitConvention(ABC):
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
-        """
-        Parse the commit to extract information.
+        """Parse the commit to extract information.
 
         Arguments:
             commit: The commit to parse.
 
         Returns:
             A dictionary containing the parsed data.
-        """  # noqa: DAR202,DAR401
+        """
         raise NotImplementedError
 
     @classmethod
-    def _format_sections_help(cls):
+    def _format_sections_help(cls) -> str:
         reversed_map = defaultdict(list)
         for section_type, section_title in cls.TYPES.items():
             reversed_map[section_title].append(section_type)
@@ -206,18 +211,31 @@ class BasicConvention(CommitConvention):
         "doc": "Documented",
     }
 
-    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)  # noqa: WPS323
-    BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
-    DEFAULT_RENDER: list[str] = [TYPES["add"], TYPES["fix"], TYPES["change"], TYPES["remove"]]
+    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
+    BREAK_REGEX: Pattern = re.compile(
+        r"^break(s|ing changes?)?[ :].+$",
+        re.I | re.MULTILINE,
+    )
+    DEFAULT_RENDER: list[str] = [
+        TYPES["add"],
+        TYPES["fix"],
+        TYPES["change"],
+        TYPES["remove"],
+    ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         commit_type = self.parse_type(commit.subject)
-        message = "\n".join([commit.subject] + commit.body)
+        message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
         is_minor = not is_major and self.is_minor(commit_type)
         is_patch = not any((is_major, is_minor))
 
-        return {"type": commit_type, "is_major": is_major, "is_minor": is_minor, "is_patch": is_patch}
+        return {
+            "type": commit_type,
+            "is_major": is_major,
+            "is_minor": is_minor,
+            "is_patch": is_patch,
+        }
 
     def parse_type(self, commit_subject: str) -> str:
         """Parse the type of the commit given its subject.
@@ -277,14 +295,23 @@ class AngularConvention(CommitConvention):
         "tests": "Tests",
     }
     SUBJECT_REGEX: Pattern = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys()))  # noqa: WPS323 (%)
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
     )
-    BREAK_REGEX: Pattern = re.compile(r"^break(s|ing changes?)?[ :].+$", re.I | re.MULTILINE)
-    DEFAULT_RENDER: list[str] = [TYPES["feat"], TYPES["fix"], TYPES["revert"], TYPES["refactor"], TYPES["perf"]]
+    BREAK_REGEX: Pattern = re.compile(
+        r"^break(s|ing changes?)?[ :].+$",
+        re.I | re.MULTILINE,
+    )
+    DEFAULT_RENDER: list[str] = [
+        TYPES["feat"],
+        TYPES["fix"],
+        TYPES["revert"],
+        TYPES["refactor"],
+        TYPES["perf"],
+    ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
-        message = "\n".join([commit.subject] + commit.body)
+        message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
         is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))
@@ -343,13 +370,12 @@ class ConventionalCommitConvention(AngularConvention):
     TYPES: dict[str, str] = AngularConvention.TYPES
     DEFAULT_RENDER: list[str] = AngularConvention.DEFAULT_RENDER
     SUBJECT_REGEX: Pattern = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"  # noqa: WPS323 (%)
-        % ("|".join(TYPES.keys()))
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
     )
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102 (use parent docstring)
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
-        message = "\n".join([commit.subject] + commit.body)
+        message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message) or subject.get("breaking") == "!"
         is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))

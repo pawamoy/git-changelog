@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from git_changelog import cli
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_main() -> None:
@@ -24,7 +29,7 @@ def test_show_help(capsys: pytest.CaptureFixture) -> None:
     assert "git-changelog" in captured.out
 
 
-def test_get_version():
+def test_get_version() -> None:
     """Get self version."""
     assert cli.get_version()
 
@@ -36,7 +41,7 @@ def test_get_version():
         ("-s", "feat,fix", "."),
     ],
 )
-def test_passing_repository_and_sections(tmp_path, args):
+def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> None:
     """Render the changelog of given repository, choosing sections.
 
     Parameters:

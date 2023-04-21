@@ -1,5 +1,7 @@
 """Tests for the `commit` module."""
 
+from __future__ import annotations
+
 import pytest
 
 from git_changelog.commit import Commit
@@ -13,10 +15,13 @@ from git_changelog.commit import Commit
         ("t1: v1\nt2:v2", {}),  # missing space after colon
         ("t1: v1\nt2: v2\n\nf", {}),  # trailers not last
         ("t1: v1\nt2 v2", {}),  # not all trailers
-        ("something: else\n\nt1: v1\nt2: v2", {"t1": "v1", "t2": "v2"}),  # parse footer only
+        (
+            "something: else\n\nt1: v1\nt2: v2",
+            {"t1": "v1", "t2": "v2"},
+        ),  # parse footer only
     ],
 )
-def test_parsing_trailers(body, expected_trailers):
+def test_parsing_trailers(body: str, expected_trailers: dict[str, str]) -> None:
     """Assert trailers are parsed correctly.
 
     Parameters:

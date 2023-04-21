@@ -32,14 +32,14 @@ from git_changelog.commit import (
 if sys.version_info < (3, 8):
     import importlib_metadata as metadata
 else:
-    from importlib import metadata  # noqa: WPS440
+    from importlib import metadata
 
 DEFAULT_VERSION_REGEX = r"^## \[v?(?P<version>[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
 CONVENTIONS = ("angular", "atom", "conventional", "basic")
 
 
-class Templates(tuple):  # noqa: WPS600 (subclassing tuple)
+class Templates(tuple):  # (subclassing tuple)
     """Helper to pick a template on the command line."""
 
     def __contains__(self, item: object) -> bool:
@@ -91,7 +91,7 @@ def get_parser() -> argparse.ArgumentParser:
             {BasicConvention._format_sections_help()}
             {AngularConvention._format_sections_help()}
             {ConventionalCommitConvention._format_sections_help()}
-            """,  # noqa: WPS437
+            """,
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -216,7 +216,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-v",
         "--version",
         action="version",
-        version="%(prog)s " + get_version(),  # noqa: WPS323 (%)
+        version="%(prog)s " + get_version(),  # (%)
         help="Show the current version of the program and exit.",
     )
     return parser
@@ -230,7 +230,7 @@ def _latest(lines: list[str], regex: Pattern) -> str | None:
     return None
 
 
-def _unreleased(versions: list[Version], last_release: str):
+def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
     for index, version in enumerate(versions):
         if version.tag == last_release:
             return versions[:index]
@@ -272,18 +272,18 @@ def main(args: list[str] | None = None) -> int:
     return 0
 
 
-def build_and_render(  # noqa: WPS231
+def build_and_render(
     repository: str,
     template: str,
     convention: str | CommitConvention,
-    parse_refs: bool = False,
-    parse_trailers: bool = False,
+    parse_refs: bool = False,  # noqa: FBT001,FBT002
+    parse_trailers: bool = False,  # noqa: FBT001,FBT002
     sections: list[str] | None = None,
-    in_place: bool = False,
+    in_place: bool = False,  # noqa: FBT001,FBT002
     output: str | TextIO | None = None,
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
-    bump_latest: bool = False,
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -314,8 +314,8 @@ def build_and_render(  # noqa: WPS231
         path = template.replace("path:", "", 1)
         try:
             jinja_template = templates.get_custom_template(path)
-        except TemplateNotFound:
-            raise ValueError(f"No such file: {path}")
+        except TemplateNotFound as error:
+            raise ValueError(f"No such file: {path}") from error
     else:
         jinja_template = templates.get_template(template)
 
@@ -339,7 +339,7 @@ def build_and_render(  # noqa: WPS231
     # render new entries in-place
     if in_place:
         # read current changelog lines
-        with open(output, "r") as changelog_file:  # type: ignore[arg-type]
+        with open(output) as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # prepare version regex and marker line
@@ -351,14 +351,12 @@ def build_and_render(  # noqa: WPS231
         last_released = _latest(lines, re.compile(version_regex))
         if last_released:
             changelog.versions_list = _unreleased(
-                changelog.versions_list, last_released
+                changelog.versions_list,
+                last_released,
             )
 
         # render new entries
-        rendered = (
-            jinja_template.render(changelog=changelog, in_place=True).rstrip("\n")
-            + "\n"
-        )
+        rendered = jinja_template.render(changelog=changelog, in_place=True).rstrip("\n") + "\n"
 
         # find marker line(s) in current changelog
         marker = lines.index(marker_line)
@@ -369,10 +367,10 @@ def build_and_render(  # noqa: WPS231
             lines[marker] = rendered
         else:
             # apply new entries between marker lines
-            lines[marker : marker + marker2 + 2] = [rendered]  # noqa: WPS362
+            lines[marker : marker + marker2 + 2] = [rendered]
 
         # write back updated changelog lines
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]  # noqa: WPS440
+        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # overwrite output file

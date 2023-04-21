@@ -127,9 +127,9 @@ def check_api(ctx: Context) -> None:
     Parameters:
         ctx: The context instance (passed automatically).
     """
-    from griffe.cli import check
+    from griffe.cli import check as gc
 
-    griffe_check = lazy(check, name="griffe.check")
+    griffe_check = lazy(gc, name="griffe.check")
     for pkg in Path("src").glob("*"):
         if pkg.is_dir():
             ctx.run(

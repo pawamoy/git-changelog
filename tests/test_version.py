@@ -1,5 +1,7 @@
 """Test version bumping."""
 
+from __future__ import annotations
+
 import pytest
 
 from git_changelog.build import bump
@@ -24,7 +26,7 @@ from git_changelog.build import bump
         ("v1.1.1", "v1.1.2"),
     ],
 )
-def test_bump_patch(version, bumped):
+def test_bump_patch(version: str, bumped: str) -> None:
     """Test default and patch version bumping.
 
     Parameters:
@@ -53,7 +55,7 @@ def test_bump_patch(version, bumped):
         ("v1.1.1", "v1.2.0"),
     ],
 )
-def test_bump_minor(version, bumped):
+def test_bump_minor(version: str, bumped: str) -> None:
     """Test minor version bumping.
 
     Parameters:
@@ -82,7 +84,7 @@ def test_bump_minor(version, bumped):
         ("v1.1.1", "v2.0.0"),
     ],
 )
-def test_bump_major(version, bumped):
+def test_bump_major(version: str, bumped: str) -> None:
     """Test major version bumping.
 
     Parameters:
