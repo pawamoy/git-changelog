@@ -146,3 +146,44 @@ def test_rendering_in_place(repo: Path, tmp_path: Path) -> None:
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
     _git("-C", str(repo), "tag", "-d", latest_tag)
+
+
+def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
+    """Render changelog in-place, and check for duplicate entries.
+
+    Parameters:
+        repo: Path to a temporary repository.
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog.md")
+    _, rendered = build_and_render(
+        str(repo),
+        convention="angular",
+        bump_latest=True,
+        output=output.as_posix(),
+        template="keepachangelog",
+    )
+
+    # When bump_latest is True, there's only one insertion marker
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
+    latest_tag = "1.2.0"
+    assert latest_tag in rendered
+
+    rendered = output.read_text()
+    # The latest tag should appear exactly three times in the changelog
+    assert rendered.count(latest_tag) == 3
+
+    # Without tagging a new version, we should get an error
+    with pytest.raises(ValueError, match=r"Version .* already in changelog"):
+        build_and_render(
+            str(repo),
+            convention="angular",
+            bump_latest=True,
+            output=output.as_posix(),
+            template="keepachangelog",
+            in_place=True,
+        )
+
+    rendered = output.read_text()
+    # The latest tag should still appear exactly three times in the changelog
+    assert rendered.count(latest_tag) == 3
