@@ -335,7 +335,7 @@ To support in-place updates in a custom template, you have two choices:
     to insert new entries. Here are these default values:
 
     ```python
-    DEFAULT_VERSION_REGEX = r"^## \[v?(?P<version>[^\]]+)"
+    DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
     DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
     ```
 

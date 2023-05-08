@@ -34,7 +34,7 @@ if sys.version_info < (3, 8):
 else:
     from importlib import metadata
 
-DEFAULT_VERSION_REGEX = r"^## \[v?(?P<version>[^\]]+)"
+DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
 CONVENTIONS = ("angular", "atom", "conventional", "basic")
 

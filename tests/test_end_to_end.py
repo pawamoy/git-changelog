@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 VERSIONS = ("0.1.0", "0.2.0", "0.2.1", "1.0.0", "1.1.0", "")
+VERSIONS_V = ("v0.1.0", "v0.2.0", "v0.2.1", "v1.0.0", "v1.1.0", "")
 KEEP_A_CHANGELOG = get_template("keepachangelog")
 
 
@@ -38,8 +39,11 @@ def _commit(repo: Path, filename: str, section: str) -> None:
     _git("-C", str(repo), "commit", "-m", f"{section}: Commit with '{section}' type")
 
 
-@pytest.fixture(scope="module", name="repo")
-def git_repo(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Path]:
+@pytest.fixture(scope="module", name="repo", params=(VERSIONS, VERSIONS_V))
+def git_repo(
+    tmp_path_factory: pytest.TempPathFactory,
+    request: pytest.Subrequest,
+) -> Iterator[Path]:
     """Pytest fixture setting up a temporary Git repository.
 
     Parameters:
@@ -49,13 +53,15 @@ def git_repo(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Path]:
         The path to a temporary Git repository.
     """
     tmp_path = tmp_path_factory.mktemp("git_changelog")
+    tmp_path.mkdir(exist_ok=True, parents=True)
     git = partial(_git, "-C", str(tmp_path))
     commit = partial(_commit, tmp_path, "dummy")
     git("init")
     git("config", "user.name", "dummy")
     git("config", "user.email", "dummy@example.com")
     git("remote", "add", "origin", "git@github.com:example/example")
-    for version in VERSIONS:
+    versions = request.param
+    for version in versions:
         for section in AngularConvention.TYPES:
             commit(section)
             commit(section)
@@ -73,7 +79,11 @@ def test_bumping_latest(repo: Path) -> None:
     """
     changelog = Changelog(repo, convention=AngularConvention, bump_latest=True)
     # features, no breaking changes: minor bumped
-    assert changelog.versions_list[0].planned_tag == bump(VERSIONS[-2], "minor")
+    assert changelog.versions_list[0].planned_tag is not None
+    assert changelog.versions_list[0].planned_tag.lstrip("v") == bump(
+        VERSIONS[-2],
+        "minor",
+    )
     rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
     assert "Unreleased" not in rendered
 
