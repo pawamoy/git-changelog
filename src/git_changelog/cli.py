@@ -350,6 +350,10 @@ def build_and_render(
         # only keep new entries (missing from changelog)
         last_released = _latest(lines, re.compile(version_regex))
         if last_released:
+            # check if the latest version is already in the changelog
+            if (last_released == changelog.versions_list[0].tag or
+                last_released == changelog.versions_list[0].planned_tag):
+                raise ValueError(f"Version {last_released} already in changelog")
             changelog.versions_list = _unreleased(
                 changelog.versions_list,
                 last_released,
