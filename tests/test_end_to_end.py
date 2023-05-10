@@ -42,7 +42,7 @@ def _commit(repo: Path, filename: str, section: str) -> None:
 @pytest.fixture(scope="module", name="repo", params=(VERSIONS, VERSIONS_V))
 def git_repo(
     tmp_path_factory: pytest.TempPathFactory,
-    request: pytest.Subrequest,
+    request: pytest.FixtureRequest,
 ) -> Iterator[Path]:
     """Pytest fixture setting up a temporary Git repository.
 
