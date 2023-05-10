@@ -4,7 +4,8 @@ site_url: "https://pawamoy.github.io/git-changelog"
 repo_url: "https://github.com/pawamoy/git-changelog"
 repo_name: "pawamoy/git-changelog"
 site_dir: "site"
-watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/git_changelog]
+watch: [mkdocs.yml, README.md, CONTRIBUTING.md, CHANGELOG.md, src/git_changelog]
+copyright: Copyright &copy; 2020 Timothée Mazzucotelli
 
 nav:
 - Home:
@@ -23,15 +24,30 @@ nav:
 
 theme:
   name: material
+  custom_dir: docs/.overrides
   icon:
     logo: material/currency-sign
   features:
+  - announce.dismiss
+  - content.action.edit
+  - content.action.view
+  - content.code.annotate
+  - content.code.copy
+  - content.tooltips
+  - navigation.footer
+  - navigation.indexes
+  - navigation.sections
   - navigation.tabs
   - navigation.tabs.sticky
   - navigation.top
   - search.highlight
   - search.suggest
+  - toc.follow
   palette:
+  - media: "(prefers-color-scheme)"
+    toggle:
+      icon: material/brightness-auto
+      name: Switch to light mode
   - media: "(prefers-color-scheme: light)"
     scheme: default
     primary: teal
@@ -45,23 +61,31 @@ theme:
     accent: lime
     toggle:
       icon: material/weather-night
-      name: Switch to light mode
+      name: Switch to system preference
 
 extra_css:
 - css/material.css
 - css/mkdocstrings.css
 
 markdown_extensions:
+- attr_list
 - admonition
 - callouts
-- pymdownx.emoji
+- footnotes
+- pymdownx.emoji:
+    emoji_index: !!python/name:materialx.emoji.twemoji
+    emoji_generator: !!python/name:materialx.emoji.to_svg
 - pymdownx.magiclink
 - pymdownx.snippets:
     check_paths: true
 - pymdownx.superfences
 - pymdownx.tabbed:
     alternate_style: true
-- pymdownx.tasklist
+    slugify: !!python/object/apply:pymdownx.slugs.slugify
+      kwds:
+        case: lower
+- pymdownx.tasklist:
+    custom_checkbox: true
 - toc:
     permalink: "¤"
 
@@ -74,7 +98,6 @@ plugins:
 - literate-nav:
     nav_file: SUMMARY.txt
 - coverage
-- section-index
 - mkdocstrings:
     handlers:
       python:
@@ -85,6 +108,11 @@ plugins:
           merge_init_into_class: true
           docstring_options:
             ignore_init_summary: true
+- git-committers:
+    enabled: !ENV [DEPLOY, false]
+    repository: pawamoy/git-changelog
+- minify:
+    minify_html: !ENV [DEPLOY, false]
 
 extra:
   social:
@@ -94,3 +122,7 @@ extra:
     link: https://fosstodon.org/@pawamoy
   - icon: fontawesome/brands/twitter
     link: https://twitter.com/pawamoy
+  - icon: fontawesome/brands/gitter
+    link: https://gitter.im/git-changelog/community
+  - icon: fontawesome/brands/python
+    link: https://pypi.org/project/git-changelog/

@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: 0.12.1
+_commit: 0.15.4
 _src_path: gh:pawamoy/copier-pdm
 author_email: pawamoy@pm.me
 author_fullname: Timothée Mazzucotelli
@@ -8,6 +8,7 @@ copyright_date: '2020'
 copyright_holder: Timothée Mazzucotelli
 copyright_holder_email: pawamoy@pm.me
 copyright_license: ISC License
+insiders: false
 project_description: Automatic Changelog generator using Jinja2 templates.
 project_name: git-changelog
 python_package_command_line_name: git-changelog
