@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [1.0.1](https://github.com/pawamoy/git-changelog/releases/tag/1.0.1) - 2023-05-10
+
+<small>[Compare with 1.0.0](https://github.com/pawamoy/git-changelog/compare/1.0.0...1.0.1)</small>
+
+### Bug Fixes
+
+- Check if the latest version tag is already part of the changelog ([1fad8a8](https://github.com/pawamoy/git-changelog/commit/1fad8a82b2b6b79e6c989e0f236cc6d11d701ae6) by Kevin Squire).
+- Include `v` prefix in default version regular expression ([a50d6a2](https://github.com/pawamoy/git-changelog/commit/a50d6a2b05ea699302b44705e994d84e30d6f489) by Kevin Squire).
+
 ## [1.0.0](https://github.com/pawamoy/git-changelog/releases/tag/1.0.0) - 2023-02-04
 
 <small>[Compare with 0.6.0](https://github.com/pawamoy/git-changelog/compare/0.6.0...1.0.0)</small>
