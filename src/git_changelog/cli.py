@@ -233,41 +233,6 @@ def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
     return versions
 
 
-def main(args: list[str] | None = None) -> int:
-    """Run the main program.
-
-    This function is executed when you type `git-changelog` or `python -m git_changelog`.
-
-    Arguments:
-        args: Arguments passed from the command line.
-
-    Returns:
-        An exit code.
-    """
-    parser = get_parser()
-    opts = parser.parse_args(args=args)
-
-    try:
-        build_and_render(
-            repository=opts.repository,
-            template=opts.template,
-            convention=opts.convention,
-            parse_refs=opts.parse_refs,
-            parse_trailers=opts.parse_trailers,
-            sections=opts.sections,
-            in_place=opts.in_place,
-            output=opts.output,
-            version_regex=opts.version_regex,
-            marker_line=opts.marker_line,
-            bump_latest=opts.bump_latest,
-        )
-    except ValueError as error:
-        print(f"git-changelog: {error}", file=sys.stderr)
-        return 1
-
-    return 0
-
-
 def build_and_render(
     repository: str,
     template: str,
@@ -387,3 +352,38 @@ def build_and_render(
                 stream.write(rendered)
 
     return changelog, rendered
+
+
+def main(args: list[str] | None = None) -> int:
+    """Run the main program.
+
+    This function is executed when you type `git-changelog` or `python -m git_changelog`.
+
+    Arguments:
+        args: Arguments passed from the command line.
+
+    Returns:
+        An exit code.
+    """
+    parser = get_parser()
+    opts = parser.parse_args(args=args)
+
+    try:
+        build_and_render(
+            repository=opts.repository,
+            template=opts.template,
+            convention=opts.convention,
+            parse_refs=opts.parse_refs,
+            parse_trailers=opts.parse_trailers,
+            sections=opts.sections,
+            in_place=opts.in_place,
+            output=opts.output,
+            version_regex=opts.version_regex,
+            marker_line=opts.marker_line,
+            bump_latest=opts.bump_latest,
+        )
+    except ValueError as error:
+        print(f"git-changelog: {error}", file=sys.stderr)
+        return 1
+
+    return 0
