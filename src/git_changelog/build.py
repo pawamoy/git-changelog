@@ -7,7 +7,7 @@ import os
 import sys
 from contextlib import suppress
 from subprocess import check_output  # (we trust the commands we run)
-from typing import TYPE_CHECKING, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Type, Union
 
 from semver import VersionInfo
 
@@ -140,8 +140,8 @@ class Version:
 class Changelog:
     """The main changelog class."""
 
-    MARKER: str = "--GIT-CHANGELOG MARKER--"
-    FORMAT: str = (
+    MARKER: ClassVar[str] = "--GIT-CHANGELOG MARKER--"
+    FORMAT: ClassVar[str] = (
         r"%H%n"  # commit commit_hash
         r"%an%n"  # author name
         r"%ae%n"  # author email
@@ -153,7 +153,7 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
-    CONVENTION: dict[str, type[CommitConvention]] = {
+    CONVENTION: ClassVar[dict[str, type[CommitConvention]]] = {
         "basic": BasicConvention,
         "angular": AngularConvention,
         "atom": AtomConvention,

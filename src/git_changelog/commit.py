@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Pattern
+from typing import TYPE_CHECKING, Any, ClassVar, Pattern
 
 if TYPE_CHECKING:
     from git_changelog.providers import ProviderRefParser, Ref
@@ -157,10 +157,10 @@ class Commit:
 class CommitConvention(ABC):
     """A base class for a convention of commit messages."""
 
-    TYPES: dict[str, str]
-    TYPE_REGEX: Pattern
-    BREAK_REGEX: Pattern
-    DEFAULT_RENDER: list[str]
+    TYPES: ClassVar[dict[str, str]]
+    TYPE_REGEX: ClassVar[Pattern]
+    BREAK_REGEX: ClassVar[Pattern]
+    DEFAULT_RENDER: ClassVar[list[str]]
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
@@ -202,7 +202,7 @@ class CommitConvention(ABC):
 class BasicConvention(CommitConvention):
     """Basic commit message convention."""
 
-    TYPES: dict[str, str] = {
+    TYPES: ClassVar[dict[str, str]] = {
         "add": "Added",
         "fix": "Fixed",
         "change": "Changed",
@@ -211,12 +211,12 @@ class BasicConvention(CommitConvention):
         "doc": "Documented",
     }
 
-    TYPE_REGEX: Pattern = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
-    BREAK_REGEX: Pattern = re.compile(
+    TYPE_REGEX: ClassVar[Pattern] = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
+    BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
     )
-    DEFAULT_RENDER: list[str] = [
+    DEFAULT_RENDER: ClassVar[list[str]] = [
         TYPES["add"],
         TYPES["fix"],
         TYPES["change"],
@@ -277,7 +277,7 @@ class BasicConvention(CommitConvention):
 class AngularConvention(CommitConvention):
     """Angular commit message convention."""
 
-    TYPES: dict[str, str] = {
+    TYPES: ClassVar[dict[str, str]] = {
         "build": "Build",
         "chore": "Chore",
         "ci": "Continuous Integration",
@@ -294,14 +294,14 @@ class AngularConvention(CommitConvention):
         "test": "Tests",
         "tests": "Tests",
     }
-    SUBJECT_REGEX: Pattern = re.compile(
+    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
     )
-    BREAK_REGEX: Pattern = re.compile(
+    BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
     )
-    DEFAULT_RENDER: list[str] = [
+    DEFAULT_RENDER: ClassVar[list[str]] = [
         TYPES["feat"],
         TYPES["fix"],
         TYPES["revert"],
@@ -367,9 +367,9 @@ class AngularConvention(CommitConvention):
 class ConventionalCommitConvention(AngularConvention):
     """Conventional commit message convention."""
 
-    TYPES: dict[str, str] = AngularConvention.TYPES
-    DEFAULT_RENDER: list[str] = AngularConvention.DEFAULT_RENDER
-    SUBJECT_REGEX: Pattern = re.compile(
+    TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
+    DEFAULT_RENDER: ClassVar[list[str]] = AngularConvention.DEFAULT_RENDER
+    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
         r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
     )
 
@@ -393,7 +393,7 @@ class ConventionalCommitConvention(AngularConvention):
 class AtomConvention(CommitConvention):
     """Atom commit message convention."""
 
-    TYPES: dict[str, str] = {
+    TYPES: ClassVar[dict[str, str]] = {
         ":art:": "",  # when improving the format/structure of the code
         ":racehorse:": "",  # when improving performance
         ":non-potable_water:": "",  # when plugging memory leaks

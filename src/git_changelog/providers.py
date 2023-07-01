@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from typing import Match, Pattern
+from typing import ClassVar, Match, Pattern
 
 
 class RefRe:
@@ -58,7 +58,7 @@ class ProviderRefParser(ABC):
     url: str
     namespace: str
     project: str
-    REF: dict[str, RefDef] = {}
+    REF: ClassVar[dict[str, RefDef]] = {}
 
     def get_refs(self, ref_type: str, text: str) -> list[Ref]:
         """Find all references in the given text.
@@ -138,7 +138,7 @@ class GitHub(ProviderRefParser):
     commit_min_length = 8
     commit_max_length = 40
 
-    REF: dict[str, RefDef] = {
+    REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
@@ -206,7 +206,7 @@ class GitLab(ProviderRefParser):
     commit_min_length = 8
     commit_max_length = 40
 
-    REF: dict[str, RefDef] = {
+    REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
             regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
