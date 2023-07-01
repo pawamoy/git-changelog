@@ -61,7 +61,7 @@ pip install git-changelog
 
 With [`pipx`](https://github.com/pipxproject/pipx):
 ```bash
-python3.7 -m pip install --user pipx
+python3.8 -m pip install --user pipx
 pipx install git-changelog
 ```
 

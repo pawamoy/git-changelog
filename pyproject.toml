@@ -8,7 +8,7 @@ description = "Automatic Changelog generator using Jinja2 templates."
 authors = [{name = "Timothée Mazzucotelli", email = "pawamoy@pm.me"}]
 license = {text = "ISC"}
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = [
     "git",
     "changelog",
@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -36,8 +35,7 @@ classifiers = [
 ]
 dependencies = [
     "Jinja2>=2.10,<4",
-    "semver~=2.13",
-    "importlib-metadata; python_version < '3.8'",
+    "semver>=2.13",
 ]
 
 [project.urls]
@@ -65,6 +63,8 @@ editable-backend = "editables"
 
 [tool.pdm.dev-dependencies]
 duty = ["duty>=0.10"]
+ci-quality = ["git-changelog[duty,docs,quality,typing,security]"]
+ci-tests = ["git-changelog[duty,tests]"]
 docs = [
     "black>=23.1",
     "markdown-callouts>=0.2",
@@ -99,4 +99,6 @@ typing = [
     "types-toml>=0.10",
     "types-setuptools>=65.5.0.2",
 ]
-security = ["safety>=2"]
+security = [
+    "safety>=2",
+]

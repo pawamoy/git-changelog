@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL := bash
-
-DUTY = $(shell [ -n "${VIRTUAL_ENV}" ] || echo pdm run) duty
+DUTY := $(if $(VIRTUAL_ENV),,pdm run) duty
+export PDM_MULTIRUN_VERSIONS ?= 3.8 3.9 3.10 3.11
 
 args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
 check_quality_args = files
@@ -32,7 +32,7 @@ help:
 
 .PHONY: lock
 lock:
-	@pdm lock --no-cross-platform
+	@pdm lock -G:all
 
 .PHONY: setup
 setup:
