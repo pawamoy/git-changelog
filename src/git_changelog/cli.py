@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from importlib import metadata
 from typing import Pattern, TextIO
 
 from jinja2.exceptions import TemplateNotFound
@@ -28,11 +29,6 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
-
-if sys.version_info < (3, 8):
-    import importlib_metadata as metadata
-else:
-    from importlib import metadata
 
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
