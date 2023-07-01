@@ -68,7 +68,7 @@ def git_repo(
         if version:
             git("tag", version)
     yield tmp_path
-    shutil.rmtree(tmp_path)
+    shutil.rmtree(tmp_path, ignore_errors=True)
 
 
 def test_bumping_latest(repo: Path) -> None:
