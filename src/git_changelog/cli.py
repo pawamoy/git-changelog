@@ -97,7 +97,7 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="REPOSITORY",
         nargs="?",
         default=".",
-        help="The repository path, relative or absolute.",
+        help="The repository path, relative or absolute. Default: %(default)s.",
     )
 
     parser.add_argument(
@@ -108,7 +108,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=False,
         help="Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
         "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
-        "Else if there are new features, bump the minor number. Else just bump the patch number.",
+        "Else if there are new features, bump the minor number. Else just bump the patch number. Default: %(default)s.",
     )
     parser.add_argument(
         "-h",
@@ -129,7 +129,7 @@ def get_parser() -> argparse.ArgumentParser:
         "When writing in-place, an 'in_place' variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
-        "(for example to skip changelog headers or footers).",
+        "(for example to skip changelog headers or footers). Default: %(default)s.",
     )
     parser.add_argument(
         "-g",
@@ -139,7 +139,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=DEFAULT_VERSION_REGEX,
         help="A regular expression to match versions in the existing changelog "
         "(used to find the latest release) when writing in-place. "
-        "The regular expression must be a Python regex with a 'version' named group. ",
+        "The regular expression must be a Python regex with a 'version' named group. Default: %(default)s.",
     )
 
     parser.add_argument(
@@ -152,7 +152,7 @@ def get_parser() -> argparse.ArgumentParser:
         "(versions missing from changelog). "
         "If two marker lines are present in the changelog, "
         "the contents between those two lines will be overwritten "
-        "(useful to update an 'Unreleased' entry for example).",
+        "(useful to update an 'Unreleased' entry for example). Default: %(default)s.",
     )
     parser.add_argument(
         "-o",
@@ -168,7 +168,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="parse_refs",
         default=False,
-        help="Parse provider-specific references in commit messages (GitHub/GitLab issues, PRs, etc.).",
+        help="Parse provider-specific references in commit messages (GitHub/GitLab issues, PRs, etc.). Default: %(default)s.",
     )
     parser.add_argument(
         "-c",
@@ -178,7 +178,7 @@ def get_parser() -> argparse.ArgumentParser:
         choices=CONVENTIONS,
         default="basic",
         dest="convention",
-        help="The commit convention to match against. Default: basic.",
+        help="The commit convention to match against. Default: %(default)s.",
     )
     parser.add_argument(
         "-s",
@@ -188,7 +188,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=None,
         dest="sections",
         help="A comma-separated list of sections to render. "
-        "See the available sections for each supported convention in the description.",
+        "See the available sections for each supported convention in the description. Default: %(default)s.",
     )
     parser.add_argument(
         "-t",
@@ -197,7 +197,7 @@ def get_parser() -> argparse.ArgumentParser:
         default="keepachangelog",
         dest="template",
         help='The Jinja2 template to use. Prefix with "path:" to specify the path '
-        'to a directory containing a file named "changelog.md".',
+        'to a directory containing a file named "changelog.md". Default: %(default)s.',
     )
     parser.add_argument(
         "-T",
@@ -206,7 +206,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         dest="parse_trailers",
-        help="Parse Git trailers in the commit message. See https://git-scm.com/docs/git-interpret-trailers.",
+        help="Parse Git trailers in the commit message. See https://git-scm.com/docs/git-interpret-trailers. Default: %(default)s.",
     )
     parser.add_argument(
         "-v",
