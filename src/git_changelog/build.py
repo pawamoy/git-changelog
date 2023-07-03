@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import re
 import sys
 from contextlib import suppress
 from subprocess import check_output  # (we trust the commands we run)
@@ -261,7 +262,13 @@ class Changelog:
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
         if git_url.endswith(".git"):
             git_url = git_url[:-4]
-        return git_url
+
+        # Remove GitHub token from the URL.
+        # See https://gist.github.com/magnetikonline/073afe7909ffdd6f10ef06a00bc3bc88.
+        # Personal access tokens (classic): ^ghp_[a-zA-Z0-9]{36}$
+        # Personal access tokens (fine-grained): ^github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}$
+        # GitHub Actions tokens: ^ghs_[a-zA-Z0-9]{36}$
+        return re.sub(r"(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})@", "", git_url)
 
     def get_log(self) -> str:
         """Get the `git log` output.

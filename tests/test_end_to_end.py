@@ -187,3 +187,21 @@ def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
     rendered = output.read_text()
     # The latest tag should still appear exactly three times in the changelog
     assert rendered.count(latest_tag) == 3
+
+
+def test_removing_tokens_from_remotes(repo: Path) -> None:
+    """Remove GitHub tokens from remotes.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    git = partial(_git, "-C", str(repo))
+    tokens = [
+        "ghp_abcdefghijklmnOPQRSTUVWXYZ0123456789",
+        "ghs_abcdefghijklmnOPQRSTUVWXYZ0123456789",
+        "github_pat_abcdefgOPQRS0123456789_abcdefghijklmnOPQRSTUVWXYZ0123456789abcdefgOPQRS0123456789A",
+    ]
+    for token in tokens:
+        git("remote", "set-url", "origin", f"https://{token}@github.com:example/example")
+        changelog = Changelog(repo)
+        assert token not in changelog.remote_url
