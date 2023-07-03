@@ -359,8 +359,52 @@ This is useful when you don't tell *git-changelog* to bump the latest version:
 you will have an "Unreleased" section that is overwritten and updated
 each time you update your changelog in-place.
 
+## Output release notes
+
+Some platforms allow to announce releases with additional "release notes".
+*git-changelog* can help generating release notes too, by simply
+reading your existing changelog and printing the latest entry.
+So if you just pushed a tag with an updated changelog,
+you can use *git-changelog* in Continuous Integration/Deployment
+to create a release (specific to your platform, e.g. GitHub)
+with the latest changelog entry as release notes.
+
+For example, on GitHub, with the [softprops/action-gh-release][] action:
+
+```yaml
+name: github_release
+
+on: push
+
+jobs:
+  github_release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
+    - name: Install git-changelog
+      run: pip install git-changelog
+    - name: Prepare release notes
+      run: git-changelog --release-notes > release-notes.md
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: release-notes.md
+```
+
+By default *git-changelog* will try to read release notes
+from a file named `CHANGELOG.md`. Use the `-i`, `--input`
+option to specify another file to read from.
+Other options can be used to help *git-changelog* retrieving
+the latest entry from your changelog: `--version-regex`
+and `--marker-line`.
+
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/
 [jinja]: https://jinja.palletsprojects.com/en/3.1.x/
 [semver]: https://semver.org/
 [git-trailers]: https://git-scm.com/docs/git-interpret-trailers
+[softprops/action-gh-release]: https://github.com/softprops/action-gh-release

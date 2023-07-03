@@ -17,7 +17,7 @@ import argparse
 import re
 import sys
 from importlib import metadata
-from typing import Pattern, TextIO
+from typing import TYPE_CHECKING, Pattern, TextIO
 
 from jinja2.exceptions import TemplateNotFound
 
@@ -29,6 +29,9 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
@@ -169,6 +172,21 @@ def get_parser() -> argparse.ArgumentParser:
         dest="parse_refs",
         default=False,
         help="Parse provider-specific references in commit messages (GitHub/GitLab issues, PRs, etc.). Default: %(default)s.",
+    )
+    parser.add_argument(
+        "-R",
+        "--release-notes",
+        action="store_true",
+        dest="release_notes",
+        default=False,
+        help="Output release notes to stdout based on the last entry in the changelog. Default: %(default)s.",
+    )
+    parser.add_argument(
+        "-I",
+        "--input",
+        dest="input",
+        default="CHANGELOG.md",
+        help="Read from given file when creating release notes. Default: %(default)s.",
     )
     parser.add_argument(
         "-c",
@@ -354,6 +372,68 @@ def build_and_render(
     return changelog, rendered
 
 
+def get_release_notes(
+    input_file: str | Path = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+) -> str:
+    """Get release notes from existing changelog.
+
+    This will return the latest entry in the changelog.
+
+    Parameters:
+        input_file: The changelog to read from.
+        version_regex: A regular expression to match version entries.
+        marker_line: The insertion marker line in the changelog.
+
+    Returns:
+        The latest changelog entry.
+    """
+    release_notes = []
+    found_marker = False
+    found_version = False
+    with open(input_file) as changelog:
+        for line in changelog:
+            line = line.strip()  # noqa: PLW2901
+            if not found_marker:
+                if line == marker_line:
+                    found_marker = True
+                continue
+            if re.search(version_regex, line):
+                if found_version:
+                    break
+                found_version = True
+            release_notes.append(line)
+    result = "\n".join(release_notes).strip()
+    if result.endswith(marker_line):
+        result = result[: -len(marker_line)].strip()
+    return result
+
+
+def output_release_notes(
+    input_file: str = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    output_file: str | TextIO = sys.stdout,
+) -> None:
+    """Print release notes from existing changelog.
+
+    This will print the latest entry in the changelog.
+
+    Parameters:
+        input_file: The changelog to read from.
+        version_regex: A regular expression to match version entries.
+        marker_line: The insertion marker line in the changelog.
+        output_file: Where to print/write the release notes.
+    """
+    release_notes = get_release_notes(input_file, version_regex, marker_line)
+    try:
+        output_file.write(release_notes)  # type: ignore[union-attr]
+    except AttributeError:
+        with open(output_file, "w") as file:  # type: ignore[arg-type]
+            file.write(release_notes)
+
+
 def main(args: list[str] | None = None) -> int:
     """Run the main program.
 
@@ -367,6 +447,15 @@ def main(args: list[str] | None = None) -> int:
     """
     parser = get_parser()
     opts = parser.parse_args(args=args)
+
+    if opts.release_notes:
+        output_release_notes(
+            input_file=opts.input,
+            version_regex=opts.version_regex,
+            marker_line=opts.marker_line,
+            output_file=opts.output,
+        )
+        return 0
 
     try:
         build_and_render(
