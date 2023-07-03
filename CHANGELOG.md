@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.0.0](https://github.com/pawamoy/git-changelog/releases/tag/2.0.0) - 2023-07-03
+
+<small>[Compare with 1.0.1](https://github.com/pawamoy/git-changelog/compare/1.0.1...2.0.0)</small>
+
+### Breaking Changes
+
+- Drop support for Python 3.7
+
+### Features
+
+- Add option to output release notes ([483745a](https://github.com/pawamoy/git-changelog/commit/483745a62078891682df6affd29e6cbfd7fdbe9e) by Timothée Mazzucotelli). [Issue #49](https://github.com/pawamoy/git-changelog/issues/49)
+
+### Bug Fixes
+
+- Remove GitHub tokens from remote URL ([187e26e](https://github.com/pawamoy/git-changelog/commit/187e26e8f1001c86d99689f5f15713a66d3f99ed) by Timothée Mazzucotelli). [Issue #50](https://github.com/pawamoy/git-changelog/issues/50)
+
+### Code Refactoring
+
+- Show default for every CLI option ([f015830](https://github.com/pawamoy/git-changelog/commit/f0158308a2196373c708b42271373f538ba6f53f) by Timothée Mazzucotelli).
+- Remove Python 3.7 related code ([3295812](https://github.com/pawamoy/git-changelog/commit/32958129189e5c11573246f20e6900246da09997) by Timothée Mazzucotelli).
+
 ## [1.0.1](https://github.com/pawamoy/git-changelog/releases/tag/1.0.1) - 2023-05-10
 
 <small>[Compare with 1.0.0](https://github.com/pawamoy/git-changelog/compare/1.0.0...1.0.1)</small>
