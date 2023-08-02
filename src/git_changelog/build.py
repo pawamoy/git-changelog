@@ -20,7 +20,7 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
-from git_changelog.providers import GitHub, GitLab, ProviderRefParser
+from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -197,6 +197,8 @@ class Changelog:
                 provider = GitHub(namespace, project, url=provider_url)
             elif "gitlab" in provider_url:
                 provider = GitLab(namespace, project, url=provider_url)
+            elif "bitbucket" in provider_url:
+                provider = Bitbucket(namespace, project, url=provider_url)
             self.remote_url: str = remote_url
         self.provider = provider
 

@@ -23,7 +23,7 @@ Update a changelog in-place, overwriting and updating the "Unreleased" section,
 using the Angular commit message convention and the Keep A Changelog template (default):
 
 ```bash
-git-changelog -io CHANGELOG.md -c angular  
+git-changelog -io CHANGELOG.md -c angular
 ```
 
 Same thing, but now you're ready to tag so you tell *git-changelog*
@@ -43,10 +43,10 @@ git-changelog -Tbio CHANGELOG.md -c angular -s build,deps,fix,feat,refactor
 ```
 
 Generate a changelog using a custom template,
-and parsing provider-specific references (GitHub/GitLab):
+and parsing provider-specific references (GitHub/GitLab/Bitbucket):
 
 ```bash
-git-changelog -rt path:./templates/changelog.md.jinja 
+git-changelog -rt path:./templates/changelog.md.jinja
 ```
 
 Author's favorite, from Python:
@@ -113,14 +113,14 @@ If a commit message summary (the first line of the message)
 with a particular word/prefix (case-insensitive),
 it is added to the corresponding section:
 
-Type    | Section
-------- | -------
-`add`     | Added
-`fix`     | Fixed
-`change`  | Changed
-`remove`  | Removed
-`merge`   | Merged
-`doc`     | Documented
+Type     | Section
+---------|-----------
+`add`    | Added
+`fix`    | Fixed
+`change` | Changed
+`remove` | Removed
+`merge`  | Merged
+`doc`    | Documented
 
 ### Angular/Karma convention
 
@@ -137,20 +137,20 @@ It expects the following format for commit messages:
 
 The types and corresponding sections *git-changelog* recognizes are:
 
-Type          | Section
-------------- | -------
-`build`       | Build
-`chore`       | Chore
-`ci`          | Continuous Integration
-`deps`        | Dependencies
-`doc(s)`      | Docs
-`feat`        | Features
-`fix`         | Bug Fixes
-`perf`        | Performance Improvements
-`ref(actor)`  | Code Refactoring
-`revert`      | Reverts
-`style`       | Style
-`test(s)`     | Tests
+Type         | Section
+-------------|-------------------------
+`build`      | Build
+`chore`      | Chore
+`ci`         | Continuous Integration
+`deps`       | Dependencies
+`doc(s)`     | Docs
+`feat`       | Features
+`fix`        | Bug Fixes
+`perf`       | Performance Improvements
+`ref(actor)` | Code Refactoring
+`revert`     | Reverts
+`style`      | Style
+`test(s)`    | Tests
 
 Breaking changes are detected by searching for `^break(s|ing changes?)?[ :]`
 in the commit message body.
@@ -196,7 +196,7 @@ You can get inspiration from
 
 ## Understand the relationship with SemVer
 
-[Semver](semver), or Semantic Versioning, helps users of tools and libraries
+[Semver][semver], or Semantic Versioning, helps users of tools and libraries
 understand the impact of version changes. To quote SemVer itself:
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
@@ -226,7 +226,7 @@ to find additional information.
 
 ### Provider-specific references
 
-*git-changelog* will detect when you are using GitHub or GitLab
+*git-changelog* will detect when you are using GitHub, GitLab or Bitbucket
 by checking the `origin` remote configured in your local clone
 (or the remote indicated by the value of the `GIT_CHANGELOG_REMOTE` environment variable).
 
@@ -281,9 +281,9 @@ Part of epic #5: https://agile-software.com/super/project/epics/5
 ```
 
 As you can see, compared to provider-specific references,
-trailers are written out explicitely, so it's a bit more work,
+trailers are written out explicitly, so it's a bit more work,
 but this ensures your changelog can be rendered correctly *anywhere*,
-not just on GitHub or GitLab, and without pre/post-processing.
+not just on GitHub, GitLab or Bitbucket, and without pre/post-processing.
 
 Trailers are rendered in the Keep A Changelog template.
 If the value is an URL, a link is created with the token as title.

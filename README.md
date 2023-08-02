@@ -18,7 +18,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
   Built-in [Angular][angular-convention], [Conventional Commit][conventional-commit], [Atom][atom-convention] and basic conventions.
 - Git service/provider agnostic,
   plus references parsing (issues, commits, etc.).
-  Built-in [GitHub][github-refs] and [Gitlab][gitlab-refs] support.
+  Built-in [GitHub][github-refs], [Gitlab][gitlab-refs] and [Bitbucket][bitbucket-refs] support.
 - Understands [Semantic Versioning][semantic-versioning]:
   major/minor/patch for versions and commits.
   Guesses next version based on last commits.
@@ -44,6 +44,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [conventional-commit]:    https://www.conventionalcommits.org/en/v1.0.0/
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
 [gitlab-refs]:            https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references
+[bitbucket-refs]:         https://support.atlassian.com/bitbucket-cloud/docs/markup-comments
 [git-trailers]:           https://git-scm.com/docs/git-interpret-trailers
 
 [issue-14]: https://github.com/pawamoy/git-changelog/issues/14
@@ -168,7 +169,7 @@ options:
                         insertion marker -->.
   -o, --output OUTPUT   Output to given file. Default: stdout.
   -r, --parse-refs      Parse provider-specific references in commit messages
-                        (GitHub/GitLab issues, PRs, etc.). Default: False.
+                        (GitHub/GitLab/Bitbucket issues, PRs, etc.). Default: False.
   -R, --release-notes   Output release notes to stdout based on the last entry
                         in the changelog. Default: False.
   -I, --input INPUT     Read from given file when creating release notes.

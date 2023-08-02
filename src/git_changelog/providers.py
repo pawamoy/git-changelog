@@ -302,3 +302,78 @@ class GitLab(ProviderRefParser):
 
     def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
         return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
+
+
+class Bitbucket(ProviderRefParser):
+    """A parser for the Bitbucket references."""
+
+    url: str = "https://bitbucket.org"
+    project_url: str = "{base_url}/{namespace}/{project}"
+    tag_url: str = "{base_url}/{namespace}/{project}/commits/tag/{ref}"
+
+    commit_min_length = 8
+    commit_max_length = 40
+
+    REF: ClassVar[dict[str, RefDef]] = {
+        "issues": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?issue\\s*" + RefRe.ID.format(symbol="#"), re.I),
+            url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+        ),
+        "merge_requests": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?pull request\\s*" + RefRe.ID.format(symbol=r"#"), re.I),
+            url_string="{base_url}/{namespace}/{project}/pull-request/{ref}",
+        ),
+        "commits": RefDef(
+            regex=re.compile(
+                RefRe.BB
+                + r"(?:{np}@)?{commit}{ba}".format(
+                    np=RefRe.NP,
+                    commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length),
+                    ba=RefRe.BA,
+                ),
+                re.I,
+            ),
+            url_string="{base_url}/{namespace}/{project}/commits/{ref}",
+        ),
+        "commits_ranges": RefDef(
+            regex=re.compile(
+                RefRe.BB
+                + r"(?:{np}@)?{commit_range}".format(
+                    np=RefRe.NP,
+                    commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length),
+                ),
+                re.I,
+            ),
+            url_string="{base_url}/{namespace}/{project}/branches/compare/{ref}#diff",
+        ),
+        "mentions": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.MENTION, re.I),
+            url_string="{base_url}/{ref}",
+        ),
+    }
+
+    def __init__(self, namespace: str, project: str, url: str = url):
+        """Initialization method.
+
+        Arguments:
+            namespace: The Bitbucket namespace.
+            project: The Bitbucket project.
+            url: The Bitbucket URL.
+        """
+        self.namespace: str = namespace
+        self.project: str = project
+        self.url: str = url  # (shadowing but uses class' as default)
+
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+        match_dict["base_url"] = self.url
+        if not match_dict.get("namespace"):
+            match_dict["namespace"] = self.namespace
+        if not match_dict.get("project"):
+            match_dict["project"] = self.project
+        return super().build_ref_url(ref_type, match_dict)
+
+    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102
+        return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+
+    def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
+        return self.build_ref_url("commits_ranges", {"ref": f"{target}..{base}"})
