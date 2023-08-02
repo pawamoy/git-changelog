@@ -24,6 +24,8 @@ A commit range: 00000000...11111111
 A snippet: $45
 Some labels: ~18, ~bug, ~"multi word label"
 Some milestones: %2, %version1, %"awesome version"
+A Bitbucket PR: Pull request #1
+A Bitbucket issue: Issue #1
 """
 
 
@@ -39,3 +41,9 @@ def test_gitlab_issue_parsing() -> None:
     gitlab = git_changelog.GitLab("pawamoy", "git-changelog")
     for ref in gitlab.REF:
         assert gitlab.get_refs(ref, text)
+
+def test_bitbucket_issue_parsing() -> None:
+    """Bitbucket issues are correctly parsed."""
+    bitbucket = git_changelog.Bitbucket("pawamoy", "git-changelog")
+    for ref in bitbucket.REF:
+        assert bitbucket.get_refs(ref, text)

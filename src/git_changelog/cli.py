@@ -171,7 +171,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="parse_refs",
         default=False,
-        help="Parse provider-specific references in commit messages (GitHub/GitLab issues, PRs, etc.). Default: %(default)s.",
+        help="Parse provider-specific references in commit messages (GitHub/GitLab/Bitbucket issues, PRs, etc.). Default: %(default)s.",
     )
     parser.add_argument(
         "-R",

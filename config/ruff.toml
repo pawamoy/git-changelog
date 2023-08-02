@@ -71,6 +71,7 @@ ignore = [
     "PLR0915",  # Too many statements
     "SLF001", # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
+    "UP032",  # Use f-string instead of `format` call
 ]
 
 [per-file-ignores]
