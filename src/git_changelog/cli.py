@@ -358,6 +358,7 @@ def build_and_render(
         with open(output, "w") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
+    # overwrite output file
     else:
         rendered = jinja_template.render(changelog=changelog)
 
