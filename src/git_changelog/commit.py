@@ -6,7 +6,7 @@ import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, ClassVar, Pattern
 
 if TYPE_CHECKING:
@@ -59,11 +59,11 @@ class Commit:
         if not author_date:
             author_date = datetime.now()  # noqa: DTZ005
         elif isinstance(author_date, str):
-            author_date = datetime.utcfromtimestamp(float(author_date))  # noqa: DTZ004
+            author_date = datetime.fromtimestamp(float(author_date), tz=timezone.utc)
         if not committer_date:
             committer_date = datetime.now()  # noqa: DTZ005
         elif isinstance(committer_date, str):
-            committer_date = datetime.utcfromtimestamp(float(committer_date))  # noqa: DTZ004
+            committer_date = datetime.fromtimestamp(float(committer_date), tz=timezone.utc)
 
         self.hash: str = commit_hash
         self.author_name: str = author_name
