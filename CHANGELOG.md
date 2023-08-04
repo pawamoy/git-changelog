@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.1.0](https://github.com/pawamoy/git-changelog/releases/tag/2.1.0) - 2023-08-04
+
+<small>[Compare with 2.0.0](https://github.com/pawamoy/git-changelog/compare/2.0.0...2.1.0)</small>
+
+### Features
+
+- Add Bitbucket provider ([5d793e5](https://github.com/pawamoy/git-changelog/commit/5d793e540be4fe5a648742c285c0762c111537ee) by Sven Axelsson).
+
+### Code Refactoring
+
+- Stop using deprecated `datetime.utcfromtimestamp` (Python 3.12) ([1f3ed5d](https://github.com/pawamoy/git-changelog/commit/1f3ed5da94e2a7c8938645977e6a7a0ffde7f713) by Sven Axelsson).
+
 ## [2.0.0](https://github.com/pawamoy/git-changelog/releases/tag/2.0.0) - 2023-07-03
 
 <small>[Compare with 1.0.1](https://github.com/pawamoy/git-changelog/compare/1.0.1...2.0.0)</small>
