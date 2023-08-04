@@ -6,6 +6,12 @@ repo_name: "pawamoy/git-changelog"
 site_dir: "site"
 watch: [mkdocs.yml, README.md, CONTRIBUTING.md, CHANGELOG.md, src/git_changelog]
 copyright: Copyright &copy; 2020 Timothée Mazzucotelli
+edit_uri: edit/main/docs/
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
 
 nav:
 - Home:
