@@ -29,9 +29,13 @@ async function evaluatePython(pyodide, editor, output, session) {
 }
 
 async function initPyodide() {
-    let pyodide = await loadPyodide();
-    await pyodide.loadPackage("micropip");
-    return pyodide;
+    try {
+        let pyodide = await loadPyodide();
+        await pyodide.loadPackage("micropip");
+        return pyodide;
+    } catch(error) {
+        return null;
+    }
 }
 
 function getTheme() {
