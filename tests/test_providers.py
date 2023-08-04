@@ -42,6 +42,7 @@ def test_gitlab_issue_parsing() -> None:
     for ref in gitlab.REF:
         assert gitlab.get_refs(ref, text)
 
+
 def test_bitbucket_issue_parsing() -> None:
     """Bitbucket issues are correctly parsed."""
     bitbucket = git_changelog.Bitbucket("pawamoy", "git-changelog")
