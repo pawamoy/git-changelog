@@ -102,7 +102,7 @@ Different conventions, or styles, are supported by *git-changelog*.
 To select a different convention than the default one (basic, see below),
 use the `-c` or `--convention` CLI option:
 
-```
+```bash
 git-changelog --convention angular
 ```
 
@@ -127,7 +127,7 @@ Type     | Section
 The Angular/Karma convention initiated the [Conventional Commit specification][conventional-commit].
 It expects the following format for commit messages:
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]
@@ -238,7 +238,7 @@ allowing to add links to issues, pull requests, users, etc.
 
 Example of a commit message with GitLab references:
 
-```
+```text
 fix: Fix atrocious bug
 
 Fixes issue #14.
@@ -272,7 +272,7 @@ delimitate the token and value.
 
 Example of a commit message with Git trailers:
 
-```
+```text
 fix: Fix atrocious bug
 
 Fixes issue #14: https://github.com/super/repo/issues/14
