@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
-CONVENTIONS = ("angular", "atom", "conventional", "basic")
+CONVENTIONS = ("angular", "conventional", "basic")
 
 
 class Templates(tuple):  # (subclassing tuple)

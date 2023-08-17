@@ -15,7 +15,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
   Built-in [Keep a Changelog][keep-a-changelog] and [Angular][angular] templates
   (also see [Conventional Changelog][conventional-changelog]).
 - Commit styles/conventions parsing.
-  Built-in [Angular][angular-convention], [Conventional Commit][conventional-commit], [Atom][atom-convention] and basic conventions.
+  Built-in [Angular][angular-convention], [Conventional Commit][conventional-commit] and basic conventions.
 - Git service/provider agnostic,
   plus references parsing (issues, commits, etc.).
   Built-in [GitHub][github-refs], [Gitlab][gitlab-refs] and [Bitbucket][bitbucket-refs] support.
@@ -39,7 +39,6 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [angular]:                https://github.com/angular/angular/blob/master/CHANGELOG.md
 [conventional-changelog]: https://github.com/conventional-changelog/conventional-changelog
 [semantic-versioning]:    http://semver.org/spec/v2.0.0.html
-[atom-convention]:        https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages
 [angular-convention]:     https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
 [conventional-commit]:    https://www.conventionalcommits.org/en/v1.0.0/
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
@@ -71,7 +70,7 @@ pipx install git-changelog
 ```
 usage: git-changelog [-b] [-h] [-i] [-g VERSION_REGEX] [-m MARKER_LINE]
                      [-o OUTPUT] [-r] [-R] [-I INPUT]
-                     [-c {angular,atom,conventional,basic}] [-s SECTIONS]
+                     [-c {angular,conventional,basic}] [-s SECTIONS]
                      [-t {angular,keepachangelog}] [-T] [-E] [-v]
                      [REPOSITORY]
 
@@ -174,7 +173,7 @@ options:
                         in the changelog. Default: False.
   -I, --input INPUT     Read from given file when creating release notes.
                         Default: CHANGELOG.md.
-  -c, --style, --commit-style, --convention {angular,atom,conventional,basic}
+  -c, --style, --commit-style, --convention {angular,conventional,basic}
                         The commit convention to match against. Default:
                         basic.
   -s, --sections SECTIONS

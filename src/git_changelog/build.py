@@ -14,7 +14,6 @@ from semver import VersionInfo
 
 from git_changelog.commit import (
     AngularConvention,
-    AtomConvention,
     BasicConvention,
     Commit,
     CommitConvention,
@@ -157,7 +156,6 @@ class Changelog:
     CONVENTION: ClassVar[dict[str, type[CommitConvention]]] = {
         "basic": BasicConvention,
         "angular": AngularConvention,
-        "atom": AtomConvention,  # type: ignore[type-abstract]
         "conventional": ConventionalCommitConvention,
     }
 
@@ -177,7 +175,7 @@ class Changelog:
         Arguments:
             repository: The repository (directory) for which to build the changelog.
             provider: The provider to use (github.com, gitlab.com, etc.).
-            convention: The commit convention to use (angular, atom, etc.).
+            convention: The commit convention to use (angular, etc.).
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
             sections: The sections to render (features, bug fixes, etc.).
