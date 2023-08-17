@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for src/git_changelog/commit.py: 89.27%</title>
+    <title>Coverage for src/git_changelog/commit.py: 89.16%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>src/git_changelog/commit.py</b>:
-            <span class="pc_cov">89.27%</span>
+            <span class="pc_cov">89.16%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">151 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">142<span class="text"> run</span></button>
+            <span class="text">149 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">140<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">9<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">2<span class="text"> excluded</span></button>
             <button type="button" class="par run show_par button_toggle_par" value="par" data-shortcut="p" title="Toggle lines partially run">5<span class="text"> partial</span></button>
@@ -66,8 +66,8 @@
             <a id="indexLink" class="nav" href="covindex.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_6e1d82568f61fc4d_providers_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-08-04 15:20 +0200
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
+            created at 2023-08-17 21:54 +0200
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -472,28 +472,6 @@
     <p class="pln"><span class="n"><a id="t388" href="#t388">388</a></span><span class="t">            <span class="str">"is_minor"</span><span class="op">:</span> <span class="nam">is_minor</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t389" href="#t389">389</a></span><span class="t">            <span class="str">"is_patch"</span><span class="op">:</span> <span class="nam">is_patch</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t390" href="#t390">390</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t391" href="#t391">391</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t392" href="#t392">392</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t393" href="#t393">393</a></span><span class="t"><span class="key">class</span> <span class="nam">AtomConvention</span><span class="op">(</span><span class="nam">CommitConvention</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t394" href="#t394">394</a></span><span class="t">    <span class="str">"""Atom commit message convention."""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t395" href="#t395">395</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t396" href="#t396">396</a></span><span class="t">    <span class="nam">TYPES</span><span class="op">:</span> <span class="nam">ClassVar</span><span class="op">[</span><span class="nam">dict</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">str</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t397" href="#t397">397</a></span><span class="t">        <span class="str">":art:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when improving the format/structure of the code</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t398" href="#t398">398</a></span><span class="t">        <span class="str">":racehorse:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when improving performance</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t399" href="#t399">399</a></span><span class="t">        <span class="str">":non-potable_water:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when plugging memory leaks</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t400" href="#t400">400</a></span><span class="t">        <span class="str">":memo:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when writing docs</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t401" href="#t401">401</a></span><span class="t">        <span class="str">":penguin:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when fixing something on Linux</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t402" href="#t402">402</a></span><span class="t">        <span class="str">":apple:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when fixing something on Mac OS</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t403" href="#t403">403</a></span><span class="t">        <span class="str">":checkered_flag:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when fixing something on Windows</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t">        <span class="str">":bug:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when fixing a bug</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t">        <span class="str">":fire:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when removing code or files</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t406" href="#t406">406</a></span><span class="t">        <span class="str">":green_heart:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when fixing the CI build</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t">        <span class="str">":white_check_mark:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when adding tests</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t">        <span class="str">":lock:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when dealing with security</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t409" href="#t409">409</a></span><span class="t">        <span class="str">":arrow_up:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when upgrading dependencies</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t410" href="#t410">410</a></span><span class="t">        <span class="str">":arrow_down:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when downgrading dependencies</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t411" href="#t411">411</a></span><span class="t">        <span class="str">":shirt:"</span><span class="op">:</span> <span class="str">""</span><span class="op">,</span>  <span class="com"># when removing linter warnings</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t412" href="#t412">412</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -502,8 +480,8 @@
             <a id="indexLink" class="nav" href="covindex.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_6e1d82568f61fc4d_providers_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-08-04 15:20 +0200
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
+            created at 2023-08-17 21:54 +0200
         </p>
     </div>
 </footer>
