@@ -157,7 +157,7 @@ class Changelog:
     CONVENTION: ClassVar[dict[str, type[CommitConvention]]] = {
         "basic": BasicConvention,
         "angular": AngularConvention,
-        "atom": AtomConvention,
+        "atom": AtomConvention,  # type: ignore[type-abstract]
         "conventional": ConventionalCommitConvention,
     }
 
