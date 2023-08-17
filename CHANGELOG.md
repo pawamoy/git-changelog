@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.2.0](https://github.com/pawamoy/git-changelog/releases/tag/2.2.0) - 2023-08-17
+
+<small>[Compare with 2.1.0](https://github.com/pawamoy/git-changelog/compare/2.1.0...2.2.0)</small>
+
+### Features
+
+- Add option to omit empty versions from output ([b91f777](https://github.com/pawamoy/git-changelog/commit/b91f7775317feb79ebd2214c3e3c5e5251449d4d) by Sven Axelsson). [PR #52](https://github.com/pawamoy/git-changelog/pull/52)
+
+### Code Refactoring
+
+- Remove broken Atom commit convention ([2f33180](https://github.com/pawamoy/git-changelog/commit/2f331801134a2519a1d3704a02061b1f297e0f09) by Timothée Mazzucotelli).
+
 ## [2.1.0](https://github.com/pawamoy/git-changelog/releases/tag/2.1.0) - 2023-08-04
 
 <small>[Compare with 2.0.0](https://github.com/pawamoy/git-changelog/compare/2.0.0...2.1.0)</small>
