@@ -72,7 +72,7 @@ pipx install git-changelog
 usage: git-changelog [-b] [-h] [-i] [-g VERSION_REGEX] [-m MARKER_LINE]
                      [-o OUTPUT] [-r] [-R] [-I INPUT]
                      [-c {angular,atom,conventional,basic}] [-s SECTIONS]
-                     [-t {angular,keepachangelog}] [-T] [-v]
+                     [-t {angular,keepachangelog}] [-T] [-E] [-v]
                      [REPOSITORY]
 
 Automatic Changelog generator using Jinja2 templates.
@@ -189,5 +189,7 @@ options:
                         Parse Git trailers in the commit message. See
                         https://git-scm.com/docs/git-interpret-trailers.
                         Default: False.
+  -E, --omit-empty-versions
+                        Omit empty versions in the output. Default: False.
   -v, --version         Show the current version of the program and exit.
 ```

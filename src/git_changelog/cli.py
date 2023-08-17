@@ -227,6 +227,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Parse Git trailers in the commit message. See https://git-scm.com/docs/git-interpret-trailers. Default: %(default)s.",
     )
     parser.add_argument(
+        "-E",
+        "--omit-empty-versions",
+        action="store_true",
+        default=False,
+        dest="omit_empty_versions",
+        help="Omit empty versions from the output. Default: %(default)s.",
+    )
+    parser.add_argument(
         "-v",
         "--version",
         action="version",
@@ -263,6 +271,7 @@ def build_and_render(
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,  # noqa: FBT001,FBT002
+    omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -281,6 +290,7 @@ def build_and_render(
         version_regex: Regular expression to match versions in an existing changelog file.
         marker_line: Marker line used to insert contents in an existing changelog.
         bump_latest: Whether to try and bump the latest version to guess the new one.
+        omit_empty_versions: Whether to omit empty versions from the output.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -314,6 +324,16 @@ def build_and_render(
         sections=sections,
         bump_latest=bump_latest,
     )
+
+    # remove empty versions from changelog data
+    if omit_empty_versions:
+        section_set = set(changelog.sections)
+        empty_versions = [
+            version for version in changelog.versions_list if section_set.isdisjoint(version.sections_dict.keys())
+        ]
+        for version in empty_versions:
+            changelog.versions_list.remove(version)
+            changelog.versions_dict.pop(version.tag)
 
     # render new entries in-place
     if in_place:
@@ -470,6 +490,7 @@ def main(args: list[str] | None = None) -> int:
             version_regex=opts.version_regex,
             marker_line=opts.marker_line,
             bump_latest=opts.bump_latest,
+            omit_empty_versions=opts.omit_empty_versions,
         )
     except ValueError as error:
         print(f"git-changelog: {error}", file=sys.stderr)
