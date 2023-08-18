@@ -17,11 +17,11 @@ import argparse
 import re
 import sys
 import warnings
-import toml
-from pathlib import Path
 from importlib import metadata
+from pathlib import Path
 from typing import Pattern, TextIO
 
+import toml
 from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
@@ -272,8 +272,8 @@ def get_parser() -> argparse.ArgumentParser:
         "--template",
         choices=Templates(("angular", "keepachangelog")),
         dest="template",
-        help="The Jinja2 template to use. Prefix it with \"path:\" to specify the path "
-        "to a directory containing a file named \"changelog.md\". "
+        help="The Jinja2 template to use. Prefix it with 'path:'' to specify the path "
+        "to a directory containing a file named 'changelog.md'. "
         f"Default: '{DEFAULT_SETTINGS['template']}'.",
     )
     parser.add_argument(
@@ -318,10 +318,9 @@ def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
 
 
 def read_config(
-    config_file: str | list[str] | None = DEFAULT_CONFIG_FILES
+    config_file: str | list[str] | None = DEFAULT_CONFIG_FILES,
 ) -> dict:
-    """
-    Find config files and initialize settings with the one of highest priority.
+    """Find config files and initialize settings with the one of highest priority.
 
     Arguments:
         config_file: A path or list of paths to configuration file(s); or ``None`` to
@@ -333,7 +332,6 @@ def read_config(
         is ``None``.
 
     """
-
     project_config = DEFAULT_SETTINGS.copy()
     if config_file is None:  # Unset config file
         return project_config
