@@ -52,7 +52,7 @@ git-changelog -rt path:./templates/changelog.md.jinja
 Generate a changelog using a specific provider (GitHub/GitLab):
 
 ```bash
-git-changelog -p github
+git-changelog --provider github
 ```
 
 Author's favorite, from Python:
