@@ -117,9 +117,20 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="bump_latest",
         default=False,
-        help="Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
+        help="Deprecated, use --bump=auto instead. "
+        "Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
         "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
         "Else if there are new features, bump the minor number. Else just bump the patch number. Default: %(default)s.",
+    )
+    parser.add_argument(
+        "-B",
+        "--bump",
+        action="store",
+        dest="bump",
+        default=None,
+        help="Specify the bump from latest version for the set of unreleased commits. "
+        "Can be one of 'major', 'minor', 'patch' or a valid semver version (eg. 1.2.3). "
+        "Cannot be used with --bump-latest",
     )
     parser.add_argument(
         "-h",
