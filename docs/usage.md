@@ -443,16 +443,16 @@ and `--marker-line`.
 
 Project-wise, permanent configuration of *git-changelog* is possible.
 By default, *git-changelog* will search for the existence a suitable configuration
-in the ``pyproject.toml`` file or otherwise, the following configuration files 
+in the `pyproject.toml` file or otherwise, the following configuration files 
 in this particular order:
-    * ``.git-changelog.toml``
-    * ``config/git-changelog.toml``
-    * ``.config/git-changelog.toml``
-    * ``~/.config/git-changelog.toml``
+    * `.git-changelog.toml`
+    * `config/git-changelog.toml`
+    * `.config/git-changelog.toml`
+    * `~/.config/git-changelog.toml`
 
-The use of a configuration file can be disabled or overridden with the ``--config-file``
+The use of a configuration file can be disabled or overridden with the `--config-file`
 option.
-To disable the configuration file, pass ``no``, ``None``, ``false``, or ``0``:
+To disable the configuration file, pass `no`, `None`, `false`, or `0`:
 
 ```bash
 git-changelog --config-file no
@@ -481,7 +481,7 @@ template = 'angular'
 version-regex = '^## \[(?P<version>v?[^\]]+)'
 ```
 
-In the case of configuring *git-changelog* within ``pyproject.toml``, these
+In the case of configuring *git-changelog* within `pyproject.toml`, these
 settings must be found in the appropriate section:
 
 ```toml
