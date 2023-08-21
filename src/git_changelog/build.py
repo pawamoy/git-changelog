@@ -413,7 +413,7 @@ class Changelog:
                 except ValueError:
                     return
             else:
-                # user specified versin
+                # user specified version
                 last_version.planned_tag = version
             # update URLs
             if self.provider:
