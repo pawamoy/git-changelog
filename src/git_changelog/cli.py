@@ -19,7 +19,7 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Pattern, TextIO
+from typing import Pattern, TextIO, Sequence
 
 import toml
 from appdirs import user_config_dir
@@ -331,7 +331,7 @@ def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
 
 
 def read_config(
-    config_file: str | Path | list[str | Path] | None = DEFAULT_CONFIG_FILES,
+    config_file: Sequence[str | Path] | str | Path | None = DEFAULT_CONFIG_FILES,
 ) -> dict:
     """Find config files and initialize settings with the one of highest priority.
 
@@ -349,9 +349,7 @@ def read_config(
     if config_file is None:  # Unset config file
         return project_config
 
-    config_file = config_file if isinstance(config_file, (list, tuple)) else [config_file]
-
-    for filename in config_file:
+    for filename in config_file if isinstance(config_file, (list, tuple)) else [config_file]:
         _path = Path(filename)
 
         if not _path.exists():
