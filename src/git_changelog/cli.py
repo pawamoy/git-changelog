@@ -169,6 +169,18 @@ def get_parser() -> argparse.ArgumentParser:
         "Default: unset (false).",
     )
     parser.add_argument(
+        "-B",
+        "--bump",
+        action="store",
+        dest="bump",
+        metavar="VERSION",
+        default=None,
+        help="Specify the bump from latest version for the set of unreleased commits. "
+        "Can be one of 'auto', 'major', 'minor', 'patch' or a valid semver version (eg. 1.2.3). "
+        "With 'auto', if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions), "
+        "else if there are new features, bump the minor number, else just bump the patch number. Default: %(default)s.",
+    )
+    parser.add_argument(
         "-h",
         "--help",
         action="help",
@@ -444,6 +456,12 @@ def build_and_render(
 
     # get provider
     provider_class = providers[provider] if provider else None
+
+    # TODO: remove at some point
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
 
     # build data
     changelog = Changelog(

@@ -471,7 +471,7 @@ The configuration file must be written in TOML language, and may take values
 for most of the command line options:
 
 ```toml
-bump-latest = false
+bump = "auto"
 convention = 'basic'
 in-place = false
 marker-line = '<!-- insertion marker -->'
@@ -489,7 +489,7 @@ settings must be found in the appropriate section:
 
 ```toml
 [tool.git-changelog]
-bump-latest = false
+bump = "minor"
 convention = 'conventional'
 in-place = false
 marker-line = '<!-- insertion marker -->'
