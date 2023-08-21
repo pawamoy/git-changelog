@@ -323,14 +323,13 @@ def read_config(
 ) -> dict:
     """Find config files and initialize settings with the one of highest priority.
 
-    Arguments:
-        config_file: A path or list of paths to configuration file(s); or ``None`` to
+    Parameters:
+        config_file: A path or list of paths to configuration file(s); or `None` to
             disable config file settings. Default: a list of paths given by
-            :obj:`~git_changelog.cli.DEFAULT_CONFIG_FILES`.
+            [`git_changelog.cli.DEFAULT_CONFIG_FILES`][].
 
     Returns:
-        A settings dictionary. Default settings if no config file is found or ``config_file``
-        is ``None``.
+        A settings dictionary. Default settings if no config file is found or `config_file` is `None`.
 
     """
     project_config = DEFAULT_SETTINGS.copy()
@@ -397,7 +396,7 @@ def read_config(
 def parse_settings(args: list[str] | None = None) -> dict:
     """Parse arguments and config files to build the final settings set.
 
-    Arguments:
+    Parameters:
         args: Arguments passed from the command line.
 
     Returns:
