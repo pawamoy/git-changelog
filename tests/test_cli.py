@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+
+
 def test_main() -> None:
     """Basic CLI test."""
     assert cli.main([]) == 0
@@ -35,7 +37,6 @@ def test_get_version() -> None:
     """Get self version."""
     assert cli.get_version()
 
-
 @pytest.mark.parametrize(
     "args",
     [
@@ -51,7 +52,12 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
         args: Command line arguments.
     """
     ch = tmp_path.joinpath("ch.md")
-    assert cli.main([*args, "-o", ch.as_posix(), "-c", "angular"]) == 0
+    parsed_settings = cli.parse_settings([*args, "-o", ch.as_posix(), "-c", "angular"])
+
+    assert parsed_settings["output"] == str(ch.as_posix())
+    assert parsed_settings["sections"] == ["feat", "fix"]
+    assert parsed_settings["repository"] == "."
+    assert parsed_settings["convention"] == "angular"
 
 
 @pytest.mark.parametrize("is_pyproject", [True, False, None])
@@ -116,3 +122,42 @@ def test_config_reading(
     ground_truth["parse_refs"] = bool(parse_refs)
 
     assert settings == ground_truth
+
+
+@pytest.mark.parametrize("value", [None, False, True])
+def test_settings_warning(
+    tmp_path: Path,
+    value: bool,
+) -> None:
+    """Check warning on bump_latest.
+
+    Parameters:
+        tmp_path: A temporary path to write the settings file into.
+    """
+
+    os.chdir(tmp_path)
+
+    args = []
+    if value is not None:
+        (tmp_path / ".git-changelog.toml").write_text(
+            toml.dumps({"bump_latest": value})
+        )
+    else:
+        args = ["--bump-latest"]
+
+    with pytest.warns(FutureWarning) as record:
+        cli.parse_settings(args)
+
+        solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
+        if value is not None:  # Warning is issued when parsing the config file.
+            solution = "remove" if not value else "auto"
+
+        assert len(record) == 1
+        assert solution in str(record[0].message)
+
+    # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
+    if (tmp_path / ".git-changelog.toml").exists():
+        with pytest.warns(FutureWarning) as record:
+            cli.parse_settings(["--bump-latest"])
+
+            assert len(record) == 2

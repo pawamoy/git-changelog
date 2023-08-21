@@ -358,6 +358,21 @@ def read_config(
             key.replace("-", "_"): value for key, value in new_settings.items()
         }
 
+        # TODO: remove at some point
+        if "bump_latest" in new_settings:
+            _opt_value = new_settings['bump_latest']
+            _suggestion = (
+                "remove it from the config file" if not _opt_value
+                else "set `bump = 'auto'` in the config file instead"
+            )
+            warnings.warn(
+                f"`bump-latest = {str(_opt_value).lower()}` option found "
+                f"in config file ({_path.absolute()}). This option will be removed in the future. "
+                f"To achieve the same result, please {_suggestion}.",
+                FutureWarning,
+                stacklevel=1,
+            )
+
         # Massage found values to meet expectations
         # Parse sections
         if "sections" in new_settings:
@@ -377,6 +392,46 @@ def read_config(
         break
 
     return project_config
+
+
+def parse_settings(args: list[str] | None = None) -> dict:
+    """Parse arguments and config files to build the final settings set.
+
+    Arguments:
+        args: Arguments passed from the command line.
+
+    Returns:
+        A dictionary with the final settings.
+    """
+
+    parser = get_parser()
+    opts = vars(parser.parse_args(args=args))
+
+    # Determine which arguments were explicitly set with the CLI
+    sentinel = object()
+    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts.keys()})
+    explicit_opts_dict = {
+        key: opts.get(key, None)
+        for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
+        if value is not sentinel
+    }
+
+    config_file = explicit_opts_dict.pop("config_file", DEFAULT_CONFIG_FILES)
+    if str(config_file).strip().lower() in ("no", "none", "off", "false", "0", ""):
+        config_file = None
+    elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
+        config_file = DEFAULT_CONFIG_FILES
+
+    settings = read_config(config_file)
+
+    # CLI arguments override the config file settings
+    settings.update(explicit_opts_dict)
+
+    # TODO: remove at some point
+    if "bump_latest" in explicit_opts_dict:
+        warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
+
+    return settings
 
 
 def build_and_render(
@@ -600,28 +655,7 @@ def main(args: list[str] | None = None) -> int:
     Returns:
         An exit code.
     """
-    parser = get_parser()
-    opts = vars(parser.parse_args(args=args))
-
-    # Determine which arguments were explicitly set with the CLI
-    sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts.keys()})
-    explicit_opts_dict = {
-        key: opts.get(key, None)
-        for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
-        if value is not sentinel
-    }
-
-    config_file = explicit_opts_dict.pop("config_file", DEFAULT_CONFIG_FILES)
-    if str(config_file).strip().lower() in ("no", "none", "off", "false", "0", ""):
-        config_file = None
-    elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
-        config_file = DEFAULT_CONFIG_FILES
-
-    settings = read_config(config_file)
-
-    # CLI arguments override the config file settings
-    settings.update(explicit_opts_dict)
+    settings = parse_settings(args)
 
     if settings.pop("release_notes"):
         output_release_notes(
