@@ -452,7 +452,7 @@ in this particular order:
 
 The use of a configuration file can be disabled or overridden with the `--config-file`
 option.
-To disable the configuration file, pass `no`, `None`, `false`, or `0`:
+To disable the configuration file, pass `no`, `none`, `false`, `off`, `0` or empty string (`''`):
 
 ```bash
 git-changelog --config-file no
@@ -476,7 +476,7 @@ output = 'output.log'
 parse-refs = false
 parse-trailers = false
 repository = '.'
-sections = ''
+sections = 'none'
 template = 'angular'
 version-regex = '^## \[(?P<version>v?[^\]]+)'
 ```
@@ -494,7 +494,7 @@ output = 'output.log'
 parse-refs = false
 parse-trailers = false
 repository = '.'
-sections = ''
+sections = 'fix,maint'
 template = 'keepachangelog'
 version-regex = '^## \[(?P<version>v?[^\]]+)'
 ```
