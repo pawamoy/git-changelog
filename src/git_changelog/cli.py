@@ -581,10 +581,6 @@ def output_release_notes(
             file.write(release_notes)
 
 
-class _Sentinel:
-    pass
-
-
 def main(args: list[str] | None = None) -> int:
     """Run the main program.
 
@@ -600,7 +596,7 @@ def main(args: list[str] | None = None) -> int:
     opts = parser.parse_args(args=args)
 
     # Determine which arguments were explicitly set with the CLI
-    sentinel = _Sentinel()
+    sentinel = object()
     sentinel_ns = argparse.Namespace(**{key: sentinel for key in vars(opts)})
     parser.parse_args(namespace=sentinel_ns)
     explicit_opts_dict = {
