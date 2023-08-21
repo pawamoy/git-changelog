@@ -332,7 +332,7 @@ def build_and_render(
     # handle misconfiguration early
     if in_place and output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
-    
+
     # get provider
     provider_class = providers[provider] if provider else None
 
