@@ -86,12 +86,12 @@ def test_config_reading(
 
     Parameters:
         tmp_path: A temporary path to write the settings file into.
-        is_pyproject: controls whether a ``pyproject.toml`` (``True``),
-        a ``.git-changelog.toml`` (``False``) or a custom file (``None``) is being tested.
-        sections: A ``sections`` config to override defaults.
-        sections_falue: The expectation for ``sections`` after reading the config file.
-        parse_refs: A explicit override of the ``parse_refs`` of the config (if boolean)
-        or skip writing the override into the test config file (``None``).
+        is_pyproject: Controls whether a `pyproject.toml` (`True`),
+            a `.git-changelog.toml` (`False`) or a custom file (`None`) is being tested.
+        sections: A `sections` config to override defaults.
+        sections_value: The expectation for `sections` after reading the config file.
+        parse_refs: An explicit override of the `parse_refs` of the config (if boolean)
+            or skip writing the override into the test config file (`None`).
     """
     os.chdir(tmp_path)
 
