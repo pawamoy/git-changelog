@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import warnings
 from importlib import metadata
 from typing import TYPE_CHECKING, Pattern, TextIO
 
@@ -127,6 +128,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--bump",
         action="store",
         dest="bump",
+        metavar="VERSION",
         default=None,
         help="Specify the bump from latest version for the set of unreleased commits. "
         "Can be one of 'auto', 'major', 'minor', 'patch' or a valid semver version (eg. 1.2.3). "
@@ -301,6 +303,7 @@ def build_and_render(
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
     provider: str | None = None,
+    bump: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -318,9 +321,11 @@ def build_and_render(
         output: Output/changelog file.
         version_regex: Regular expression to match versions in an existing changelog file.
         marker_line: Marker line used to insert contents in an existing changelog.
-        bump_latest: Whether to try and bump the latest version to guess the new one.
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
         omit_empty_versions: Whether to omit empty versions from the output.
         provider: Provider class used by this repository.
+        bump: Whether to try and bump to a given version.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -348,6 +353,12 @@ def build_and_render(
     # get provider
     provider_class = providers[provider] if provider else None
 
+    # TODO: remove at some point
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
     # build data
     changelog = Changelog(
         repository,
@@ -356,7 +367,7 @@ def build_and_render(
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
         sections=sections,
-        bump_to=bump_to,
+        bump=bump,
     )
 
     # remove empty versions from changelog data
@@ -511,6 +522,10 @@ def main(args: list[str] | None = None) -> int:
         )
         return 0
 
+    # TODO: remove at some point
+    if opts.bump_latest:
+        warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
+
     try:
         build_and_render(
             repository=opts.repository,
@@ -526,6 +541,7 @@ def main(args: list[str] | None = None) -> int:
             marker_line=opts.marker_line,
             bump_latest=opts.bump_latest,
             omit_empty_versions=opts.omit_empty_versions,
+            bump=opts.bump,
         )
     except ValueError as error:
         print(f"git-changelog: {error}", file=sys.stderr)

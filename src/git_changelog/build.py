@@ -6,9 +6,9 @@ import datetime
 import os
 import re
 import sys
-from contextlib import suppress
+import warnings
 from subprocess import check_output
-from typing import TYPE_CHECKING, ClassVar, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 
 from semver import VersionInfo
 
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
-def bump(version: str, part: str = "patch") -> str:
+def bump(version: str, part: Literal["major", "minor", "patch"] = "patch") -> str:
     """Bump a version.
 
     Arguments:
@@ -168,7 +168,8 @@ class Changelog:
         parse_provider_refs: bool = False,
         parse_trailers: bool = False,
         sections: list[str] | None = None,
-        bump_to: str | None = None,
+        bump_latest: bool = False,
+        bump: str | None = None,
     ):
         """Initialization method.
 
@@ -179,7 +180,8 @@ class Changelog:
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
             sections: The sections to render (features, bug fixes, etc.).
-            bump_to: Whether to try and bump to a given version.
+            bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
+            bump: Whether to try and bump to a given version.
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
@@ -236,8 +238,17 @@ class Changelog:
         self.versions_list = v_list
         self.versions_dict = v_dict
 
-        if bump_to:
-            self._bump_to(bump_to)
+        # TODO: remove at some point
+        if bump_latest:
+            warnings.warn(
+                "`bump_latest=True` is deprecated in favor of `bump='auto'`",
+                DeprecationWarning,
+                stacklevel=1,
+            )
+            if bump is None:
+                bump = "auto"
+        if bump:
+            self._bump(bump)
 
         # fix a single, initial version to 0.1.0
         self._fix_single_version()
@@ -398,7 +409,7 @@ class Changelog:
             if version in {"major", "minor", "patch"}:
                 # bump version (don't fail on non-semver versions)
                 try:
-                    last_version.planned_tag = bump(last_tag, version)
+                    last_version.planned_tag = bump(last_tag, version)  # type: ignore[arg-type]
                 except ValueError:
                     return
             else:
@@ -411,7 +422,6 @@ class Changelog:
                     base=last_version.previous_version.tag,
                     target=last_version.planned_tag,
                 )
-
 
     def _fix_single_version(self) -> None:
         last_version = self.versions_list[0]
