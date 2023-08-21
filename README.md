@@ -164,9 +164,11 @@ options:
                         missing from changelog). If two marker lines are
                         present in the changelog, the contents between those
                         two lines will be overwritten (useful to update an
-                        'Unreleased' entry for example). Default: <!--
-                        insertion marker -->.
+                        'Unreleased' entry for example). Default:
+                        <!-- insertion marker -->.
   -o, --output OUTPUT   Output to given file. Default: stdout.
+  -p {github,gitlab}, --provider {github,gitlab}
+                        Explicitly specify the repository provider.
   -r, --parse-refs      Parse provider-specific references in commit messages
                         (GitHub/GitLab/Bitbucket issues, PRs, etc.). Default: False.
   -R, --release-notes   Output release notes to stdout based on the last entry

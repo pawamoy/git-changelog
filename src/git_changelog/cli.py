@@ -29,6 +29,7 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
+from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -61,6 +62,13 @@ def get_version() -> str:
 
 def _comma_separated_list(value: str) -> list[str]:
     return value.split(",")
+
+
+providers: dict[str, type[ProviderRefParser]] = {
+    "github": GitHub,
+    "gitlab": GitLab,
+    "bitbucket": Bitbucket,
+}
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -164,6 +172,14 @@ def get_parser() -> argparse.ArgumentParser:
         dest="output",
         default=sys.stdout,
         help="Output to given file. Default: stdout.",
+    )
+    parser.add_argument(
+        "-p",
+        "--provider",
+        dest="provider",
+        default=None,
+        choices=providers.keys(),
+        help="Explicitly specify the repository provider. Default: %(default)s.",
     )
     parser.add_argument(
         "-r",
@@ -272,6 +288,7 @@ def build_and_render(
     marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
+    provider: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -291,6 +308,7 @@ def build_and_render(
         marker_line: Marker line used to insert contents in an existing changelog.
         bump_latest: Whether to try and bump the latest version to guess the new one.
         omit_empty_versions: Whether to omit empty versions from the output.
+        provider: Provider class used by this repository.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -315,9 +333,13 @@ def build_and_render(
     if in_place and output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
 
+    # get provider
+    provider_class = providers[provider] if provider else None
+
     # build data
     changelog = Changelog(
         repository,
+        provider=provider_class,
         convention=convention,
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
@@ -484,6 +506,7 @@ def main(args: list[str] | None = None) -> int:
             convention=opts.convention,
             parse_refs=opts.parse_refs,
             parse_trailers=opts.parse_trailers,
+            provider=opts.provider,
             sections=opts.sections,
             in_place=opts.in_place,
             output=opts.output,

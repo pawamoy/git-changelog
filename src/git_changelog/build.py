@@ -7,7 +7,7 @@ import os
 import re
 import sys
 from contextlib import suppress
-from subprocess import check_output  # (we trust the commands we run)
+from subprocess import check_output
 from typing import TYPE_CHECKING, ClassVar, Type, Union
 
 from semver import VersionInfo
@@ -163,7 +163,7 @@ class Changelog:
         self,
         repository: str | Path,
         *,
-        provider: ProviderRefParser | None = None,
+        provider: ProviderRefParser | type[ProviderRefParser] | None = None,
         convention: ConventionType | None = None,
         parse_provider_refs: bool = False,
         parse_trailers: bool = False,
@@ -186,17 +186,21 @@ class Changelog:
         self.parse_trailers: bool = parse_trailers
 
         # set provider
-        if not provider:
+        if not isinstance(provider, ProviderRefParser):
             remote_url = self.get_remote_url()
             split = remote_url.split("/")
             provider_url = "/".join(split[:3])
             namespace, project = "/".join(split[3:-1]), split[-1]
-            if "github" in provider_url:
+            if callable(provider):
+                provider = provider(namespace, project, url=provider_url)
+            elif "github" in provider_url:
                 provider = GitHub(namespace, project, url=provider_url)
             elif "gitlab" in provider_url:
                 provider = GitLab(namespace, project, url=provider_url)
             elif "bitbucket" in provider_url:
                 provider = Bitbucket(namespace, project, url=provider_url)
+            else:
+                provider = None
             self.remote_url: str = remote_url
         self.provider = provider
 

@@ -49,6 +49,12 @@ and parsing provider-specific references (GitHub/GitLab/Bitbucket):
 git-changelog -rt path:./templates/changelog.md.jinja
 ```
 
+Generate a changelog using a specific provider (GitHub/GitLab/BitBucket):
+
+```bash
+git-changelog --provider github
+```
+
 Author's favorite, from Python:
 
 ```python
@@ -58,6 +64,7 @@ build_and_render(
     repository=".",
     output="CHANGELOG.md",
     convention="angular",
+    provider="github",
     template="keepachangelog",
     parse_trailers=True,
     parse_refs=False,
