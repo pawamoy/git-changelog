@@ -324,8 +324,8 @@ def read_config(
 
     Arguments:
         config_file: A path or list of paths to configuration file(s); or ``None`` to
-            disable config file settings. Default: ``pyproject.toml`` and ``.git-changelogrc``
-            at the current working directory.
+            disable config file settings. Default: a list of paths given by
+            :obj:`~git_changelog.cli.DEFAULT_CONFIG_FILES`.
 
     Returns:
         A settings dictionary. Default settings if no config file is found or ``config_file``
