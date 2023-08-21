@@ -57,14 +57,16 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
 @pytest.mark.parametrize("is_pyproject", [True, False, None])
 @pytest.mark.parametrize(("sections", "sections_value"), [
     (None, None),
-    ("none", None),
-    ("force-null", None),
     ("", None),
-    ("none, none, none", None),
+    (",,", None),
+    ("force-null", None),
     ("a, b, ", ["a", "b"]),
     ("a,  , ", ["a"]),
     ("a, b, c", ["a", "b", "c"]),
     (["a", "b", "c"], ["a", "b", "c"]),
+    # Uncomment if None/null is once allowed as a value
+    # ("none", None),
+    # ("none, none, none", None),
 ])
 @pytest.mark.parametrize("parse_refs", [None, False, True])
 def test_config_reading(

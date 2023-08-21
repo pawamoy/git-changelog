@@ -352,7 +352,7 @@ def read_config(
                 or new_settings.get("tool.git-changelog", {})
             )
 
-            if not new_settings:  # Likely, pyproject.toml did not have a git-changelog section
+            if not new_settings:  # pyproject.toml did not have a git-changelog section
                 continue
 
         # Settings can have hyphens like in the CLI
@@ -362,14 +362,18 @@ def read_config(
 
         # Massage found values to meet expectations
         # Parse sections
-        if "sections" in new_settings and new_settings["sections"] is not None:
-            sections = new_settings["sections"]
+        if "sections" in new_settings:
+            # Remove "sections" from dict, only restore if the list is valid
+            sections = new_settings.pop("sections", None)
             if isinstance(sections, str):
-                sections = [s.strip() for s in sections.split(",")]
+                sections = sections.split(",")
 
-            new_settings["sections"] = [
-                s.strip() for s in sections if s.strip() and s.strip() != "none"
-            ] or None
+            sections = [
+                s.strip() for s in sections if isinstance(s, str) and s.strip()
+            ]
+
+            if sections:  # toml doesn't store null/nil
+                new_settings["sections"] = sections
 
         project_config.update(new_settings)
         break

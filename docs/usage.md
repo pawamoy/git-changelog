@@ -479,7 +479,7 @@ output = 'output.log'
 parse-refs = false
 parse-trailers = false
 repository = '.'
-sections = 'none'
+sections = ['fix', 'maint']
 template = 'angular'
 version-regex = '^## \[(?P<version>v?[^\]]+)'
 ```
