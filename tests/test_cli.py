@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING
+import sys
 
 import pytest
 import toml
@@ -14,6 +15,20 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+if sys.version_info >= (3, 11):
+    from contextlib import chdir
+else:
+    # TODO: remove once support for Python 3.10 is dropped
+    from contextlib import contextmanager
+
+    @contextmanager
+    def chdir(path: str) -> Iterator[None]:  # noqa: D103
+        old_wd = os.getcwd()
+        os.chdir(path)
+        try:
+            yield
+        finally:
+            os.chdir(old_wd)
 
 
 def test_main() -> None:
@@ -93,35 +108,34 @@ def test_config_reading(
         parse_refs: An explicit override of the `parse_refs` of the config (if boolean)
             or skip writing the override into the test config file (`None`).
     """
-    os.chdir(tmp_path)
+    with chdir(tmp_path):
+        config_content = {}
 
-    config_content = {}
+        if sections is not None:
+            config_content["sections"] = None if sections == "force-null" else sections
 
-    if sections is not None:
-        config_content["sections"] = None if sections == "force-null" else sections
+        if parse_refs is not None:
+            config_content["parse_refs"] = parse_refs
 
-    if parse_refs is not None:
-        config_content["parse_refs"] = parse_refs
+        config_fname = "custom-file.toml" if is_pyproject is None else ".git-changelog.toml"
+        config_fname = "pyproject.toml" if is_pyproject else config_fname
+        (tmp_path / config_fname).write_text(
+            toml.dumps(
+                config_content if not is_pyproject
+                else {"tool": {"git-changelog": config_content}},
+            ),
+        )
 
-    config_fname = "custom-file.toml" if is_pyproject is None else ".git-changelog.toml"
-    config_fname = "pyproject.toml" if is_pyproject else config_fname
-    (tmp_path / config_fname).write_text(
-        toml.dumps(
-            config_content if not is_pyproject
-            else {"tool": {"git-changelog": config_content}},
-        ),
-    )
+        settings = (
+            cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml"
+            else cli.read_config()
+        )
 
-    settings = (
-        cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml"
-        else cli.read_config()
-    )
+        ground_truth = cli.DEFAULT_SETTINGS.copy()
+        ground_truth["sections"] = sections_value
+        ground_truth["parse_refs"] = bool(parse_refs)
 
-    ground_truth = cli.DEFAULT_SETTINGS.copy()
-    ground_truth["sections"] = sections_value
-    ground_truth["parse_refs"] = bool(parse_refs)
-
-    assert settings == ground_truth
+        assert settings == ground_truth
 
 
 @pytest.mark.parametrize("value", [None, False, True])
@@ -135,29 +149,28 @@ def test_settings_warning(
         tmp_path: A temporary path to write the settings file into.
     """
 
-    os.chdir(tmp_path)
+    with chdir(tmp_path):
+        args = []
+        if value is not None:
+            (tmp_path / ".git-changelog.toml").write_text(
+                toml.dumps({"bump_latest": value})
+            )
+        else:
+            args = ["--bump-latest"]
 
-    args = []
-    if value is not None:
-        (tmp_path / ".git-changelog.toml").write_text(
-            toml.dumps({"bump_latest": value})
-        )
-    else:
-        args = ["--bump-latest"]
-
-    with pytest.warns(FutureWarning) as record:
-        cli.parse_settings(args)
-
-        solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
-        if value is not None:  # Warning is issued when parsing the config file.
-            solution = "remove" if not value else "auto"
-
-        assert len(record) == 1
-        assert solution in str(record[0].message)
-
-    # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
-    if (tmp_path / ".git-changelog.toml").exists():
         with pytest.warns(FutureWarning) as record:
-            cli.parse_settings(["--bump-latest"])
+            cli.parse_settings(args)
 
-            assert len(record) == 2
+            solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
+            if value is not None:  # Warning is issued when parsing the config file.
+                solution = "remove" if not value else "auto"
+
+            assert len(record) == 1
+            assert solution in str(record[0].message)
+
+        # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
+        if (tmp_path / ".git-changelog.toml").exists():
+            with pytest.warns(FutureWarning) as record:
+                cli.parse_settings(["--bump-latest"])
+
+                assert len(record) == 2
