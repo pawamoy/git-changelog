@@ -443,6 +443,12 @@ def build_and_render(
     # get provider
     provider_class = providers[provider] if provider else None
 
+    # TODO: remove at some point
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
     # build data
     changelog = Changelog(
         repository,
@@ -616,19 +622,6 @@ def main(args: list[str] | None = None) -> int:
 
     # CLI arguments override the config file settings
     settings.update(explicit_opts_dict)
-
-    # TODO: remove at some point
-    _bump_latest = settings.pop("bump_latest", None)
-    if _bump_latest is not None:
-        warnings.warn(
-            "`--bump-latest` is deprecated in favor of `--bump auto`",
-            FutureWarning,
-            stacklevel=1,
-        )
-
-        # If `--bump-latest` is `True`, set `--bump auto`
-        if _bump_latest and settings.get("bump", None) is None:
-            settings["bump"] = "auto"
 
     if settings.pop("release_notes"):
         output_release_notes(
