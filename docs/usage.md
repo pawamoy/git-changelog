@@ -69,7 +69,7 @@ build_and_render(
     parse_trailers=True,
     parse_refs=False,
     sections=("build", "deps", "feat", "fix", "refactor"),
-    bump_latest=True,
+    bump="auto",
     in_place=True,
 )
 ```
@@ -220,10 +220,39 @@ will bump the MINOR part of the latest tag. Other types will bump the PATCH part
 Commits containing breaking changes will bump the MAJOR part, unless MAJOR is 0,
 in which case they'll only bump the MINOR part.
 
-To tell *git-changelog* to try and guess the new version, use the `-b` or `--bump-latest` CLI option:
+To tell *git-changelog* to try and guess the new version, use the `--bump=auto` CLI option:
 
 ```bash
-git-changelog --bump
+git-changelog --bump auto
+```
+
+You can also specify a version to bump to directly:
+
+```bash
+git-changelog --bump 2.3.1
+```
+
+Or which part of the version to bump, resetting
+numbers on its right to 0:
+
+```bash
+git-changelog --bump major  # 1.2.3 -> 2.0.0
+git-changelog --bump minor  # 1.2.3 -> 1.3.0
+git-changelog --bump patch  # 1.2.3 -> 1.2.4
+```
+
+Note that the major number won't be bumped if the latest version is 0.x.
+Instead, the minor number will be bumped:
+
+```bash
+git-changelog --bump major  # 0.1.2 -> 0.2.0, same as minor because 0.x
+git-changelog --bump minor  # 0.1.2 -> 0.2.0
+```
+
+In that case, when you are ready to bump to 1.0.0, just pass this version as value:
+
+```bash
+git-changelog --bump 1.0.0
 ```
 
 ## Parse additional information in commit messages
@@ -408,6 +437,67 @@ option to specify another file to read from.
 Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
+
+
+## Configuration files
+
+Project-wise, permanent configuration of *git-changelog* is possible.
+By default, *git-changelog* will search for the existence a suitable configuration
+in the ``pyproject.toml`` file or otherwise, the following configuration files 
+in this particular order:
+    * ``.git-changelog.toml``
+    * ``config/git-changelog.toml``
+    * ``.config/git-changelog.toml``
+    * ``~/.config/git-changelog.toml``
+
+The use of a configuration file can be disabled or overridden with the ``--config-file``
+option.
+To disable the configuration file, pass ``no``, ``None``, ``false``, or ``0``:
+
+```bash
+git-changelog --config-file no
+```
+
+To override the configuration file, pass the path to the new file:
+
+```bash
+git-changelog --config-file $HOME/.custom-git-changelog-config
+```
+
+The configuration file must be written in TOML language, and may take values
+for most of the command line options:
+
+```toml
+bump-latest = false
+convention = 'basic'
+in-place = false
+marker-line = '<!-- insertion marker -->'
+output = 'output.log'
+parse-refs = false
+parse-trailers = false
+repository = '.'
+sections = ''
+template = 'angular'
+version-regex = '^## \[(?P<version>v?[^\]]+)'
+```
+
+In the case of configuring *git-changelog* within ``pyproject.toml``, these
+settings must be found in the appropriate section:
+
+```toml
+[tool.git-changelog]
+bump-latest = false
+convention = 'conventional'
+in-place = false
+marker-line = '<!-- insertion marker -->'
+output = 'output.log'
+parse-refs = false
+parse-trailers = false
+repository = '.'
+sections = ''
+template = 'keepachangelog'
+version-regex = '^## \[(?P<version>v?[^\]]+)'
+```
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/

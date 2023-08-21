@@ -137,13 +137,22 @@ positional arguments:
   REPOSITORY            The repository path, relative or absolute. Default: .
 
 options:
-  -b, --bump-latest     Guess the new latest version by bumping the previous
+  -b, --bump-latest     Deprecated, use --bump=auto instead.
+                        Guess the new latest version by bumping the previous
                         one based on the set of unreleased commits. For
                         example, if a commit contains breaking changes, bump
                         the major number (or the minor number for 0.x
                         versions). Else if there are new features, bump the
                         minor number. Else just bump the patch number.
                         Default: False.
+  --bump VERSION        Specify the bump from latest version for the set
+                        of unreleased commits. Can be one of 'auto',
+                        'major', 'minor', 'patch' or a valid semver version
+                        (eg. 1.2.3). With 'auto', if a commit contains breaking
+                        changes, bump the major number (or the minor number
+                        for 0.x versions), else if there are new features,
+                        bump the minor number, else just bump the patch number.
+                        Default: None.
   -h, --help            Show this help message and exit.
   -i, --in-place        Insert new entries (versions missing from changelog)
                         in-place. An output file must be specified. With
