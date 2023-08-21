@@ -71,10 +71,6 @@ providers: dict[str, type[ProviderRefParser]] = {
 }
 
 
-def _provider_type(value: str) -> type[ProviderRefParser]:
-    return providers[value]
-
-
 def get_parser() -> argparse.ArgumentParser:
     """Return the CLI argument parser.
 
@@ -180,7 +176,6 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-p",
         "--provider",
-        type=_provider_type,  # type: ignore[arg-type]
         dest="provider",
         default=None,
         choices=providers.keys(),
@@ -293,7 +288,7 @@ def build_and_render(
     marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
-    provider: type[ProviderRefParser] | None = None,
+    provider: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -304,7 +299,6 @@ def build_and_render(
         repository: Path to a local repository.
         template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
         convention: Name of a commit message style/convention.
-        provider: Provider class used by this repository.
         parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
         parse_trailers: Whether to parse Git trailers.
         sections: Sections to render (features, bug fixes, etc.).
@@ -314,6 +308,7 @@ def build_and_render(
         marker_line: Marker line used to insert contents in an existing changelog.
         bump_latest: Whether to try and bump the latest version to guess the new one.
         omit_empty_versions: Whether to omit empty versions from the output.
+        provider: Provider class used by this repository.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -337,11 +332,14 @@ def build_and_render(
     # handle misconfiguration early
     if in_place and output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
+    
+    # get provider
+    provider_class = providers[provider] if provider else None
 
     # build data
     changelog = Changelog(
         repository,
-        provider=provider,
+        provider=provider_class,
         convention=convention,
         parse_provider_refs=parse_refs,
         parse_trailers=parse_trailers,
