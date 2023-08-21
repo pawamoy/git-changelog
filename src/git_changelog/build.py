@@ -6,9 +6,9 @@ import datetime
 import os
 import re
 import sys
-from contextlib import suppress
+import warnings
 from subprocess import check_output
-from typing import TYPE_CHECKING, ClassVar, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 
 from semver import VersionInfo
 
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
-def bump(version: str, part: str = "patch") -> str:
+def bump(version: str, part: Literal["major", "minor", "patch"] = "patch") -> str:
     """Bump a version.
 
     Arguments:
@@ -169,6 +169,7 @@ class Changelog:
         parse_trailers: bool = False,
         sections: list[str] | None = None,
         bump_latest: bool = False,
+        bump: str | None = None,
     ):
         """Initialization method.
 
@@ -179,7 +180,8 @@ class Changelog:
             parse_provider_refs: Whether to parse provider-specific references in the commit messages.
             parse_trailers: Whether to parse Git trailers in the commit messages.
             sections: The sections to render (features, bug fixes, etc.).
-            bump_latest: Whether to try and bump latest version to guess new one.
+            bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
+            bump: Whether to try and bump to a given version.
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
@@ -236,9 +238,17 @@ class Changelog:
         self.versions_list = v_list
         self.versions_dict = v_dict
 
-        # try to guess the new version by bumping the latest one
+        # TODO: remove at some point
         if bump_latest:
-            self._bump_latest()
+            warnings.warn(
+                "`bump_latest=True` is deprecated in favor of `bump='auto'`",
+                DeprecationWarning,
+                stacklevel=1,
+            )
+            if bump is None:
+                bump = "auto"
+        if bump:
+            self._bump(bump)
 
         # fix a single, initial version to 0.1.0
         self._fix_single_version()
@@ -383,33 +393,35 @@ class Changelog:
             )
         return versions_list, versions_dict
 
-    def _bump_latest(self) -> None:
-        # guess the next version number based on last version and recent commits
+    def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
         if not last_version.tag and last_version.previous_version:
             last_tag = last_version.previous_version.tag
-            major = minor = False
-            for commit in last_version.commits:
-                if commit.convention["is_major"]:
-                    major = True
-                    break
-                if commit.convention["is_minor"]:
-                    minor = True
-            # never fail on non-semver versions
-            with suppress(ValueError):
-                if major:
-                    planned_tag = bump(last_tag, "major")
-                elif minor:
-                    planned_tag = bump(last_tag, "minor")
-                else:
-                    planned_tag = bump(last_tag, "patch")
-                last_version.planned_tag = planned_tag
-                if self.provider:
-                    last_version.url = self.provider.get_tag_url(tag=planned_tag)
-                    last_version.compare_url = self.provider.get_compare_url(
-                        base=last_version.previous_version.tag,
-                        target=last_version.planned_tag,
-                    )
+            if version == "auto":
+                # guess the next version number based on last version and recent commits
+                version = "patch"
+                for commit in last_version.commits:
+                    if commit.convention["is_major"]:
+                        version = "major"
+                        break
+                    if commit.convention["is_minor"]:
+                        version = "minor"
+            if version in {"major", "minor", "patch"}:
+                # bump version (don't fail on non-semver versions)
+                try:
+                    last_version.planned_tag = bump(last_tag, version)  # type: ignore[arg-type]
+                except ValueError:
+                    return
+            else:
+                # user specified version
+                last_version.planned_tag = version
+            # update URLs
+            if self.provider:
+                last_version.url = self.provider.get_tag_url(tag=last_version.planned_tag)
+                last_version.compare_url = self.provider.get_compare_url(
+                    base=last_version.previous_version.tag,
+                    target=last_version.planned_tag,
+                )
 
     def _fix_single_version(self) -> None:
         last_version = self.versions_list[0]

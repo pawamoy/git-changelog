@@ -77,7 +77,7 @@ def test_bumping_latest(repo: Path) -> None:
     Parameters:
         repo: Path to a temporary repository.
     """
-    changelog = Changelog(repo, convention=AngularConvention, bump_latest=True)
+    changelog = Changelog(repo, convention=AngularConvention, bump="auto")
     # features, no breaking changes: minor bumped
     assert changelog.versions_list[0].planned_tag is not None
     assert changelog.versions_list[0].planned_tag.lstrip("v") == bump(
@@ -94,7 +94,7 @@ def test_not_bumping_latest(repo: Path) -> None:
     Parameters:
         repo: Path to a temporary repository.
     """
-    changelog = Changelog(repo, convention=AngularConvention, bump_latest=False)
+    changelog = Changelog(repo, convention=AngularConvention, bump=None)
     assert changelog.versions_list[0].planned_tag is None
     rendered = KEEP_A_CHANGELOG.render(changelog=changelog)
     assert "Unreleased" in rendered
@@ -124,7 +124,7 @@ def test_rendering_in_place(repo: Path, tmp_path: Path) -> None:
     _, rendered = build_and_render(
         str(repo),
         convention="angular",
-        bump_latest=False,
+        bump=None,
         output=output.as_posix(),
         template="keepachangelog",
     )
@@ -136,7 +136,7 @@ def test_rendering_in_place(repo: Path, tmp_path: Path) -> None:
     build_and_render(
         str(repo),
         convention="angular",
-        bump_latest=True,
+        bump="auto",
         output=output.as_posix(),
         template="keepachangelog",
         in_place=True,
@@ -159,7 +159,7 @@ def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
     _, rendered = build_and_render(
         str(repo),
         convention="angular",
-        bump_latest=True,
+        bump="auto",
         output=output.as_posix(),
         template="keepachangelog",
     )
@@ -178,7 +178,7 @@ def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
         build_and_render(
             str(repo),
             convention="angular",
-            bump_latest=True,
+            bump="auto",
             output=output.as_posix(),
             template="keepachangelog",
             in_place=True,
