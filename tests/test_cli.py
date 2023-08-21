@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING
 import sys
+from typing import TYPE_CHECKING, Any, Iterator
 
 import pytest
 import toml
@@ -52,6 +52,7 @@ def test_get_version() -> None:
     """Get self version."""
     assert cli.get_version()
 
+
 @pytest.mark.parametrize(
     "args",
     [
@@ -76,19 +77,22 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
 
 
 @pytest.mark.parametrize("is_pyproject", [True, False, None])
-@pytest.mark.parametrize(("sections", "sections_value"), [
-    (None, None),
-    ("", None),
-    (",,", None),
-    ("force-null", None),
-    ("a, b, ", ["a", "b"]),
-    ("a,  , ", ["a"]),
-    ("a, b, c", ["a", "b", "c"]),
-    (["a", "b", "c"], ["a", "b", "c"]),
-    # Uncomment if None/null is once allowed as a value
-    # ("none", None),
-    # ("none, none, none", None),
-])
+@pytest.mark.parametrize(
+    ("sections", "sections_value"),
+    [
+        (None, None),
+        ("", None),
+        (",,", None),
+        ("force-null", None),
+        ("a, b, ", ["a", "b"]),
+        ("a,  , ", ["a"]),
+        ("a, b, c", ["a", "b", "c"]),
+        (["a", "b", "c"], ["a", "b", "c"]),
+        # Uncomment if None/null is once allowed as a value
+        # ("none", None),
+        # ("none, none, none", None),
+    ],
+)
 @pytest.mark.parametrize("parse_refs", [None, False, True])
 def test_config_reading(
     tmp_path: Path,
@@ -108,8 +112,8 @@ def test_config_reading(
         parse_refs: An explicit override of the `parse_refs` of the config (if boolean)
             or skip writing the override into the test config file (`None`).
     """
-    with chdir(tmp_path):
-        config_content = {}
+    with chdir(str(tmp_path)):
+        config_content: dict[str, Any] = {}
 
         if sections is not None:
             config_content["sections"] = None if sections == "force-null" else sections
@@ -121,17 +125,13 @@ def test_config_reading(
         config_fname = "pyproject.toml" if is_pyproject else config_fname
         (tmp_path / config_fname).write_text(
             toml.dumps(
-                config_content if not is_pyproject
-                else {"tool": {"git-changelog": config_content}},
+                config_content if not is_pyproject else {"tool": {"git-changelog": config_content}},
             ),
         )
 
-        settings = (
-            cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml"
-            else cli.read_config()
-        )
+        settings = cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml" else cli.read_config()
 
-        ground_truth = cli.DEFAULT_SETTINGS.copy()
+        ground_truth: dict[str, Any] = cli.DEFAULT_SETTINGS.copy()
         ground_truth["sections"] = sections_value
         ground_truth["parse_refs"] = bool(parse_refs)
 
@@ -148,12 +148,11 @@ def test_settings_warning(
     Parameters:
         tmp_path: A temporary path to write the settings file into.
     """
-
-    with chdir(tmp_path):
-        args = []
+    with chdir(str(tmp_path)):
+        args: list[str] = []
         if value is not None:
             (tmp_path / ".git-changelog.toml").write_text(
-                toml.dumps({"bump_latest": value})
+                toml.dumps({"bump_latest": value}),
             )
         else:
             args = ["--bump-latest"]

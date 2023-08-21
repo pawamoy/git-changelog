@@ -19,7 +19,7 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Pattern, TextIO, Sequence
+from typing import Pattern, Sequence, TextIO
 
 import toml
 from appdirs import user_config_dir
@@ -46,6 +46,7 @@ DEFAULT_CONFIG_FILES = [
     ".config/git-changelog.toml",
     str(Path(user_config_dir()) / "git-changelog.toml"),
 ]
+"""Default configuration files read by git-changelog."""
 
 DEFAULT_SETTINGS = {
     "bump": None,
@@ -238,15 +239,13 @@ def get_parser() -> argparse.ArgumentParser:
         "--release-notes",
         action="store_true",
         dest="release_notes",
-        help="Output release notes to stdout based on the last entry in the changelog. "
-        "Default: unset (false).",
+        help="Output release notes to stdout based on the last entry in the changelog. Default: unset (false).",
     )
     parser.add_argument(
         "-I",
         "--input",
         dest="input",
-        help="Read from given file when creating release notes. "
-        f"Default: '{DEFAULT_CHANGELOG_FILE}'.",
+        help=f"Read from given file when creating release notes. Default: '{DEFAULT_CHANGELOG_FILE}'.",
     )
     parser.add_argument(
         "-c",
@@ -255,8 +254,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--convention",
         choices=CONVENTIONS,
         dest="convention",
-        help="The commit convention to match against. "
-        f"Default: '{DEFAULT_SETTINGS['convention']}'.",
+        help=f"The commit convention to match against. Default: '{DEFAULT_SETTINGS['convention']}'.",
     )
     parser.add_argument(
         "-s",
@@ -344,25 +342,22 @@ def read_config(
 
         new_settings = toml.load(_path)
         if _path.name == "pyproject.toml":
-            new_settings = (
-                new_settings.get("tool", {}).get("git-changelog", {})
-                or new_settings.get("tool.git-changelog", {})
+            new_settings = new_settings.get("tool", {}).get("git-changelog", {}) or new_settings.get(
+                "tool.git-changelog",
+                {},
             )
 
             if not new_settings:  # pyproject.toml did not have a git-changelog section
                 continue
 
         # Settings can have hyphens like in the CLI
-        new_settings = {
-            key.replace("-", "_"): value for key, value in new_settings.items()
-        }
+        new_settings = {key.replace("-", "_"): value for key, value in new_settings.items()}
 
         # TODO: remove at some point
         if "bump_latest" in new_settings:
-            _opt_value = new_settings['bump_latest']
+            _opt_value = new_settings["bump_latest"]
             _suggestion = (
-                "remove it from the config file" if not _opt_value
-                else "set `bump = 'auto'` in the config file instead"
+                "remove it from the config file" if not _opt_value else "set `bump = 'auto'` in the config file instead"
             )
             warnings.warn(
                 f"`bump-latest = {str(_opt_value).lower()}` option found "
@@ -380,9 +375,7 @@ def read_config(
             if isinstance(sections, str):
                 sections = sections.split(",")
 
-            sections = [
-                s.strip() for s in sections if isinstance(s, str) and s.strip()
-            ]
+            sections = [s.strip() for s in sections if isinstance(s, str) and s.strip()]
 
             if sections:  # toml doesn't store null/nil
                 new_settings["sections"] = sections
@@ -402,13 +395,12 @@ def parse_settings(args: list[str] | None = None) -> dict:
     Returns:
         A dictionary with the final settings.
     """
-
     parser = get_parser()
     opts = vars(parser.parse_args(args=args))
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts.keys()})
+    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts})
     explicit_opts_dict = {
         key: opts.get(key, None)
         for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
