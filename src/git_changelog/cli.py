@@ -318,7 +318,7 @@ def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
 
 
 def read_config(
-    config_file: str | list[str] | None = DEFAULT_CONFIG_FILES,
+    config_file: str | Path | list[str | Path] | None = DEFAULT_CONFIG_FILES,
 ) -> dict:
     """Find config files and initialize settings with the one of highest priority.
 
@@ -336,7 +336,7 @@ def read_config(
     if config_file is None:  # Unset config file
         return project_config
 
-    config_file = [config_file] if isinstance(config_file, str) else config_file
+    config_file = config_file if isinstance(config_file, (list, tuple)) else [config_file]
 
     for filename in config_file:
         _path = Path(filename)
@@ -346,7 +346,10 @@ def read_config(
 
         new_settings = toml.load(_path)
         if _path.name == "pyproject.toml":
-            new_settings = new_settings.get("tool", {}).get("git-changelog", {})
+            new_settings = (
+                new_settings.get("tool", {}).get("git-changelog", {})
+                or new_settings.get("tool.git-changelog", {})
+            )
 
             if not new_settings:  # Likely, pyproject.toml did not have a git-changelog section
                 continue
@@ -364,22 +367,8 @@ def read_config(
                 sections = [s.strip() for s in sections.split(",")]
 
             new_settings["sections"] = [
-                s.strip() for s in sections if s and s.strip() != "none"
+                s.strip() for s in sections if s.strip() and s.strip() != "none"
             ] or None
-
-        # Convert boolean values
-        new_settings = {
-            key: True if (
-                isinstance(value, str)
-                and value.strip().lower() in ("yes", "on", "true", "1", "")
-            ) else value for key, value in new_settings.items()
-        }
-        new_settings = {
-            key: False if (
-                isinstance(value, str)
-                and value.strip().lower() in ("no", "none", "off", "false", "0")
-            ) else value for key, value in new_settings.items()
-        }
 
         project_config.update(new_settings)
         break
