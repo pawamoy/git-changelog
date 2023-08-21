@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Pattern, TextIO
 
 import toml
+from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
@@ -43,7 +44,7 @@ DEFAULT_CONFIG_FILES = [
     ".git-changelog.toml",
     "config/git-changelog.toml",
     ".config/git-changelog.toml",
-    str(Path.home() / ".config" / "git-changelog.toml"),
+    str(Path(user_config_dir()) / "git-changelog.toml"),
 ]
 
 DEFAULT_SETTINGS = {

@@ -448,8 +448,11 @@ in this particular order:
     * `.git-changelog.toml`
     * `config/git-changelog.toml`
     * `.config/git-changelog.toml`
-    * `~/.config/git-changelog.toml`
+    * `<current-user-config-path>/git-changelog.toml`
 
+In the last case (`<current-user-config-path>/git-changelog.toml`), the `<current-user-config-path>`
+is platform-dependent and will be automatically inferred from your settings.
+In Unix systems, this will typically point at `$HOME/.config/git-changelog.toml`.
 The use of a configuration file can be disabled or overridden with the `--config-file`
 option.
 To disable the configuration file, pass `no`, `none`, `false`, `off`, `0` or empty string (`''`):

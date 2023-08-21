@@ -34,6 +34,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "appdirs",
     "Jinja2>=2.10,<4",
     "semver>=2.13",
     "toml>=0.10",
