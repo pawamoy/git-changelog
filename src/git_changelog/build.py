@@ -7,11 +7,8 @@ import os
 import re
 import sys
 from contextlib import suppress
-from subprocess import check_output  # (we trust the commands we run)
+from subprocess import check_output
 from typing import TYPE_CHECKING, ClassVar, Type, Union
-from pathlib import Path
-from subprocess import check_output  # noqa: S404 (we trust the commands we run)
-from typing import Callable, Type, Union
 
 from semver import VersionInfo
 
@@ -166,7 +163,7 @@ class Changelog:
         self,
         repository: str | Path,
         *,
-        provider: ProviderRefParser | Type[ProviderRefParser] | None = None,
+        provider: ProviderRefParser | type[ProviderRefParser] | None = None,
         convention: ConventionType | None = None,
         parse_provider_refs: bool = False,
         parse_trailers: bool = False,

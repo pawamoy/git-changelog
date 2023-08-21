@@ -18,7 +18,6 @@ import re
 import sys
 from importlib import metadata
 from typing import TYPE_CHECKING, Pattern, TextIO
-from typing import Any, Dict, Pattern, Sequence, TextIO, Type
 
 from jinja2.exceptions import TemplateNotFound
 
@@ -30,8 +29,7 @@ from git_changelog.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
-from git_changelog.commit import AngularConvention, BasicConvention, CommitConvention, ConventionalCommitConvention
-from git_changelog.providers import GitHub, GitLab, ProviderRefParser
+from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -50,34 +48,6 @@ class Templates(tuple):  # (subclassing tuple)
         return False
 
 
-class ProviderAction(argparse.Action):
-    """An action for argparse arguments."""
-
-    providers: Dict[str, Type[ProviderRefParser]] = {
-        "github": GitHub,
-        "gitlab": GitLab,
-    }
-
-    def __call__(
-        self,
-        parser: argparse.ArgumentParser,
-        namespace: argparse.Namespace,
-        values: str | Sequence[Any] | None,
-        option_string: str | None = None,
-    ) -> None:
-        """Convert a command-line option into a value from a provided dictionary.
-
-        Parameters:
-            parser: The ArgumentParser object which contains this action.
-            namespace: The Namespace object that will be returned by argparse.
-            values: The dictionary used to find the appropriate value.
-            option_string: The option string that was used to invoke this action.
-
-        """
-        if isinstance(values, str):
-            setattr(namespace, self.dest, self.providers.get(values, self.default))
-
-
 def get_version() -> str:
     """Return the current `git-changelog` version.
 
@@ -92,6 +62,17 @@ def get_version() -> str:
 
 def _comma_separated_list(value: str) -> list[str]:
     return value.split(",")
+
+
+providers: dict[str, type[ProviderRefParser]] = {
+    "github": GitHub,
+    "gitlab": GitLab,
+    "bitbucket": Bitbucket,
+}
+
+
+def _provider_type(value: str) -> type[ProviderRefParser]:
+    return providers[value]
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -199,11 +180,11 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-p",
         "--provider",
-        action=ProviderAction,
+        type=_provider_type,  # type: ignore[arg-type]
         dest="provider",
         default=None,
-        choices=ProviderAction.providers.keys(),
-        help="Explicitly specify the repository provider.",
+        choices=providers.keys(),
+        help="Explicitly specify the repository provider. Default: %(default)s.",
     )
     parser.add_argument(
         "-r",
@@ -312,7 +293,7 @@ def build_and_render(
     marker_line: str = DEFAULT_MARKER_LINE,
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
-    provider: Type[ProviderRefParser] | None = None,
+    provider: type[ProviderRefParser] | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 

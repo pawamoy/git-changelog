@@ -60,6 +60,18 @@ class ProviderRefParser(ABC):
     project: str
     REF: ClassVar[dict[str, RefDef]] = {}
 
+    def __init__(self, namespace: str, project: str, url: str | None = None):
+        """Initialization method.
+
+        Arguments:
+            namespace: The Bitbucket namespace.
+            project: The Bitbucket project.
+            url: The Bitbucket URL.
+        """
+        self.namespace: str = namespace
+        self.project: str = project
+        self.url: str = url or self.url
+
     def get_refs(self, ref_type: str, text: str) -> list[Ref]:
         """Find all references in the given text.
 
@@ -169,18 +181,6 @@ class GitHub(ProviderRefParser):
         "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
 
-    def __init__(self, namespace: str, project: str, url: str = url):
-        """Initialization method.
-
-        Arguments:
-            namespace: The GitHub namespace.
-            project: The GitHub project.
-            url: The GitHub URL.
-        """
-        self.namespace: str = namespace
-        self.project: str = project
-        self.url: str = url  # (shadowing but uses class' as default)
-
     def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
@@ -275,18 +275,6 @@ class GitLab(ProviderRefParser):
         "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
 
-    def __init__(self, namespace: str, project: str, url: str = url):
-        """Initialization method.
-
-        Arguments:
-            namespace: The GitLab namespace.
-            project: The GitLab project.
-            url: The GitLab URL.
-        """
-        self.namespace: str = namespace
-        self.project: str = project
-        self.url: str = url  # (shadowing but uses class' as default)
-
     def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
@@ -351,18 +339,6 @@ class Bitbucket(ProviderRefParser):
             url_string="{base_url}/{ref}",
         ),
     }
-
-    def __init__(self, namespace: str, project: str, url: str = url):
-        """Initialization method.
-
-        Arguments:
-            namespace: The Bitbucket namespace.
-            project: The Bitbucket project.
-            url: The Bitbucket URL.
-        """
-        self.namespace: str = namespace
-        self.project: str = project
-        self.url: str = url  # (shadowing but uses class' as default)
 
     def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
         match_dict["base_url"] = self.url

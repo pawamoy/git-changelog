@@ -49,7 +49,7 @@ and parsing provider-specific references (GitHub/GitLab/Bitbucket):
 git-changelog -rt path:./templates/changelog.md.jinja
 ```
 
-Generate a changelog using a specific provider (GitHub/GitLab):
+Generate a changelog using a specific provider (GitHub/GitLab/BitBucket):
 
 ```bash
 git-changelog --provider github
