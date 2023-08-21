@@ -595,14 +595,14 @@ def main(args: list[str] | None = None) -> int:
         An exit code.
     """
     parser = get_parser()
-    opts = parser.parse_args(args=args)
+    opts = vars(parser.parse_args(args=args))
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in vars(opts)})
-    parser.parse_args(namespace=sentinel_ns)
+    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts.keys()})
     explicit_opts_dict = {
-        key: value for key, value in vars(sentinel_ns).items()
+        key: opts.get(key, None)
+        for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
         if value is not sentinel
     }
 
