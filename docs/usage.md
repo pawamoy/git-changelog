@@ -482,7 +482,7 @@ parse-trailers = false
 repository = "."
 sections = ["fix", "maint"]
 template = "angular"
-version-regex = "^## \[(?P<version>v?[^\]]+)"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
 ```
 
 In the case of configuring *git-changelog* within `pyproject.toml`, these
@@ -500,7 +500,7 @@ parse-trailers = false
 repository = "."
 sections = "fix,maint"
 template = "keepachangelog"
-version-regex = "^## \[(?P<version>v?[^\]]+)"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
 ```
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
