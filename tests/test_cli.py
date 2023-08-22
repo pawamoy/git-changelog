@@ -2,14 +2,33 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import os
+import sys
+from typing import TYPE_CHECKING, Any, Iterator
 
 import pytest
+import toml
 
 from git_changelog import cli
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+if sys.version_info >= (3, 11):
+    from contextlib import chdir
+else:
+    # TODO: remove once support for Python 3.10 is dropped
+    from contextlib import contextmanager
+
+    @contextmanager
+    def chdir(path: str) -> Iterator[None]:  # noqa: D103
+        old_wd = os.getcwd()
+        os.chdir(path)
+        try:
+            yield
+        finally:
+            os.chdir(old_wd)
 
 
 def test_main() -> None:
@@ -49,4 +68,108 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
         args: Command line arguments.
     """
     ch = tmp_path.joinpath("ch.md")
-    assert cli.main([*args, "-o", ch.as_posix(), "-c", "angular"]) == 0
+    parsed_settings = cli.parse_settings([*args, "-o", ch.as_posix(), "-c", "angular"])
+
+    assert parsed_settings["output"] == str(ch.as_posix())
+    assert parsed_settings["sections"] == ["feat", "fix"]
+    assert parsed_settings["repository"] == "."
+    assert parsed_settings["convention"] == "angular"
+
+
+@pytest.mark.parametrize("is_pyproject", [True, False, None])
+@pytest.mark.parametrize(
+    ("sections", "sections_value"),
+    [
+        (None, None),
+        ("", None),
+        (",,", None),
+        ("force-null", None),
+        ("a, b, ", ["a", "b"]),
+        ("a,  , ", ["a"]),
+        ("a, b, c", ["a", "b", "c"]),
+        (["a", "b", "c"], ["a", "b", "c"]),
+        # Uncomment if None/null is once allowed as a value
+        # ("none", None),
+        # ("none, none, none", None),
+    ],
+)
+@pytest.mark.parametrize("parse_refs", [None, False, True])
+def test_config_reading(
+    tmp_path: Path,
+    is_pyproject: bool | None,
+    sections: str | list[str] | None,
+    sections_value: list | None,
+    parse_refs: bool | None,
+) -> None:
+    """Check settings files are correctly interpreted.
+
+    Parameters:
+        tmp_path: A temporary path to write the settings file into.
+        is_pyproject: Controls whether a `pyproject.toml` (`True`),
+            a `.git-changelog.toml` (`False`) or a custom file (`None`) is being tested.
+        sections: A `sections` config to override defaults.
+        sections_value: The expectation for `sections` after reading the config file.
+        parse_refs: An explicit override of the `parse_refs` of the config (if boolean)
+            or skip writing the override into the test config file (`None`).
+    """
+    with chdir(str(tmp_path)):
+        config_content: dict[str, Any] = {}
+
+        if sections is not None:
+            config_content["sections"] = None if sections == "force-null" else sections
+
+        if parse_refs is not None:
+            config_content["parse_refs"] = parse_refs
+
+        config_fname = "custom-file.toml" if is_pyproject is None else ".git-changelog.toml"
+        config_fname = "pyproject.toml" if is_pyproject else config_fname
+        (tmp_path / config_fname).write_text(
+            toml.dumps(
+                config_content if not is_pyproject else {"tool": {"git-changelog": config_content}},
+            ),
+        )
+
+        settings = cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml" else cli.read_config()
+
+        ground_truth: dict[str, Any] = cli.DEFAULT_SETTINGS.copy()
+        ground_truth["sections"] = sections_value
+        ground_truth["parse_refs"] = bool(parse_refs)
+
+        assert settings == ground_truth
+
+
+@pytest.mark.parametrize("value", [None, False, True])
+def test_settings_warning(
+    tmp_path: Path,
+    value: bool,
+) -> None:
+    """Check warning on bump_latest.
+
+    Parameters:
+        tmp_path: A temporary path to write the settings file into.
+    """
+    with chdir(str(tmp_path)):
+        args: list[str] = []
+        if value is not None:
+            (tmp_path / ".git-changelog.toml").write_text(
+                toml.dumps({"bump_latest": value}),
+            )
+        else:
+            args = ["--bump-latest"]
+
+        with pytest.warns(FutureWarning) as record:
+            cli.parse_settings(args)
+
+            solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
+            if value is not None:  # Warning is issued when parsing the config file.
+                solution = "remove" if not value else "auto"
+
+            assert len(record) == 1
+            assert solution in str(record[0].message)
+
+        # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
+        if (tmp_path / ".git-changelog.toml").exists():
+            with pytest.warns(FutureWarning) as record:
+                cli.parse_settings(["--bump-latest"])
+
+                assert len(record) == 2

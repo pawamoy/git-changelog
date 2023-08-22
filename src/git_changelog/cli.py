@@ -18,8 +18,11 @@ import re
 import sys
 import warnings
 from importlib import metadata
-from typing import TYPE_CHECKING, Pattern, TextIO
+from pathlib import Path
+from typing import Pattern, Sequence, TextIO
 
+import toml
+from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
 from git_changelog import templates
@@ -32,12 +35,37 @@ from git_changelog.commit import (
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
+DEFAULT_CHANGELOG_FILE = "CHANGELOG.md"
 CONVENTIONS = ("angular", "conventional", "basic")
+DEFAULT_CONFIG_FILES = [
+    "pyproject.toml",
+    ".git-changelog.toml",
+    "config/git-changelog.toml",
+    ".config/git-changelog.toml",
+    str(Path(user_config_dir()) / "git-changelog.toml"),
+]
+"""Default configuration files read by git-changelog."""
+
+DEFAULT_SETTINGS = {
+    "bump": None,
+    "bump_latest": None,
+    "convention": "basic",
+    "in_place": False,
+    "input": DEFAULT_CHANGELOG_FILE,
+    "marker_line": DEFAULT_MARKER_LINE,
+    "omit_empty_versions": False,
+    "output": sys.stdout,
+    "parse_refs": False,
+    "parse_trailers": False,
+    "provider": None,
+    "release_notes": False,
+    "repository": ".",
+    "sections": None,
+    "template": "keepachangelog",
+    "version_regex": DEFAULT_VERSION_REGEX,
+}
 
 
 class Templates(tuple):  # (subclassing tuple)
@@ -108,8 +136,14 @@ def get_parser() -> argparse.ArgumentParser:
         "repository",
         metavar="REPOSITORY",
         nargs="?",
-        default=".",
-        help="The repository path, relative or absolute. Default: %(default)s.",
+        help="The repository path, relative or absolute. Default: current working directory.",
+    )
+
+    parser.add_argument(
+        "--config-file",
+        metavar="PATH",
+        nargs="*",
+        help="Configuration file(s).",
     )
 
     parser.add_argument(
@@ -117,11 +151,11 @@ def get_parser() -> argparse.ArgumentParser:
         "--bump-latest",
         action="store_true",
         dest="bump_latest",
-        default=False,
         help="Deprecated, use --bump=auto instead. "
         "Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
         "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
-        "Else if there are new features, bump the minor number. Else just bump the patch number. Default: %(default)s.",
+        "Else if there are new features, bump the minor number. Else just bump the patch number. "
+        "Default: unset (false).",
     )
     parser.add_argument(
         "-B",
@@ -129,11 +163,11 @@ def get_parser() -> argparse.ArgumentParser:
         action="store",
         dest="bump",
         metavar="VERSION",
-        default=None,
         help="Specify the bump from latest version for the set of unreleased commits. "
         "Can be one of 'auto', 'major', 'minor', 'patch' or a valid semver version (eg. 1.2.3). "
         "With 'auto', if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions), "
-        "else if there are new features, bump the minor number, else just bump the patch number. Default: %(default)s.",
+        "else if there are new features, bump the minor number, else just bump the patch number. "
+        "Default: unset (false).",
     )
     parser.add_argument(
         "-h",
@@ -147,24 +181,23 @@ def get_parser() -> argparse.ArgumentParser:
         "--in-place",
         action="store_true",
         dest="in_place",
-        default=False,
         help="Insert new entries (versions missing from changelog) in-place. "
         "An output file must be specified. With custom templates, "
         "you can pass two additional arguments: --version-regex and --marker-line. "
         "When writing in-place, an 'in_place' variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
-        "(for example to skip changelog headers or footers). Default: %(default)s.",
+        "(for example to skip changelog headers or footers). Default: unset (false).",
     )
     parser.add_argument(
         "-g",
         "--version-regex",
         action="store",
         dest="version_regex",
-        default=DEFAULT_VERSION_REGEX,
         help="A regular expression to match versions in the existing changelog "
         "(used to find the latest release) when writing in-place. "
-        "The regular expression must be a Python regex with a 'version' named group. Default: %(default)s.",
+        "The regular expression must be a Python regex with a 'version' named group. "
+        f"Default: '{DEFAULT_VERSION_REGEX}'.",
     )
 
     parser.add_argument(
@@ -172,51 +205,47 @@ def get_parser() -> argparse.ArgumentParser:
         "--marker-line",
         action="store",
         dest="marker_line",
-        default=DEFAULT_MARKER_LINE,
         help="A marker line at which to insert new entries "
         "(versions missing from changelog). "
         "If two marker lines are present in the changelog, "
         "the contents between those two lines will be overwritten "
-        "(useful to update an 'Unreleased' entry for example). Default: %(default)s.",
+        "(useful to update an 'Unreleased' entry for example). "
+        f"Default: '{DEFAULT_MARKER_LINE}'.",
     )
     parser.add_argument(
         "-o",
         "--output",
         action="store",
         dest="output",
-        default=sys.stdout,
-        help="Output to given file. Default: stdout.",
+        help="Output to given file. Default: standard output.",
     )
     parser.add_argument(
         "-p",
         "--provider",
         dest="provider",
-        default=None,
         choices=providers.keys(),
-        help="Explicitly specify the repository provider. Default: %(default)s.",
+        help="Explicitly specify the repository provider. Default: unset.",
     )
     parser.add_argument(
         "-r",
         "--parse-refs",
         action="store_true",
         dest="parse_refs",
-        default=False,
-        help="Parse provider-specific references in commit messages (GitHub/GitLab/Bitbucket issues, PRs, etc.). Default: %(default)s.",
+        help="Parse provider-specific references in commit messages (GitHub/GitLab/Bitbucket "
+        "issues, PRs, etc.). Default: unset (false).",
     )
     parser.add_argument(
         "-R",
         "--release-notes",
         action="store_true",
         dest="release_notes",
-        default=False,
-        help="Output release notes to stdout based on the last entry in the changelog. Default: %(default)s.",
+        help="Output release notes to stdout based on the last entry in the changelog. Default: unset (false).",
     )
     parser.add_argument(
         "-I",
         "--input",
         dest="input",
-        default="CHANGELOG.md",
-        help="Read from given file when creating release notes. Default: %(default)s.",
+        help=f"Read from given file when creating release notes. Default: '{DEFAULT_CHANGELOG_FILE}'.",
     )
     parser.add_argument(
         "-c",
@@ -224,45 +253,43 @@ def get_parser() -> argparse.ArgumentParser:
         "--commit-style",
         "--convention",
         choices=CONVENTIONS,
-        default="basic",
         dest="convention",
-        help="The commit convention to match against. Default: %(default)s.",
+        help=f"The commit convention to match against. Default: '{DEFAULT_SETTINGS['convention']}'.",
     )
     parser.add_argument(
         "-s",
         "--sections",
         action="store",
         type=_comma_separated_list,
-        default=None,
         dest="sections",
         help="A comma-separated list of sections to render. "
-        "See the available sections for each supported convention in the description. Default: %(default)s.",
+        "See the available sections for each supported convention in the description. "
+        "Default: unset (None).",
     )
     parser.add_argument(
         "-t",
         "--template",
         choices=Templates(("angular", "keepachangelog")),
-        default="keepachangelog",
         dest="template",
-        help='The Jinja2 template to use. Prefix with "path:" to specify the path '
-        'to a directory containing a file named "changelog.md". Default: %(default)s.',
+        help="The Jinja2 template to use. Prefix it with 'path:'' to specify the path "
+        "to a directory containing a file named 'changelog.md'. "
+        f"Default: '{DEFAULT_SETTINGS['template']}'.",
     )
     parser.add_argument(
         "-T",
         "--trailers",
         "--git-trailers",
         action="store_true",
-        default=False,
         dest="parse_trailers",
-        help="Parse Git trailers in the commit message. See https://git-scm.com/docs/git-interpret-trailers. Default: %(default)s.",
+        help="Parse Git trailers in the commit message. "
+        "See https://git-scm.com/docs/git-interpret-trailers. Default: unset (false).",
     )
     parser.add_argument(
         "-E",
         "--omit-empty-versions",
         action="store_true",
-        default=False,
         dest="omit_empty_versions",
-        help="Omit empty versions from the output. Default: %(default)s.",
+        help="Omit empty versions from the output. Default: unset (false).",
     )
     parser.add_argument(
         "-v",
@@ -287,6 +314,115 @@ def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
         if version.tag == last_release:
             return versions[:index]
     return versions
+
+
+def read_config(
+    config_file: Sequence[str | Path] | str | Path | None = DEFAULT_CONFIG_FILES,
+) -> dict:
+    """Find config files and initialize settings with the one of highest priority.
+
+    Parameters:
+        config_file: A path or list of paths to configuration file(s); or `None` to
+            disable config file settings. Default: a list of paths given by
+            [`git_changelog.cli.DEFAULT_CONFIG_FILES`][].
+
+    Returns:
+        A settings dictionary. Default settings if no config file is found or `config_file` is `None`.
+
+    """
+    project_config = DEFAULT_SETTINGS.copy()
+    if config_file is None:  # Unset config file
+        return project_config
+
+    for filename in config_file if isinstance(config_file, (list, tuple)) else [config_file]:
+        _path = Path(filename)
+
+        if not _path.exists():
+            continue
+
+        new_settings = toml.load(_path)
+        if _path.name == "pyproject.toml":
+            new_settings = new_settings.get("tool", {}).get("git-changelog", {}) or new_settings.get(
+                "tool.git-changelog",
+                {},
+            )
+
+            if not new_settings:  # pyproject.toml did not have a git-changelog section
+                continue
+
+        # Settings can have hyphens like in the CLI
+        new_settings = {key.replace("-", "_"): value for key, value in new_settings.items()}
+
+        # TODO: remove at some point
+        if "bump_latest" in new_settings:
+            _opt_value = new_settings["bump_latest"]
+            _suggestion = (
+                "remove it from the config file" if not _opt_value else "set `bump = 'auto'` in the config file instead"
+            )
+            warnings.warn(
+                f"`bump-latest = {str(_opt_value).lower()}` option found "
+                f"in config file ({_path.absolute()}). This option will be removed in the future. "
+                f"To achieve the same result, please {_suggestion}.",
+                FutureWarning,
+                stacklevel=1,
+            )
+
+        # Massage found values to meet expectations
+        # Parse sections
+        if "sections" in new_settings:
+            # Remove "sections" from dict, only restore if the list is valid
+            sections = new_settings.pop("sections", None)
+            if isinstance(sections, str):
+                sections = sections.split(",")
+
+            sections = [s.strip() for s in sections if isinstance(s, str) and s.strip()]
+
+            if sections:  # toml doesn't store null/nil
+                new_settings["sections"] = sections
+
+        project_config.update(new_settings)
+        break
+
+    return project_config
+
+
+def parse_settings(args: list[str] | None = None) -> dict:
+    """Parse arguments and config files to build the final settings set.
+
+    Parameters:
+        args: Arguments passed from the command line.
+
+    Returns:
+        A dictionary with the final settings.
+    """
+    parser = get_parser()
+    opts = vars(parser.parse_args(args=args))
+
+    # Determine which arguments were explicitly set with the CLI
+    sentinel = object()
+    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts})
+    explicit_opts_dict = {
+        key: opts.get(key, None)
+        for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
+        if value is not sentinel
+    }
+
+    config_file = explicit_opts_dict.pop("config_file", DEFAULT_CONFIG_FILES)
+    if str(config_file).strip().lower() in ("no", "none", "off", "false", "0", ""):
+        config_file = None
+    elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
+        config_file = DEFAULT_CONFIG_FILES
+
+    settings = read_config(config_file)
+
+    # CLI arguments override the config file settings
+    settings.update(explicit_opts_dict)
+
+    # TODO: remove at some point
+    if "bump_latest" in explicit_opts_dict:
+        warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
+
+    return settings
 
 
 def build_and_render(
@@ -510,39 +646,21 @@ def main(args: list[str] | None = None) -> int:
     Returns:
         An exit code.
     """
-    parser = get_parser()
-    opts = parser.parse_args(args=args)
+    settings = parse_settings(args)
 
-    if opts.release_notes:
+    if settings.pop("release_notes"):
         output_release_notes(
-            input_file=opts.input,
-            version_regex=opts.version_regex,
-            marker_line=opts.marker_line,
-            output_file=opts.output,
+            input_file=settings["input"],
+            version_regex=settings["version_regex"],
+            marker_line=settings["marker_line"],
+            output_file=settings["output"],
         )
         return 0
 
-    # TODO: remove at some point
-    if opts.bump_latest:
-        warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
-
+    # --input is not necessary anymore
+    settings.pop("input", None)
     try:
-        build_and_render(
-            repository=opts.repository,
-            template=opts.template,
-            convention=opts.convention,
-            parse_refs=opts.parse_refs,
-            parse_trailers=opts.parse_trailers,
-            provider=opts.provider,
-            sections=opts.sections,
-            in_place=opts.in_place,
-            output=opts.output,
-            version_regex=opts.version_regex,
-            marker_line=opts.marker_line,
-            bump_latest=opts.bump_latest,
-            omit_empty_versions=opts.omit_empty_versions,
-            bump=opts.bump,
-        )
+        build_and_render(**settings)
     except ValueError as error:
         print(f"git-changelog: {error}", file=sys.stderr)
         return 1

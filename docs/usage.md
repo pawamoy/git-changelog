@@ -438,6 +438,71 @@ Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
 
+
+## Configuration files
+
+Project-wise, permanent configuration of *git-changelog* is possible.
+By default, *git-changelog* will search for the existence a suitable configuration
+in the `pyproject.toml` file or otherwise, the following configuration files 
+in this particular order:
+
+- `.git-changelog.toml`
+- `config/git-changelog.toml`
+- `.config/git-changelog.toml`
+- `<current-user-config-path>/git-changelog.toml`
+
+In the last case (`<current-user-config-path>/git-changelog.toml`), the `<current-user-config-path>`
+is platform-dependent and will be automatically inferred from your settings.
+In Unix systems, this will typically point at `$HOME/.config/git-changelog.toml`.
+The use of a configuration file can be disabled or overridden with the `--config-file`
+option.
+To disable the configuration file, pass `no`, `none`, `false`, `off`, `0` or empty string (`''`):
+
+```bash
+git-changelog --config-file no
+```
+
+To override the configuration file, pass the path to the new file:
+
+```bash
+git-changelog --config-file $HOME/.custom-git-changelog-config
+```
+
+The configuration file must be written in TOML language, and may take values
+for most of the command line options:
+
+```toml
+bump = "auto"
+convention = "basic"
+in-place = false
+marker-line = "<!-- insertion marker -->"
+output = "output.log"
+parse-refs = false
+parse-trailers = false
+repository = "."
+sections = ["fix", "maint"]
+template = "angular"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+```
+
+In the case of configuring *git-changelog* within `pyproject.toml`, these
+settings must be found in the appropriate section:
+
+```toml
+[tool.git-changelog]
+bump = "minor"
+convention = "conventional"
+in-place = false
+marker-line = "<!-- insertion marker -->"
+output = "output.log"
+parse-refs = false
+parse-trailers = false
+repository = "."
+sections = "fix,maint"
+template = "keepachangelog"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+```
+
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/
 [jinja]: https://jinja.palletsprojects.com/en/3.1.x/
