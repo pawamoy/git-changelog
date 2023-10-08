@@ -241,15 +241,16 @@ git-changelog --bump minor  # 1.2.3 -> 1.3.0
 git-changelog --bump patch  # 1.2.3 -> 1.2.4
 ```
 
-Note that the major number won't be bumped if the latest version is 0.x.
-Instead, the minor number will be bumped:
+You also have the ability to avoid bumping the major number if the latest version is 0.x. 
+Instead, the minor number will be incremented. To achieve this behavior, use the `--major-version-zero` flag.
 
 ```bash
-git-changelog --bump major  # 0.1.2 -> 0.2.0, same as minor because 0.x
+git-changelog --bump major  # 0.1.2 -> 1.0.0
+git-changelog --bump major --major-version-zero  # 0.1.2 -> 0.2.0, same as minor because 0.x
 git-changelog --bump minor  # 0.1.2 -> 0.2.0
 ```
 
-In that case, when you are ready to bump to 1.0.0, just pass this version as value:
+In that case, when you are ready to bump to 1.0.0, just pass this version as value or just don't use `--major-version-zero` flag:
 
 ```bash
 git-changelog --bump 1.0.0
@@ -483,6 +484,8 @@ repository = "."
 sections = ["fix", "maint"]
 template = "angular"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+provider = "gitlab"
+major-version-zero = true
 ```
 
 In the case of configuring *git-changelog* within `pyproject.toml`, these

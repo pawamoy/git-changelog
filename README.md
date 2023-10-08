@@ -149,10 +149,12 @@ options:
                         of unreleased commits. Can be one of 'auto',
                         'major', 'minor', 'patch' or a valid semver version
                         (eg. 1.2.3). With 'auto', if a commit contains breaking
-                        changes, bump the major number (or the minor number
-                        for 0.x versions), else if there are new features,
+                        changes, bump the major number, else if there are new features,
                         bump the minor number, else just bump the patch number.
                         Default: None.
+  --major-version-zero  When true, breaking changes on a 0.x will remain as a 0.x version.
+                        On false, a breaking change will bump a 0.x version to 1.0. 
+                        major-version-zero. Default: unset (false).
   -h, --help            Show this help message and exit.
   -i, --in-place        Insert new entries (versions missing from changelog)
                         in-place. An output file must be specified. With
