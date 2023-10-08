@@ -198,6 +198,38 @@ class CommitConvention(ABC):
             """,
         )
 
+    def is_minor(self, commit_type: str) -> bool:
+        """Tell if this commit is worth a minor bump.
+
+        Arguments:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a minor commit.
+        """
+        return commit_type in [self.TYPES[t] for t in self.MINOR_TYPES if t in self.TYPES]
+
+    @classmethod
+    def replace_types(cls, types: dict[str, str]) -> None:
+        """Replace default TYPES with dict.
+
+        Arguments:
+            types: Dict with custom types.
+        """
+        cls.TYPES = types
+
+    @classmethod
+    def update_minor_list(cls, commit_type: str) -> None:
+        """Updates the MINOR_TYPES class variable with the provided comma-separated commit types.
+
+        Arguments:
+            commit_type (str): A comma-separated string of commit types to be considered as minor.
+
+        Example:
+            CommitConvention.update_minor_list("feat,fix,update")
+        """
+        cls.MINOR_TYPES = commit_type.split(",")
+
 
 class BasicConvention(CommitConvention):
     """Basic commit message convention."""
@@ -210,8 +242,7 @@ class BasicConvention(CommitConvention):
         "merge": "Merged",
         "doc": "Documented",
     }
-
-    TYPE_REGEX: ClassVar[Pattern] = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
+    MINOR_TYPES: ClassVar[list] = ["add"]
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -222,6 +253,11 @@ class BasicConvention(CommitConvention):
         TYPES["change"],
         TYPES["remove"],
     ]
+
+    @property
+    def type_regex(self) -> re.Pattern:
+        """Type regex."""
+        return re.compile(r"^(?P<type>(%s))" % "|".join(self.TYPES.keys()), re.I)
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         commit_type = self.parse_type(commit.subject)
@@ -246,21 +282,10 @@ class BasicConvention(CommitConvention):
         Returns:
             The commit type.
         """
-        type_match = self.TYPE_REGEX.match(commit_subject)
+        type_match = self.type_regex.match(commit_subject)
         if type_match:
             return self.TYPES.get(type_match.groupdict()["type"].lower(), "")
         return ""
-
-    def is_minor(self, commit_type: str) -> bool:
-        """Tell if this commit is worth a minor bump.
-
-        Arguments:
-            commit_type: The commit type.
-
-        Returns:
-            Whether it's a minor commit.
-        """
-        return commit_type == self.TYPES["add"]
 
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
@@ -294,9 +319,7 @@ class AngularConvention(CommitConvention):
         "test": "Tests",
         "tests": "Tests",
     }
-    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
-    )
+    MINOR_TYPES: ClassVar[list] = ["feat"]
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -308,6 +331,13 @@ class AngularConvention(CommitConvention):
         TYPES["refactor"],
         TYPES["perf"],
     ]
+
+    @property
+    def subject_regex(self) -> re.Pattern:
+        """Subject regex."""
+        return re.compile(
+            r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(self.TYPES.keys())),  # (%)
+        )
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
@@ -334,23 +364,12 @@ class AngularConvention(CommitConvention):
         Returns:
             The parsed data.
         """
-        subject_match = self.SUBJECT_REGEX.match(commit_subject)
+        subject_match = self.subject_regex.match(commit_subject)
         if subject_match:
             dct = subject_match.groupdict()
             dct["type"] = self.TYPES[dct["type"]]
             return dct
         return {"type": "", "scope": "", "subject": commit_subject}
-
-    def is_minor(self, commit_type: str) -> bool:
-        """Tell if this commit is worth a minor bump.
-
-        Arguments:
-            commit_type: The commit type.
-
-        Returns:
-            Whether it's a minor commit.
-        """
-        return commit_type == self.TYPES["feat"]
 
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
@@ -369,9 +388,13 @@ class ConventionalCommitConvention(AngularConvention):
 
     TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
     DEFAULT_RENDER: ClassVar[list[str]] = AngularConvention.DEFAULT_RENDER
-    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
-    )
+
+    @property
+    def subject_regex(self) -> re.Pattern:
+        """Subject regex."""
+        return re.compile(
+            r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(self.TYPES.keys())),  # (%)
+        )
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)

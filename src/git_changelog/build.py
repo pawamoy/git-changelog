@@ -170,6 +170,8 @@ class Changelog:
         sections: list[str] | None = None,
         bump_latest: bool = False,
         bump: str | None = None,
+        rewrite_convention: dict[str, str] | None = None,
+        minor_types: str | None = None,
     ):
         """Initialization method.
 
@@ -182,6 +184,9 @@ class Changelog:
             sections: The sections to render (features, bug fixes, etc.).
             bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
             bump: Whether to try and bump to a given version.
+            rewrite_convention: A dictionary mapping type to section, intended to modify the default convention.TYPES.
+                If provided, the 'sections' argument becomes mandatory.
+            minor_types: Types signifying a minor version change. String separated by commas.
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
@@ -209,6 +214,10 @@ class Changelog:
         # set convention
         if isinstance(convention, str):
             try:
+                if rewrite_convention:
+                    self.CONVENTION[convention].replace_types(rewrite_convention)
+                if minor_types:
+                    self.CONVENTION[convention].update_minor_list(minor_types)
                 convention = self.CONVENTION[convention]()
             except KeyError:
                 print(  # noqa: T201
