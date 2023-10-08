@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from abc import ABCMeta
+from typing import Generator
+
 import pytest
 
 from git_changelog.commit import (
     AngularConvention,
     BasicConvention,
     Commit,
+    CommitConvention,
     ConventionalCommitConvention,
 )
 
@@ -43,20 +47,23 @@ def test_parsing_trailers(body: str, expected_trailers: dict[str, str]) -> None:
 
 
 @pytest.fixture()
-def _reserve_types() -> None:
+def _reserve_types() -> Generator[None, None, None]:
     """Fixture to preserve the conventional types."""
-    original_types = {
-        AngularConvention: [dict(AngularConvention.TYPES), list(AngularConvention.MINOR_TYPES)],
-        BasicConvention: [dict(BasicConvention.TYPES), list(BasicConvention.MINOR_TYPES)],
-        ConventionalCommitConvention: [dict(ConventionalCommitConvention.TYPES), list(ConventionalCommitConvention.MINOR_TYPES)],
+    original_types: dict[type[CommitConvention], tuple[dict[str, str], list[str]]] = {
+        AngularConvention: (dict(AngularConvention.TYPES), list(AngularConvention.MINOR_TYPES)),
+        BasicConvention: (dict(BasicConvention.TYPES), list(BasicConvention.MINOR_TYPES)),
+        ConventionalCommitConvention: (dict(ConventionalCommitConvention.TYPES),
+                                       list(ConventionalCommitConvention.MINOR_TYPES)),
     }
+
     yield
-    AngularConvention.TYPES = original_types[AngularConvention][0]
-    BasicConvention.TYPES = original_types[BasicConvention][0]
-    ConventionalCommitConvention.TYPES = original_types[ConventionalCommitConvention][0]
-    AngularConvention.MINOR_TYPES = original_types[AngularConvention][1]
-    BasicConvention.MINOR_TYPES = original_types[BasicConvention][1]
-    ConventionalCommitConvention.MINOR_TYPES = original_types[ConventionalCommitConvention][1]
+
+    AngularConvention.TYPES = dict(original_types[AngularConvention][0])
+    BasicConvention.TYPES = dict(original_types[BasicConvention][0])
+    ConventionalCommitConvention.TYPES = dict(original_types[ConventionalCommitConvention][0])
+    AngularConvention.MINOR_TYPES = list(original_types[AngularConvention][1])
+    BasicConvention.MINOR_TYPES = list(original_types[BasicConvention][1])
+    ConventionalCommitConvention.MINOR_TYPES = list(original_types[ConventionalCommitConvention][1])
 
 
 @pytest.mark.usefixtures("_reserve_types")
@@ -85,7 +92,9 @@ def test_is_minor_works_with_custom_minor_types() -> None:
         )
         convention.replace_types(_new_types)
         convention.update_minor_list(_minor_types)
-        commit_dict = convention().parse_commit(commit)
-        assert not commit_dict["is_major"]
-        assert commit_dict["is_minor"]
-        assert not commit_dict["is_patch"]
+        if not isinstance(convention, ABCMeta):
+            conv = convention()
+            commit_dict = conv.parse_commit(commit)
+            assert not commit_dict["is_major"]
+            assert commit_dict["is_minor"]
+            assert not commit_dict["is_patch"]

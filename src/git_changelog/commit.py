@@ -161,6 +161,7 @@ class CommitConvention(ABC):
     TYPE_REGEX: ClassVar[Pattern]
     BREAK_REGEX: ClassVar[Pattern]
     DEFAULT_RENDER: ClassVar[list[str]]
+    MINOR_TYPES: ClassVar[list[str]]
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
