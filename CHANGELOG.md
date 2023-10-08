@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.3.0](https://github.com/pawamoy/git-changelog/releases/tag/2.3.0) - 2023-10-08
+
+<small>[Compare with 2.2.0](https://github.com/pawamoy/git-changelog/compare/2.2.0...2.3.0)</small>
+
+### Deprecations
+
+- CLI argument `--bump-latest` and API parameter `bump_latest`
+    are deprecated in favor of `--bump=auto` and `bump="auto"`
+    argument and parameter, respectively.
+    See ["Understand the relationship with SemVer"](usage.md#understand-the-relationship-with-semver).
+
+### Features
+
+- Add configuration files ([b527ccf](https://github.com/pawamoy/git-changelog/commit/b527ccf0939a1186254eb3b7003768c9594d0e63) by Oscar Esteban). [Issue #54](https://github.com/pawamoy/git-changelog/issues/54), [PR #55](https://github.com/pawamoy/git-changelog/pull/55), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+- Add bump option (CLI, library) allowing to specify an exact version to bump to, as well as `auto`, `major`, `minor` or `patch` ([2c0dbb8](https://github.com/pawamoy/git-changelog/commit/2c0dbb84ab4dc7d24f301bbc8a1c25358eca5c36) by Théo Goudout). [Issue #38](https://github.com/pawamoy/git-changelog/issues/38), [PR #41](https://github.com/pawamoy/git-changelog/pull/41), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+- Add provider CLI option ([908531b](https://github.com/pawamoy/git-changelog/commit/908531b514c92cc0a37b352330450fc070a28821) by Théo Goudout). [Issue #37](https://github.com/pawamoy/git-changelog/issues/37), [PR #40](https://github.com/pawamoy/git-changelog/pull/40), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+
 ## [2.2.0](https://github.com/pawamoy/git-changelog/releases/tag/2.2.0) - 2023-08-17
 
 <small>[Compare with 2.1.0](https://github.com/pawamoy/git-changelog/compare/2.1.0...2.2.0)</small>
