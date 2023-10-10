@@ -8,6 +8,7 @@ import shutil
 import subprocess
 from functools import partial
 from typing import TYPE_CHECKING, Iterator
+from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 
@@ -189,19 +190,21 @@ def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
     assert rendered.count(latest_tag) == 3
 
 
-def test_removing_tokens_from_remotes(repo: Path) -> None:
-    """Remove GitHub tokens from remotes.
+def test_removing_credentials_from_remotes(repo: Path) -> None:
+    """Remove credentials from remotes.
 
     Parameters:
         repo: Temporary Git repository (fixture).
     """
     git = partial(_git, "-C", str(repo))
-    tokens = [
+    credentials = [
         "ghp_abcdefghijklmnOPQRSTUVWXYZ0123456789",
         "ghs_abcdefghijklmnOPQRSTUVWXYZ0123456789",
         "github_pat_abcdefgOPQRS0123456789_abcdefghijklmnOPQRSTUVWXYZ0123456789abcdefgOPQRS0123456789A",
+        "user:password",
     ]
-    for token in tokens:
-        git("remote", "set-url", "origin", f"https://{token}@github.com:example/example")
+    for creds in credentials:
+        git("remote", "set-url", "origin", f"https://{creds}@github.com:example/example")
         changelog = Changelog(repo)
-        assert token not in changelog.remote_url
+        assert creds not in changelog.remote_url
+        assert urlunsplit(urlsplit(changelog.remote_url)) == changelog.remote_url

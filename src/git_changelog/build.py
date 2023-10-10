@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import datetime
 import os
-import re
 import sys
 import warnings
 from subprocess import check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
+from urllib.parse import urlsplit, urlunsplit
 
 from semver import VersionInfo
 
@@ -277,12 +277,14 @@ class Changelog:
         if git_url.endswith(".git"):
             git_url = git_url[:-4]
 
-        # Remove GitHub token from the URL.
-        # See https://gist.github.com/magnetikonline/073afe7909ffdd6f10ef06a00bc3bc88.
-        # Personal access tokens (classic): ^ghp_[a-zA-Z0-9]{36}$
-        # Personal access tokens (fine-grained): ^github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}$
-        # GitHub Actions tokens: ^ghs_[a-zA-Z0-9]{36}$
-        return re.sub(r"(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})@", "", git_url)
+        # Remove credentials from the URL.
+        if git_url.startswith(("http://", "https://")):
+            # (addressing scheme, network location, path, query, fragment identifier)
+            urlparts = list(urlsplit(git_url))
+            urlparts[1] = urlparts[1].split("@", 1)[-1]
+            git_url = urlunsplit(urlparts)
+
+        return git_url
 
     def get_log(self) -> str:
         """Get the `git log` output.
