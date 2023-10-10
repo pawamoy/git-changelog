@@ -506,6 +506,33 @@ template = "keepachangelog"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
 ```
 
+## Custom types
+
+Configuration files offer greater flexibility compared to using CLI arguments. 
+You can overwrite default types with the `rewrite-convention` parameter. 
+
+In that case `sections` is required and `minor-types` is strongly recommended.
+
+This can be useful for custom conventions or translating sections in your changelog.
+
+```toml
+[tool.git-changelog]
+convention = "conventional"
+sections = "build,chore,doc,n,feat"
+minor-types = "feat,n"
+...
+
+[tool.git-changelog.rewrite-convention]
+build = "Build"
+chore = "Chore"
+ci = "Continuous Integration"
+deps = "Dependencies"
+doc = "Documentation"
+feat = "Features"
+n = "Notes"
+
+```
+
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/
 [jinja]: https://jinja.palletsprojects.com/en/3.1.x/
