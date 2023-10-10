@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.3.1](https://github.com/pawamoy/git-changelog/releases/tag/2.3.1) - 2023-10-10
+
+<small>[Compare with 2.3.0](https://github.com/pawamoy/git-changelog/compare/2.3.0...2.3.1)</small>
+
+### Bug Fixes
+
+- Remove any credentials from remote URLs, not just GitHub tokens ([5d07e91](https://github.com/pawamoy/git-changelog/commit/5d07e91c0ce1a8d21ace984ed1481f72da78b175) by Timothée Mazzucotelli). [Issue #61](https://github.com/pawamoy/git-changelog/issues/61)
+
 ## [2.3.0](https://github.com/pawamoy/git-changelog/releases/tag/2.3.0) - 2023-10-08
 
 <small>[Compare with 2.2.0](https://github.com/pawamoy/git-changelog/compare/2.2.0...2.3.0)</small>
