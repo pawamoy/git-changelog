@@ -19,13 +19,13 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Pattern, Sequence, TextIO
+from typing import Any, Pattern, Sequence, TextIO
 
 import toml
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
-from git_changelog import templates
+from git_changelog import debug, templates
 from git_changelog.build import Changelog, Version
 from git_changelog.commit import (
     AngularConvention,
@@ -98,6 +98,15 @@ providers: dict[str, type[ProviderRefParser]] = {
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
 }
+
+
+class _DebugInfo(argparse.Action):
+    def __init__(self, nargs: int | str | None = 0, **kwargs: Any) -> None:
+        super().__init__(nargs=nargs, **kwargs)
+
+    def __call__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
+        debug.print_debug_info()
+        sys.exit(0)
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -292,12 +301,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Omit empty versions from the output. Default: unset (false).",
     )
     parser.add_argument(
-        "-v",
+        "-V",
         "--version",
         action="version",
-        version="%(prog)s " + get_version(),  # (%)
+        version=f"%(prog)s {debug.get_version()}",
         help="Show the current version of the program and exit.",
     )
+    parser.add_argument("--debug-info", action=_DebugInfo, help="Print debug information.")
+
     return parser
 
 

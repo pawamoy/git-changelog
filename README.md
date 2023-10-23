@@ -55,11 +55,13 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 ## Installation
 
 With `pip`:
+
 ```bash
 pip install git-changelog
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
+
 ```bash
 python3.8 -m pip install --user pipx
 pipx install git-changelog
