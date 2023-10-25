@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.3.2](https://github.com/pawamoy/git-changelog/releases/tag/2.3.2) - 2023-10-25
+
+<small>[Compare with 2.3.1](https://github.com/pawamoy/git-changelog/compare/2.3.1...2.3.2)</small>
+
+### Dependencies
+
+- Use tomli instead of toml on Python less than 3.11 ([37f7cf1](https://github.com/pawamoy/git-changelog/commit/37f7cf1766944223e5ad2bc51fe7f48539aa1729) by Timothée Mazzucotelli).
+
 ## [2.3.1](https://github.com/pawamoy/git-changelog/releases/tag/2.3.1) - 2023-10-10
 
 <small>[Compare with 2.3.0](https://github.com/pawamoy/git-changelog/compare/2.3.0...2.3.1)</small>
