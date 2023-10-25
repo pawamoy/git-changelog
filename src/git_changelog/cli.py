@@ -21,7 +21,6 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any, Pattern, Sequence, TextIO
 
-import toml
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
@@ -34,6 +33,12 @@ from git_changelog.commit import (
     ConventionalCommitConvention,
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+
+# TODO: Remove once support for Python 3.10 is dropped.
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
@@ -351,7 +356,8 @@ def read_config(
         if not _path.exists():
             continue
 
-        new_settings = toml.load(_path)
+        with _path.open("rb") as file:
+            new_settings = tomllib.load(file)
         if _path.name == "pyproject.toml":
             new_settings = new_settings.get("tool", {}).get("git-changelog", {}) or new_settings.get(
                 "tool.git-changelog",
