@@ -1,6 +1,0 @@
-* [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> git_changelog](git_changelog/index.md)
-    * [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> build](git_changelog/build.md)
-    * [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> cli](git_changelog/cli.md)
-    * [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> commit](git_changelog/commit.md)
-    * [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> providers](git_changelog/providers.md)
-    * [<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code> templates](git_changelog/templates/index.md)
