@@ -438,6 +438,16 @@ Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
 
+## Filter commits
+
+Sometimes it may be useful to use a limited set of commits, for example, if your
+project has migrated to semver recently and you want to ignore old non-conventional commits.
+
+This is possible through the option `-F`, `--filter-commits`, which takes a
+*revision-range* to select the commits that will be used in the changelog.
+This option will pass the [revision-range](https://git-scm.com/docs/git-log#
+Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow 
+the rules defined by Git.
 
 ## Configuration files
 

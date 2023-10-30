@@ -6,7 +6,7 @@ import datetime
 import os
 import sys
 import warnings
-from subprocess import check_output
+from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 from urllib.parse import urlsplit, urlunsplit
 
@@ -170,6 +170,7 @@ class Changelog:
         sections: list[str] | None = None,
         bump_latest: bool = False,
         bump: str | None = None,
+        filter_commits: str | None = None,
     ):
         """Initialization method.
 
@@ -182,10 +183,12 @@ class Changelog:
             sections: The sections to render (features, bug fixes, etc.).
             bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
             bump: Whether to try and bump to a given version.
+            filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
+        self.filter_commits: str | None = filter_commits
 
         # set provider
         if not isinstance(provider, ProviderRefParser):
@@ -292,6 +295,15 @@ class Changelog:
         Returns:
             The output of the `git log` command, with a particular format.
         """
+        if self.filter_commits:
+            try:
+                return self.run_git("log", "--date=unix", "--format=" + self.FORMAT, self.filter_commits)
+            except CalledProcessError as e:
+                raise ValueError(
+                    f"An error ocurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
+                ) from e
+
+        # No revision-range provided. Call normally
         return self.run_git("log", "--date=unix", "--format=" + self.FORMAT)
 
     def parse_commits(self) -> list[Commit]:
