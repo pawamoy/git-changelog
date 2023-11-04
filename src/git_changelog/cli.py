@@ -154,7 +154,7 @@ def get_parser() -> argparse.ArgumentParser:
         dest="bump_latest",
         help="Deprecated, use --bump=auto instead. "
         "Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
-        "For example, if a commit contains breaking changes, bump the major number. "
+        "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
         "Else if there are new features, bump the minor number. Else just bump the patch number. "
         "Default: unset (false).",
     )
