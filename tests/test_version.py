@@ -84,14 +84,14 @@ def test_bump_minor(version: str, bumped: str) -> None:
         ("v1.1.1", "v2.0.0"),
     ],
 )
-def test_bump_major(version: str, bumped: str) -> None:
-    """Test major version bumping.
+def test_bump_major_no_zerover(version: str, bumped: str) -> None:
+    """Test major version bumping without zerover.
 
     Parameters:
         version: The base version.
         bumped: The expected, bumped version.
     """
-    assert bump(version, "major") == bumped
+    assert bump(version, "major", zerover=False) == bumped
 
 
 @pytest.mark.parametrize(
@@ -113,11 +113,11 @@ def test_bump_major(version: str, bumped: str) -> None:
         ("v1.1.1", "v2.0.0"),
     ],
 )
-def test_bump_major_major_version_zero(version: str, bumped: str) -> None:
-    """Test major version bumping with major_version_zero option.
+def test_bump_major_zerover(version: str, bumped: str) -> None:
+    """Test major version bumping with zerover.
 
     Parameters:
         version: The base version.
         bumped: The expected, bumped version.
     """
-    assert bump(version, "major", major_version_zero=True) == bumped
+    assert bump(version, "major", zerover=True) == bumped

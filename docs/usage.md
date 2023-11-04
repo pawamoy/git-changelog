@@ -241,20 +241,27 @@ git-changelog --bump minor  # 1.2.3 -> 1.3.0
 git-changelog --bump patch  # 1.2.3 -> 1.2.4
 ```
 
-You also have the ability to avoid bumping the major number if the latest version is 0.x. 
-Instead, the minor number will be incremented. To achieve this behavior, use the `--major-version-zero` flag.
+Note that, by default the major number won't be bumped if the latest version is 0.x. Instead, the minor number will be bumped:
 
 ```bash
-git-changelog --bump major  # 0.1.2 -> 1.0.0
-git-changelog --bump major --major-version-zero  # 0.1.2 -> 0.2.0, same as minor because 0.x
+git-changelog --bump major  # 0.1.2 -> 0.2.0, same as minor because 0.x
 git-changelog --bump minor  # 0.1.2 -> 0.2.0
 ```
 
-In that case, when you are ready to bump to 1.0.0, just pass this version as value or just don't use `--major-version-zero` flag:
+In that case, when you are ready to bump to 1.0.0, just pass this version as value, or use the `-Z`, `--no-zerover` flag:
 
 ```bash
 git-changelog --bump 1.0.0
+git-changelog --bump major -Z
 ```
+
+If you use *git-changelog* in CI, to update your changelog automatically,
+it is recommended to use a configuration file instead of the CLI option.
+On a fresh project, start by setting `zerover = true` in one of the supported
+[configuration files](#configuration-files). Then, once you are ready
+to bump to v1, set `zerover = false` and commit it as a breaking change.
+Once v1 is released, the setting has no use anymore, and you can remove it
+from your configuration file.
 
 ## Parse additional information in commit messages
 
@@ -485,7 +492,7 @@ sections = ["fix", "maint"]
 template = "angular"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
 provider = "gitlab"
-major-version-zero = true
+zerover = true
 ```
 
 In the case of configuring *git-changelog* within `pyproject.toml`, these

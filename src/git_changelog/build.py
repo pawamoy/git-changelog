@@ -27,13 +27,13 @@ if TYPE_CHECKING:
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
-def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, major_version_zero: bool = False) -> str:
+def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
     """Bump a version.
 
     Arguments:
         version: The version to bump.
         part: The part of the version to bump (major, minor, or patch).
-        major_version_zero: Keep major version at zero, even for breaking changes. Default: False.
+        zerover: Keep major version at zero, even for breaking changes.
 
     Returns:
         The bumped version.
@@ -44,7 +44,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ma
         version = version[1:]
 
     semver_version = VersionInfo.parse(version)
-    if part == "major" and (semver_version.major != 0 or not major_version_zero):
+    if part == "major" and (semver_version.major != 0 or not zerover):
         semver_version = semver_version.bump_major()
     elif part == "minor" or (part == "major" and semver_version.major == 0):
         semver_version = semver_version.bump_minor()
@@ -171,7 +171,7 @@ class Changelog:
         sections: list[str] | None = None,
         bump_latest: bool = False,
         bump: str | None = None,
-        major_version_zero: bool = False,
+        zerover: bool = True,
         rewrite_convention: dict[str, str] | None = None,
         minor_types: str | None = None,
     ):
@@ -186,7 +186,7 @@ class Changelog:
             sections: The sections to render (features, bug fixes, etc.).
             bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
             bump: Whether to try and bump to a given version.
-            major_version_zero: Keep major version at zero, even for breaking changes.
+            zerover: Keep major version at zero, even for breaking changes.
             rewrite_convention: A dictionary mapping type to section, intended to modify the default convention.TYPES.
                 If provided, the 'sections' argument becomes mandatory.
             minor_types: Types signifying a minor version change. String separated by commas.
@@ -194,7 +194,7 @@ class Changelog:
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
-        self.major_version_zero: bool = major_version_zero
+        self.zerover: bool = zerover
 
         # set provider
         if not isinstance(provider, ProviderRefParser):
@@ -422,7 +422,7 @@ class Changelog:
             if version in {"major", "minor", "patch"}:
                 # bump version (don't fail on non-semver versions)
                 try:
-                    last_version.planned_tag = bump(last_tag, version, major_version_zero=self.major_version_zero)  # type: ignore[arg-type]
+                    last_version.planned_tag = bump(last_tag, version, zerover=self.zerover)  # type: ignore[arg-type]
                 except ValueError:
                     return
             else:

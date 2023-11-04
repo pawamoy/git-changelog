@@ -65,7 +65,7 @@ DEFAULT_SETTINGS = {
     "sections": None,
     "template": "keepachangelog",
     "version_regex": DEFAULT_VERSION_REGEX,
-    "major_version_zero": False,
+    "zerover": True,
     "rewrite_convention": None,
     "minor_types": None,
 }
@@ -295,12 +295,12 @@ def get_parser() -> argparse.ArgumentParser:
         help="Omit empty versions from the output. Default: unset (false).",
     )
     parser.add_argument(
-        "--major-version-zero",
-        action="store_true",
-        dest="major_version_zero",
-        help="When true, breaking changes on a 0.x will remain as a 0.x version. "
-             "On false, a breaking change will bump a 0.x version to 1.0. major-version-zero. "
-             "Default: unset (false).",
+        "-Z",
+        "--no-zerover",
+        action="store_false",
+        dest="zerover",
+        help="By default, breaking changes on a 0.x don't bump the major version, maintaining it at 0. "
+        "With this option, a breaking change will bump a 0.x version to 1.0.",
     )
     parser.add_argument(
         "-v",
@@ -451,7 +451,7 @@ def build_and_render(
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
     provider: str | None = None,
     bump: str | None = None,
-    major_version_zero: bool = False,  # noqa: FBT001,FBT002
+    zerover: bool = True,  # noqa: FBT001,FBT002
     rewrite_convention: dict | None = None,
     minor_types: str | None = None,
 ) -> tuple[Changelog, str]:
@@ -476,7 +476,7 @@ def build_and_render(
         omit_empty_versions: Whether to omit empty versions from the output.
         provider: Provider class used by this repository.
         bump: Whether to try and bump to a given version.
-        major_version_zero: Keep major version at zero, even for breaking changes.
+        zerover: Keep major version at zero, even for breaking changes.
         rewrite_convention: A dictionary mapping type to section, intended to modify the default convention.TYPES.
             If provided, the 'sections' argument becomes mandatory.
         minor_types: Types signifying a minor version change. String separated by commas.
@@ -526,7 +526,7 @@ def build_and_render(
         parse_trailers=parse_trailers,
         sections=sections,
         bump=bump,
-        major_version_zero=major_version_zero,
+        zerover=zerover,
         rewrite_convention=rewrite_convention,
         minor_types=minor_types,
     )

@@ -152,9 +152,9 @@ options:
                         changes, bump the major number, else if there are new features,
                         bump the minor number, else just bump the patch number.
                         Default: None.
-  --major-version-zero  When true, breaking changes on a 0.x will remain as a 0.x version.
-                        On false, a breaking change will bump a 0.x version to 1.0. 
-                        major-version-zero. Default: unset (false).
+  -Z, --no-zerover      By default, breaking changes on a 0.x don't bump the
+                        major version, maintaining it at 0. With this option, a
+                        breaking change will bump a 0.x version to 1.0.
   -h, --help            Show this help message and exit.
   -i, --in-place        Insert new entries (versions missing from changelog)
                         in-place. An output file must be specified. With
