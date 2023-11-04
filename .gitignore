@@ -17,4 +17,3 @@ pdm.toml
 __pypackages__/
 .venv/
 .cache/
-.helix
