@@ -27,12 +27,13 @@ if TYPE_CHECKING:
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
-def bump(version: str, part: Literal["major", "minor", "patch"] = "patch") -> str:
+def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
     """Bump a version.
 
     Arguments:
         version: The version to bump.
         part: The part of the version to bump (major, minor, or patch).
+        zerover: Keep major version at zero, even for breaking changes.
 
     Returns:
         The bumped version.
@@ -43,7 +44,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch") -> st
         version = version[1:]
 
     semver_version = VersionInfo.parse(version)
-    if part == "major" and semver_version.major != 0:
+    if part == "major" and (semver_version.major != 0 or not zerover):
         semver_version = semver_version.bump_major()
     elif part == "minor" or (part == "major" and semver_version.major == 0):
         semver_version = semver_version.bump_minor()
@@ -170,6 +171,7 @@ class Changelog:
         sections: list[str] | None = None,
         bump_latest: bool = False,
         bump: str | None = None,
+        zerover: bool = True,
         filter_commits: str | None = None,
     ):
         """Initialization method.
@@ -183,11 +185,13 @@ class Changelog:
             sections: The sections to render (features, bug fixes, etc.).
             bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
             bump: Whether to try and bump to a given version.
+            zerover: Keep major version at zero, even for breaking changes.
             filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
+        self.zerover: bool = zerover
         self.filter_commits: str | None = filter_commits
 
         # set provider
@@ -423,7 +427,7 @@ class Changelog:
             if version in {"major", "minor", "patch"}:
                 # bump version (don't fail on non-semver versions)
                 try:
-                    last_version.planned_tag = bump(last_tag, version)  # type: ignore[arg-type]
+                    last_version.planned_tag = bump(last_tag, version, zerover=self.zerover)  # type: ignore[arg-type]
                 except ValueError:
                     return
             else:

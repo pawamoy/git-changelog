@@ -71,6 +71,7 @@ DEFAULT_SETTINGS = {
     "sections": None,
     "template": "keepachangelog",
     "version_regex": DEFAULT_VERSION_REGEX,
+    "zerover": True,
 }
 
 
@@ -307,11 +308,19 @@ def get_parser() -> argparse.ArgumentParser:
         help="Omit empty versions from the output. Default: unset (false).",
     )
     parser.add_argument(
+        "-Z",
+        "--no-zerover",
+        action="store_false",
+        dest="zerover",
+        help="By default, breaking changes on a 0.x don't bump the major version, maintaining it at 0. "
+        "With this option, a breaking change will bump a 0.x version to 1.0.",
+    )
+    parser.add_argument(
         "-F",
         "--filter-commits",
         action="store",
         dest="filter_commits",
-        help="The Git revision-range filter to use (e.g. 'v1.2.0..'). Default: no filter",
+        help="The Git revision-range filter to use (e.g. 'v1.2.0..'). Default: no filter.",
     )
     parser.add_argument(
         "-V",
@@ -465,6 +474,7 @@ def build_and_render(
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
     provider: str | None = None,
     bump: str | None = None,
+    zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
@@ -488,6 +498,7 @@ def build_and_render(
         omit_empty_versions: Whether to omit empty versions from the output.
         provider: Provider class used by this repository.
         bump: Whether to try and bump to a given version.
+        zerover: Keep major version at zero, even for breaking changes.
         filter_commits: The Git revision-range used to filter commits in git-log.
 
     Raises:
@@ -531,6 +542,7 @@ def build_and_render(
         parse_trailers=parse_trailers,
         sections=sections,
         bump=bump,
+        zerover=zerover,
         filter_commits=filter_commits,
     )
 
