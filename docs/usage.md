@@ -241,14 +241,16 @@ git-changelog --bump minor  # 1.2.3 -> 1.3.0
 git-changelog --bump patch  # 1.2.3 -> 1.2.4
 ```
 
-Note that, by default the major number won't be bumped if the latest version is 0.x. Instead, the minor number will be bumped:
+Note that, by default the major number won't be bumped if the latest version is 0.x.
+Instead, the minor number will be bumped:
 
 ```bash
 git-changelog --bump major  # 0.1.2 -> 0.2.0, same as minor because 0.x
 git-changelog --bump minor  # 0.1.2 -> 0.2.0
 ```
 
-In that case, when you are ready to bump to 1.0.0, just pass this version as value, or use the `-Z`, `--no-zerover` flag:
+In that case, when you are ready to bump to 1.0.0,
+just pass this version as value, or use the `-Z`, `--no-zerover` flag:
 
 ```bash
 git-changelog --bump 1.0.0
@@ -511,33 +513,6 @@ repository = "."
 sections = "fix,maint"
 template = "keepachangelog"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
-```
-
-## Custom types
-
-Configuration files offer greater flexibility compared to using CLI arguments. 
-You can overwrite default types with the `rewrite-convention` parameter. 
-
-In that case `sections` is required and `minor-types` is strongly recommended.
-
-This can be useful for custom conventions or translating sections in your changelog.
-
-```toml
-[tool.git-changelog]
-convention = "conventional"
-sections = "build,chore,doc,n,feat"
-minor-types = "feat,n"
-...
-
-[tool.git-changelog.rewrite-convention]
-build = "Build"
-chore = "Chore"
-ci = "Continuous Integration"
-deps = "Dependencies"
-doc = "Documentation"
-feat = "Features"
-n = "Notes"
-
 ```
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/

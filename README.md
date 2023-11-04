@@ -149,7 +149,8 @@ options:
                         of unreleased commits. Can be one of 'auto',
                         'major', 'minor', 'patch' or a valid semver version
                         (eg. 1.2.3). With 'auto', if a commit contains breaking
-                        changes, bump the major number, else if there are new features,
+                        changes, bump the major number (or the minor number
+                        for 0.x versions), else if there are new features,
                         bump the minor number, else just bump the patch number.
                         Default: None.
   -Z, --no-zerover      By default, breaking changes on a 0.x don't bump the
