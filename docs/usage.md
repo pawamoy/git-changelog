@@ -196,10 +196,22 @@ for each commit message convetions.
 Both are very similar, they just differ with the formatting a bit.
 We stronly recommend the `keepachangelog` format.
 
+Use the `-t`, `--template` option to specify the template to use:
+
+```bash
+git-changelog --template keepachangelog
+```
+
 You can also write and use your own changelog templates.
 Templates are single files written using the [Jinja][jinja] templating engine.
 You can get inspiration from
 [the source of our built-in templates](https://github.com/pawamoy/git-changelog/tree/master/src/git_changelog/templates).
+
+Prefix value passed to the `--template` option with `path:` to use a custom template:
+
+```bash
+git-changelog --template path:mytemplate.md
+```
 
 ## Filter commits
 
