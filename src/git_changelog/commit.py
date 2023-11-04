@@ -161,7 +161,6 @@ class CommitConvention(ABC):
     TYPE_REGEX: ClassVar[Pattern]
     BREAK_REGEX: ClassVar[Pattern]
     DEFAULT_RENDER: ClassVar[list[str]]
-    MINOR_TYPES: ClassVar[list[str]]
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
@@ -199,39 +198,6 @@ class CommitConvention(ABC):
             """,
         )
 
-    def is_minor(self, commit_type: str) -> bool:
-        """Tell if this commit is worth a minor bump.
-
-        Arguments:
-            commit_type: The commit type.
-
-        Returns:
-            Whether it's a minor commit.
-        """
-        return commit_type in [self.TYPES[t] for t in self.MINOR_TYPES if t in self.TYPES]
-
-    @classmethod
-    def replace_types(cls, types: dict[str, str]) -> None:
-        """Replace default TYPES with dict.
-
-        Arguments:
-            types: Dict with custom types.
-        """
-        cls.TYPES = types
-
-    @classmethod
-    def update_minor_list(cls, commit_type: str) -> None:
-        """Updates the MINOR_TYPES class variable with the provided comma-separated commit types.
-
-        Arguments:
-            commit_type (str): A comma-separated string of commit types to be considered as minor.
-
-        Example:
-            CommitConvention.update_minor_list("feat,fix,update")
-        """
-        cls.MINOR_TYPES = commit_type.split(",")
-
-
 class BasicConvention(CommitConvention):
     """Basic commit message convention."""
 
@@ -243,7 +209,6 @@ class BasicConvention(CommitConvention):
         "merge": "Merged",
         "doc": "Documented",
     }
-    MINOR_TYPES: ClassVar[list] = ["add"]
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -320,7 +285,6 @@ class AngularConvention(CommitConvention):
         "test": "Tests",
         "tests": "Tests",
     }
-    MINOR_TYPES: ClassVar[list] = ["feat"]
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,

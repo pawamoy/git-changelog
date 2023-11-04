@@ -254,7 +254,8 @@ just pass this version as value, or use the `-Z`, `--no-zerover` flag:
 
 ```bash
 git-changelog --bump 1.0.0
-git-changelog --bump major -Z
+git-changelog --bump auto --no-zerover
+git-changelog --bump major --no-zerover
 ```
 
 If you use *git-changelog* in CI, to update your changelog automatically,

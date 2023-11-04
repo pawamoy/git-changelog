@@ -66,8 +66,6 @@ DEFAULT_SETTINGS = {
     "template": "keepachangelog",
     "version_regex": DEFAULT_VERSION_REGEX,
     "zerover": True,
-    "rewrite_convention": None,
-    "minor_types": None,
 }
 
 
@@ -452,8 +450,6 @@ def build_and_render(
     provider: str | None = None,
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
-    rewrite_convention: dict | None = None,
-    minor_types: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -477,9 +473,6 @@ def build_and_render(
         provider: Provider class used by this repository.
         bump: Whether to try and bump to a given version.
         zerover: Keep major version at zero, even for breaking changes.
-        rewrite_convention: A dictionary mapping type to section, intended to modify the default convention.TYPES.
-            If provided, the 'sections' argument becomes mandatory.
-        minor_types: Types signifying a minor version change. String separated by commas.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -504,10 +497,6 @@ def build_and_render(
     if in_place and output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
 
-    if rewrite_convention and not sections:
-        raise ValueError("When using 'rewrite-convention', please specify the "
-                         "sections you wish to render, e.g., sections='feat,docs'.")
-
     # get provider
     provider_class = providers[provider] if provider else None
 
@@ -527,8 +516,6 @@ def build_and_render(
         sections=sections,
         bump=bump,
         zerover=zerover,
-        rewrite_convention=rewrite_convention,
-        minor_types=minor_types,
     )
 
     # remove empty versions from changelog data
