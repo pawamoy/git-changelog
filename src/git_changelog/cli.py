@@ -57,6 +57,7 @@ DEFAULT_SETTINGS = {
     "bump": None,
     "bump_latest": None,
     "convention": "basic",
+    "filter_commits": None,
     "in_place": False,
     "input": DEFAULT_CHANGELOG_FILE,
     "marker_line": DEFAULT_MARKER_LINE,
