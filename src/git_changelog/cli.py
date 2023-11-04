@@ -286,8 +286,8 @@ def get_parser() -> argparse.ArgumentParser:
         "--template",
         choices=Templates(("angular", "keepachangelog")),
         dest="template",
-        help="The Jinja2 template to use. Prefix it with 'path:'' to specify the path "
-        "to a directory containing a file named 'changelog.md'. "
+        help="The Jinja2 template to use. Prefix it with 'path:' to specify the path "
+        "to a Jinja templated file. "
         f"Default: '{DEFAULT_SETTINGS['template']}'.",
     )
     parser.add_argument(
