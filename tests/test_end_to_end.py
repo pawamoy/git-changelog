@@ -8,6 +8,7 @@ import shutil
 import subprocess
 from functools import partial
 from typing import TYPE_CHECKING, Iterator
+from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 
@@ -189,19 +190,46 @@ def test_no_duplicate_rendering(repo: Path, tmp_path: Path) -> None:
     assert rendered.count(latest_tag) == 3
 
 
-def test_removing_tokens_from_remotes(repo: Path) -> None:
-    """Remove GitHub tokens from remotes.
+def test_removing_credentials_from_remotes(repo: Path) -> None:
+    """Remove credentials from remotes.
 
     Parameters:
         repo: Temporary Git repository (fixture).
     """
     git = partial(_git, "-C", str(repo))
-    tokens = [
+    credentials = [
         "ghp_abcdefghijklmnOPQRSTUVWXYZ0123456789",
         "ghs_abcdefghijklmnOPQRSTUVWXYZ0123456789",
         "github_pat_abcdefgOPQRS0123456789_abcdefghijklmnOPQRSTUVWXYZ0123456789abcdefgOPQRS0123456789A",
+        "user:password",
     ]
-    for token in tokens:
-        git("remote", "set-url", "origin", f"https://{token}@github.com:example/example")
+    for creds in credentials:
+        git("remote", "set-url", "origin", f"https://{creds}@github.com:example/example")
         changelog = Changelog(repo)
-        assert token not in changelog.remote_url
+        assert creds not in changelog.remote_url
+        assert urlunsplit(urlsplit(changelog.remote_url)) == changelog.remote_url
+
+
+def test_filter_commits_option(repo: Path) -> None:
+    """Filter commit by revision-range argument.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    git = partial(_git, "-C", str(repo))
+    is_tag_with_v = git("tag").split("\n")[0].startswith("v")
+
+    range = "1.0.0.."
+    expected = ["", "1.1.0"]
+    if is_tag_with_v:
+        range = "v1.0.0.."
+        expected = ["", "v1.1.0"]
+
+    changelog = Changelog(repo, filter_commits=range)
+    taglist = [version.tag for version in changelog.versions_list]
+
+    assert taglist == expected
+
+    err_msg = "Maybe the provided git-log revision-range is not valid"
+    with pytest.raises(ValueError, match=err_msg):
+        changelog = Changelog(repo, filter_commits="invalid")

@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import datetime
 import os
-import re
 import sys
 import warnings
-from subprocess import check_output
+from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
+from urllib.parse import urlsplit, urlunsplit
 
 from semver import VersionInfo
 
@@ -172,6 +172,7 @@ class Changelog:
         bump_latest: bool = False,
         bump: str | None = None,
         zerover: bool = True,
+        filter_commits: str | None = None,
     ):
         """Initialization method.
 
@@ -185,11 +186,13 @@ class Changelog:
             bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
             bump: Whether to try and bump to a given version.
             zerover: Keep major version at zero, even for breaking changes.
+            filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
         """
         self.repository: str | Path = repository
         self.parse_provider_refs: bool = parse_provider_refs
         self.parse_trailers: bool = parse_trailers
         self.zerover: bool = zerover
+        self.filter_commits: str | None = filter_commits
 
         # set provider
         if not isinstance(provider, ProviderRefParser):
@@ -281,12 +284,14 @@ class Changelog:
         if git_url.endswith(".git"):
             git_url = git_url[:-4]
 
-        # Remove GitHub token from the URL.
-        # See https://gist.github.com/magnetikonline/073afe7909ffdd6f10ef06a00bc3bc88.
-        # Personal access tokens (classic): ^ghp_[a-zA-Z0-9]{36}$
-        # Personal access tokens (fine-grained): ^github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}$
-        # GitHub Actions tokens: ^ghs_[a-zA-Z0-9]{36}$
-        return re.sub(r"(gh[ps]_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})@", "", git_url)
+        # Remove credentials from the URL.
+        if git_url.startswith(("http://", "https://")):
+            # (addressing scheme, network location, path, query, fragment identifier)
+            urlparts = list(urlsplit(git_url))
+            urlparts[1] = urlparts[1].split("@", 1)[-1]
+            git_url = urlunsplit(urlparts)
+
+        return git_url
 
     def get_log(self) -> str:
         """Get the `git log` output.
@@ -294,6 +299,15 @@ class Changelog:
         Returns:
             The output of the `git log` command, with a particular format.
         """
+        if self.filter_commits:
+            try:
+                return self.run_git("log", "--date=unix", "--format=" + self.FORMAT, self.filter_commits)
+            except CalledProcessError as e:
+                raise ValueError(
+                    f"An error ocurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
+                ) from e
+
+        # No revision-range provided. Call normally
         return self.run_git("log", "--date=unix", "--format=" + self.FORMAT)
 
     def parse_commits(self) -> list[Commit]:

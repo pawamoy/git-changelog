@@ -19,13 +19,12 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Pattern, Sequence, TextIO
+from typing import Any, Pattern, Sequence, TextIO
 
-import toml
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
-from git_changelog import templates
+from git_changelog import debug, templates
 from git_changelog.build import Changelog, Version
 from git_changelog.commit import (
     AngularConvention,
@@ -34,6 +33,12 @@ from git_changelog.commit import (
     ConventionalCommitConvention,
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+
+# TODO: Remove once support for Python 3.10 is dropped.
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
@@ -52,6 +57,7 @@ DEFAULT_SETTINGS = {
     "bump": None,
     "bump_latest": None,
     "convention": "basic",
+    "filter_commits": None,
     "in_place": False,
     "input": DEFAULT_CHANGELOG_FILE,
     "marker_line": DEFAULT_MARKER_LINE,
@@ -99,6 +105,15 @@ providers: dict[str, type[ProviderRefParser]] = {
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
 }
+
+
+class _DebugInfo(argparse.Action):
+    def __init__(self, nargs: int | str | None = 0, **kwargs: Any) -> None:
+        super().__init__(nargs=nargs, **kwargs)
+
+    def __call__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
+        debug.print_debug_info()
+        sys.exit(0)
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -272,8 +287,8 @@ def get_parser() -> argparse.ArgumentParser:
         "--template",
         choices=Templates(("angular", "keepachangelog")),
         dest="template",
-        help="The Jinja2 template to use. Prefix it with 'path:'' to specify the path "
-        "to a directory containing a file named 'changelog.md'. "
+        help="The Jinja2 template to use. Prefix it with 'path:' to specify the path "
+        "to a Jinja templated file. "
         f"Default: '{DEFAULT_SETTINGS['template']}'.",
     )
     parser.add_argument(
@@ -301,12 +316,21 @@ def get_parser() -> argparse.ArgumentParser:
         "With this option, a breaking change will bump a 0.x version to 1.0.",
     )
     parser.add_argument(
-        "-v",
+        "-F",
+        "--filter-commits",
+        action="store",
+        dest="filter_commits",
+        help="The Git revision-range filter to use (e.g. 'v1.2.0..'). Default: no filter.",
+    )
+    parser.add_argument(
+        "-V",
         "--version",
         action="version",
-        version="%(prog)s " + get_version(),  # (%)
+        version=f"%(prog)s {debug.get_version()}",
         help="Show the current version of the program and exit.",
     )
+    parser.add_argument("--debug-info", action=_DebugInfo, help="Print debug information.")
+
     return parser
 
 
@@ -349,7 +373,8 @@ def read_config(
         if not _path.exists():
             continue
 
-        new_settings = toml.load(_path)
+        with _path.open("rb") as file:
+            new_settings = tomllib.load(file)
         if _path.name == "pyproject.toml":
             new_settings = new_settings.get("tool", {}).get("git-changelog", {}) or new_settings.get(
                 "tool.git-changelog",
@@ -450,6 +475,7 @@ def build_and_render(
     provider: str | None = None,
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
+    filter_commits: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -473,6 +499,7 @@ def build_and_render(
         provider: Provider class used by this repository.
         bump: Whether to try and bump to a given version.
         zerover: Keep major version at zero, even for breaking changes.
+        filter_commits: The Git revision-range used to filter commits in git-log.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -516,6 +543,7 @@ def build_and_render(
         sections=sections,
         bump=bump,
         zerover=zerover,
+        filter_commits=filter_commits,
     )
 
     # remove empty versions from changelog data
@@ -627,7 +655,7 @@ def output_release_notes(
     input_file: str = "CHANGELOG.md",
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
-    output_file: str | TextIO = sys.stdout,
+    output_file: str | TextIO | None = None,
 ) -> None:
     """Print release notes from existing changelog.
 
@@ -639,6 +667,7 @@ def output_release_notes(
         marker_line: The insertion marker line in the changelog.
         output_file: Where to print/write the release notes.
     """
+    output_file = output_file or sys.stdout
     release_notes = get_release_notes(input_file, version_regex, marker_line)
     try:
         output_file.write(release_notes)  # type: ignore[union-attr]
@@ -665,7 +694,7 @@ def main(args: list[str] | None = None) -> int:
             input_file=settings["input"],
             version_regex=settings["version_regex"],
             marker_line=settings["marker_line"],
-            output_file=settings["output"],
+            output_file=None,  # force writing to stdout
         )
         return 0
 

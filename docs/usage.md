@@ -196,10 +196,45 @@ for each commit message convetions.
 Both are very similar, they just differ with the formatting a bit.
 We stronly recommend the `keepachangelog` format.
 
+Use the `-t`, `--template` option to specify the template to use:
+
+```bash
+git-changelog --template keepachangelog
+```
+
 You can also write and use your own changelog templates.
 Templates are single files written using the [Jinja][jinja] templating engine.
 You can get inspiration from
 [the source of our built-in templates](https://github.com/pawamoy/git-changelog/tree/master/src/git_changelog/templates).
+
+Prefix value passed to the `--template` option with `path:` to use a custom template:
+
+```bash
+git-changelog --template path:mytemplate.md
+```
+
+## Filter commits
+
+Sometimes it may be useful to use a limited set of commits, for example, if your
+project has migrated to semver recently and you want to ignore old non-conventional commits.
+
+This is possible through the option `-F`, `--filter-commits`, which takes a
+*revision-range* to select the commits that will be used in the changelog.
+This option will pass the [revision-range](https://git-scm.com/docs/git-log#
+Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow 
+the rules defined by Git.
+
+For example, to use commits from tag `0.5.0` up to latest:
+
+```bash
+git-changelog --filter-commits "0.5.0.."
+```
+
+Or using the commit hash:
+
+```bash
+git-changelog --filter-commits "2c0dbb8.."
+```
 
 ## Understand the relationship with SemVer
 
@@ -449,7 +484,6 @@ Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
 
-
 ## Configuration files
 
 Project-wise, permanent configuration of *git-changelog* is possible.
@@ -486,6 +520,7 @@ for most of the command line options:
 bump = "auto"
 convention = "basic"
 in-place = false
+filter-commits = "0.5.0.."
 marker-line = "<!-- insertion marker -->"
 output = "output.log"
 parse-refs = false

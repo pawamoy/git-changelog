@@ -7,9 +7,9 @@ import sys
 from typing import TYPE_CHECKING, Any, Iterator
 
 import pytest
-import toml
+import tomli_w
 
-from git_changelog import cli
+from git_changelog import cli, debug
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -83,7 +83,6 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
         (None, None),
         ("", None),
         (",,", None),
-        ("force-null", None),
         ("a, b, ", ["a", "b"]),
         ("a,  , ", ["a"]),
         ("a, b, c", ["a", "b", "c"]),
@@ -116,15 +115,15 @@ def test_config_reading(
         config_content: dict[str, Any] = {}
 
         if sections is not None:
-            config_content["sections"] = None if sections == "force-null" else sections
+            config_content["sections"] = sections
 
         if parse_refs is not None:
             config_content["parse_refs"] = parse_refs
 
         config_fname = "custom-file.toml" if is_pyproject is None else ".git-changelog.toml"
         config_fname = "pyproject.toml" if is_pyproject else config_fname
-        (tmp_path / config_fname).write_text(
-            toml.dumps(
+        tmp_path.joinpath(config_fname).write_text(
+            tomli_w.dumps(
                 config_content if not is_pyproject else {"tool": {"git-changelog": config_content}},
             ),
         )
@@ -152,7 +151,7 @@ def test_settings_warning(
         args: list[str] = []
         if value is not None:
             (tmp_path / ".git-changelog.toml").write_text(
-                toml.dumps({"bump_latest": value}),
+                tomli_w.dumps({"bump_latest": value}),
             )
         else:
             args = ["--bump-latest"]
@@ -173,3 +172,30 @@ def test_settings_warning(
                 cli.parse_settings(["--bump-latest"])
 
                 assert len(record) == 2
+
+
+def test_show_version(capsys: pytest.CaptureFixture) -> None:
+    """Show version.
+
+    Parameters:
+        capsys: Pytest fixture to capture output.
+    """
+    with pytest.raises(SystemExit):
+        cli.main(["-V"])
+    captured = capsys.readouterr()
+    assert debug.get_version() in captured.out
+
+
+def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
+    """Show debug information.
+
+    Parameters:
+        capsys: Pytest fixture to capture output.
+    """
+    with pytest.raises(SystemExit):
+        cli.main(["--debug-info"])
+    captured = capsys.readouterr().out.lower()
+    assert "python" in captured
+    assert "system" in captured
+    assert "environment" in captured
+    assert "packages" in captured
