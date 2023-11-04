@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.4.0](https://github.com/pawamoy/git-changelog/releases/tag/2.4.0) - 2023-11-04
+
+<small>[Compare with 2.3.2](https://github.com/pawamoy/git-changelog/compare/2.3.2...2.4.0)</small>
+
+### Features
+
+- Add option to enable/disable "zerover" behavior ([7d0c259](https://github.com/pawamoy/git-changelog/commit/7d0c259f2ec4c5666d15a3616de8765f52fb282c) by Mark Minakov). [Issue #57](https://github.com/pawamoy/git-changelog/issues/57), [PR #58](https://github.com/pawamoy/git-changelog/pull/58), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+- Add `-F,--filter-commits` to filter by revision-range ([e016965](https://github.com/pawamoy/git-changelog/commit/e0169654c917497ce88966fca1baf47d0a4586f7) by Pedro Brochado). [Issue #63](https://github.com/pawamoy/git-changelog/issues/63), [Issue #16](https://github.com/pawamoy/git-changelog/issues/16), [PR #64](https://github.com/pawamoy/git-changelog/pull/64), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+
+### Bug Fixes
+
+- Always output release notes to stdout ([1e44bca](https://github.com/pawamoy/git-changelog/commit/1e44bcaf82da9c5be4e853bf504fcd8faae06a3d) by Timothée Mazzucotelli). [Issue #65](https://github.com/pawamoy/git-changelog/issues/65)
+
 ## [2.3.2](https://github.com/pawamoy/git-changelog/releases/tag/2.3.2) - 2023-10-25
 
 <small>[Compare with 2.3.1](https://github.com/pawamoy/git-changelog/compare/2.3.1...2.3.2)</small>
