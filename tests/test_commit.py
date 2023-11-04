@@ -2,17 +2,10 @@
 
 from __future__ import annotations
 
-from abc import ABCMeta
-from typing import Generator
-
 import pytest
 
 from git_changelog.commit import (
-    AngularConvention,
-    BasicConvention,
     Commit,
-    CommitConvention,
-    ConventionalCommitConvention,
 )
 
 

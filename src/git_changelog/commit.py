@@ -198,6 +198,7 @@ class CommitConvention(ABC):
             """,
         )
 
+
 class BasicConvention(CommitConvention):
     """Basic commit message convention."""
 
@@ -209,6 +210,8 @@ class BasicConvention(CommitConvention):
         "merge": "Merged",
         "doc": "Documented",
     }
+
+    TYPE_REGEX: ClassVar[Pattern] = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -219,11 +222,6 @@ class BasicConvention(CommitConvention):
         TYPES["change"],
         TYPES["remove"],
     ]
-
-    @property
-    def type_regex(self) -> re.Pattern:
-        """Type regex."""
-        return re.compile(r"^(?P<type>(%s))" % "|".join(self.TYPES.keys()), re.I)
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         commit_type = self.parse_type(commit.subject)
@@ -248,10 +246,21 @@ class BasicConvention(CommitConvention):
         Returns:
             The commit type.
         """
-        type_match = self.type_regex.match(commit_subject)
+        type_match = self.TYPE_REGEX.match(commit_subject)
         if type_match:
             return self.TYPES.get(type_match.groupdict()["type"].lower(), "")
         return ""
+
+    def is_minor(self, commit_type: str) -> bool:
+        """Tell if this commit is worth a minor bump.
+
+        Arguments:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a minor commit.
+        """
+        return commit_type == self.TYPES["add"]
 
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
@@ -285,6 +294,9 @@ class AngularConvention(CommitConvention):
         "test": "Tests",
         "tests": "Tests",
     }
+    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
+    )
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -296,13 +308,6 @@ class AngularConvention(CommitConvention):
         TYPES["refactor"],
         TYPES["perf"],
     ]
-
-    @property
-    def subject_regex(self) -> re.Pattern:
-        """Subject regex."""
-        return re.compile(
-            r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(self.TYPES.keys())),  # (%)
-        )
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
@@ -329,12 +334,23 @@ class AngularConvention(CommitConvention):
         Returns:
             The parsed data.
         """
-        subject_match = self.subject_regex.match(commit_subject)
+        subject_match = self.SUBJECT_REGEX.match(commit_subject)
         if subject_match:
             dct = subject_match.groupdict()
             dct["type"] = self.TYPES[dct["type"]]
             return dct
         return {"type": "", "scope": "", "subject": commit_subject}
+
+    def is_minor(self, commit_type: str) -> bool:
+        """Tell if this commit is worth a minor bump.
+
+        Arguments:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a minor commit.
+        """
+        return commit_type == self.TYPES["feat"]
 
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
@@ -353,13 +369,9 @@ class ConventionalCommitConvention(AngularConvention):
 
     TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
     DEFAULT_RENDER: ClassVar[list[str]] = AngularConvention.DEFAULT_RENDER
-
-    @property
-    def subject_regex(self) -> re.Pattern:
-        """Subject regex."""
-        return re.compile(
-            r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(self.TYPES.keys())),  # (%)
-        )
+    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
+        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
+    )
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
