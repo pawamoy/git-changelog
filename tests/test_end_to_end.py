@@ -208,3 +208,28 @@ def test_removing_credentials_from_remotes(repo: Path) -> None:
         changelog = Changelog(repo)
         assert creds not in changelog.remote_url
         assert urlunsplit(urlsplit(changelog.remote_url)) == changelog.remote_url
+
+
+def test_filter_commits_option(repo: Path) -> None:
+    """Filter commit by revision-range argument.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    git = partial(_git, "-C", str(repo))
+    is_tag_with_v = git("tag").split("\n")[0].startswith("v")
+
+    range = "1.0.0.."
+    expected = ["", "1.1.0"]
+    if is_tag_with_v:
+        range = "v1.0.0.."
+        expected = ["", "v1.1.0"]
+
+    changelog = Changelog(repo, filter_commits=range)
+    taglist = [version.tag for version in changelog.versions_list]
+
+    assert taglist == expected
+
+    err_msg = "Maybe the provided git-log revision-range is not valid"
+    with pytest.raises(ValueError, match=err_msg):
+        changelog = Changelog(repo, filter_commits="invalid")
