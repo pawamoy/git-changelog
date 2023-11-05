@@ -551,6 +551,69 @@ template = "keepachangelog"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
 ```
 
+### Commit conventions: updating defaults
+
+Predefined code conventions can be altered within settings files.
+For example, the following `pyproject.toml` would edit the *basic*
+convention:
+
+```toml
+[tool.git-changelog]
+sections = "fix,add,change,remove,doc,maint"
+
+[tool.git-changelog.conventions.basic]
+merge = ''
+doc = 'Documentation'
+maint = 'Maintenance'
+```
+
+This configuration would remove the `merge` type of commits, and
+introduce the `maint` commit set.
+It also overrides the title of `doc` commits, from `"Documented"` to `"Documentation"`.
+Finally, and to keep synchrony with the changes generator, the `sections` general setting
+is also specified.
+
+### Commit conventions: creating a custom convention
+
+```toml
+[tool.git-changelog]
+convention = 'myconvention'
+
+[tool.git-changelog.conventions.myconvention]
+fix = 'Bug fixes'
+enh = 'New features and enhancements'
+feat = 'New features and enhancements'
+doc = 'Documentation'
+docs = 'Documentation'
+maint = 'Maintenance and continuous integration'
+chore = 'Maintenance and continuous integration'
+ci = 'Maintenance and continuous integration'
+sty = 'Code style and comments'
+style = 'Code style and comments'
+```
+
+If the `sections` setting is not present and the convention selected is `myconvention`,
+then `sections` will be generated based in the order the commit types are specified.
+In the above example, this is equivalent to:
+
+```toml
+[tool.git-changelog]
+convention = 'myconvention'
+sections = ['fix', 'enh', 'doc', 'maint', 'sty']
+
+[tool.git-changelog.conventions.myconvention]
+fix = 'Bug fixes'
+enh = 'New features and enhancements'
+feat = 'New features and enhancements'
+doc = 'Documentation'
+docs = 'Documentation'
+maint = 'Maintenance and continuous integration'
+chore = 'Maintenance and continuous integration'
+ci = 'Maintenance and continuous integration'
+sty = 'Code style and comments'
+style = 'Code style and comments'
+```
+
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/
 [jinja]: https://jinja.palletsprojects.com/en/3.1.x/
