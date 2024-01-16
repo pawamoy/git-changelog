@@ -16,10 +16,11 @@ validation:
 nav:
 - Home:
   - Overview: index.md
-  - Usage: usage.md
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
+- Usage: usage.md
+- CLI reference: cli.md
 # defer to gen-files + literate-nav
 - API reference:
   - git-changelog: reference/
@@ -79,6 +80,7 @@ markdown_extensions:
 - admonition
 - callouts
 - footnotes
+- md_in_html
 - pymdownx.emoji:
     emoji_index: !!python/name:material.extensions.emoji.twemoji
     emoji_generator: !!python/name:material.extensions.emoji.to_svg

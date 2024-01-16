@@ -67,144 +67,24 @@ python3.8 -m pip install --user pipx
 pipx install git-changelog
 ```
 
-## Usage (command-line)
+## Usage
 
 ```
-usage: git-changelog [-b] [-h] [-i] [-g VERSION_REGEX] [-m MARKER_LINE]
-                     [-o OUTPUT] [-r] [-R] [-I INPUT]
-                     [-c {angular,conventional,basic}] [-s SECTIONS]
-                     [-t {angular,keepachangelog}] [-T] [-E] [-v]
-                     [REPOSITORY]
-
-Automatic Changelog generator using Jinja2 templates.
-
-This tool parses your commit messages to extract useful data
-that is then rendered using Jinja2 templates, for example to
-a changelog file formatted in Markdown.
-
-Each Git tag will be treated as a version of your project.
-Each version contains a set of commits, and will be an entry
-in your changelog. Commits in each version will be grouped
-by sections, depending on the commit convention you follow.
-
-BASIC CONVENTION
-
-Default sections:
-- add: Added
-- fix: Fixed
-- change: Changed
-- remove: Removed
-
-Additional sections:
-- merge: Merged
-- doc: Documented
-
-ANGULAR CONVENTION
-
-Default sections:
-- feat: Features
-- fix: Bug Fixes
-- revert: Reverts
-- ref, refactor: Code Refactoring
-- perf: Performance Improvements
-
-Additional sections:
-- build: Build
-- chore: Chore
-- ci: Continuous Integration
-- deps: Dependencies
-- doc, docs: Docs
-- style: Style
-- test, tests: Tests
-
-CONVENTIONALCOMMIT CONVENTION
-
-Default sections:
-- feat: Features
-- fix: Bug Fixes
-- revert: Reverts
-- ref, refactor: Code Refactoring
-- perf: Performance Improvements
-
-Additional sections:
-- build: Build
-- chore: Chore
-- ci: Continuous Integration
-- deps: Dependencies
-- doc, docs: Docs
-- style: Style
-- test, tests: Tests
-
-positional arguments:
-  REPOSITORY            The repository path, relative or absolute. Default: .
-
-options:
-  -b, --bump-latest     Deprecated, use --bump=auto instead.
-                        Guess the new latest version by bumping the previous
-                        one based on the set of unreleased commits. For
-                        example, if a commit contains breaking changes, bump
-                        the major number (or the minor number for 0.x
-                        versions). Else if there are new features, bump the
-                        minor number. Else just bump the patch number.
-                        Default: False.
-  --bump VERSION        Specify the bump from latest version for the set
-                        of unreleased commits. Can be one of 'auto',
-                        'major', 'minor', 'patch' or a valid semver version
-                        (eg. 1.2.3). With 'auto', if a commit contains breaking
-                        changes, bump the major number (or the minor number
-                        for 0.x versions), else if there are new features,
-                        bump the minor number, else just bump the patch number.
-                        Default: None.
-  -Z, --no-zerover      By default, breaking changes on a 0.x don't bump the
-                        major version, maintaining it at 0. With this option, a
-                        breaking change will bump a 0.x version to 1.0.
-  -h, --help            Show this help message and exit.
-  -i, --in-place        Insert new entries (versions missing from changelog)
-                        in-place. An output file must be specified. With
-                        custom templates, you can pass two additional
-                        arguments: --version-regex and --marker-line. When
-                        writing in-place, an 'in_place' variable will be
-                        injected in the Jinja context, allowing to adapt the
-                        generated contents (for example to skip changelog
-                        headers or footers). Default: False.
-  -g, --version-regex VERSION_REGEX
-                        A regular expression to match versions in the existing
-                        changelog (used to find the latest release) when
-                        writing in-place. The regular expression must be a
-                        Python regex with a 'version' named group. Default:
-                        ^## \[(?P<version>v?[^\]]+).
-  -m, --marker-line MARKER_LINE
-                        A marker line at which to insert new entries (versions
-                        missing from changelog). If two marker lines are
-                        present in the changelog, the contents between those
-                        two lines will be overwritten (useful to update an
-                        'Unreleased' entry for example). Default:
-                        <!-- insertion marker -->.
-  -o, --output OUTPUT   Output to given file. Default: stdout.
-  -p {github,gitlab}, --provider {github,gitlab}
-                        Explicitly specify the repository provider.
-  -r, --parse-refs      Parse provider-specific references in commit messages
-                        (GitHub/GitLab/Bitbucket issues, PRs, etc.). Default: False.
-  -R, --release-notes   Output release notes to stdout based on the last entry
-                        in the changelog. Default: False.
-  -I, --input INPUT     Read from given file when creating release notes.
-                        Default: CHANGELOG.md.
-  -c, --style, --commit-style, --convention {angular,conventional,basic}
-                        The commit convention to match against. Default:
-                        basic.
-  -s, --sections SECTIONS
-                        A comma-separated list of sections to render. See the
-                        available sections for each supported convention in
-                        the description. Default: None.
-  -t {angular,keepachangelog}, --template {angular,keepachangelog}
-                        The Jinja2 template to use. Prefix with "path:" to
-                        specify the path to a directory containing a file
-                        named "changelog.md". Default: keepachangelog.
-  -T, --trailers, --git-trailers
-                        Parse Git trailers in the commit message. See
-                        https://git-scm.com/docs/git-interpret-trailers.
-                        Default: False.
-  -E, --omit-empty-versions
-                        Omit empty versions in the output. Default: False.
-  -v, --version         Show the current version of the program and exit.
+git-changelog [--config-file [PATH ...]] [-b] [-B VERSION] [-h] [-i]
+              [-g VERSION_REGEX] [-m MARKER_LINE] [-o OUTPUT]
+              [-p {github,gitlab,bitbucket}] [-r] [-R] [-I INPUT]
+              [-c {angular,conventional,basic}] [-s SECTIONS]
+              [-t {angular,keepachangelog}] [-T] [-E] [-Z] [-F FILTER_COMMITS]
+              [-V] [--debug-info]
+              [REPOSITORY]
 ```
+
+Simply run `git-changelog` in your repository to output a changelog on standard output.
+To show the different options and their descriptions, use `git-changelog -h`.
+
+- See [Quick usage](http://pawamoy.github.io/git-changelog/usage/#quick-usage)
+  for some command line examples.
+- See [Configuration](https://pawamoy.github.io/git-changelog/usage/#configuration-files)
+  to learn how to configure *git-changelog* for your project.
+- See the [CLI reference](https://pawamoy.github.io/git-changelog/cli)
+  and the [API reference](https://pawamoy.github.io/git-changelog/reference) for more information.

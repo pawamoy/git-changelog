@@ -1,3 +1,8 @@
+---
+hide:
+- navigation
+---
+
 # Usage
 
 *git-changelog* parses your commit messages to extract useful data
@@ -76,7 +81,78 @@ build_and_render(
 
 The following sections explain in more details all the features of *git-changelog*.
 
+## Configuration files
+
+[(--config-file)](cli.md#config_file)
+
+Project-wise, permanent configuration of *git-changelog* is possible.
+By default, *git-changelog* will search for the existence a suitable configuration
+in the `pyproject.toml` file or otherwise, the following configuration files 
+in this particular order:
+
+- `.git-changelog.toml`
+- `config/git-changelog.toml`
+- `.config/git-changelog.toml`
+- `<current-user-config-path>/git-changelog.toml`
+
+In the last case (`<current-user-config-path>/git-changelog.toml`), the `<current-user-config-path>`
+is platform-dependent and will be automatically inferred from your settings.
+In Unix systems, this will typically point at `$HOME/.config/git-changelog.toml`.
+The use of a configuration file can be disabled or overridden with the `--config-file`
+option.
+To disable the configuration file, pass `no`, `none`, `false`, `off`, `0` or empty string (`''`):
+
+```bash
+git-changelog --config-file no
+```
+
+To override the configuration file, pass the path to the new file:
+
+```bash
+git-changelog --config-file $HOME/.custom-git-changelog-config
+```
+
+The configuration file must be written in TOML language, and may take values
+for most of the command line options:
+
+```toml
+bump = "auto"
+convention = "basic"
+in-place = false
+filter-commits = "0.5.0.."
+marker-line = "<!-- insertion marker -->"
+output = "output.log"
+parse-refs = false
+parse-trailers = false
+repository = "."
+sections = ["fix", "maint"]
+template = "angular"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+provider = "gitlab"
+zerover = true
+```
+
+In the case of configuring *git-changelog* within `pyproject.toml`, these
+settings must be found in the appropriate section:
+
+```toml
+[tool.git-changelog]
+bump = "minor"
+convention = "conventional"
+in-place = false
+marker-line = "<!-- insertion marker -->"
+output = "output.log"
+parse-refs = false
+parse-trailers = false
+repository = "."
+sections = "fix,maint"
+template = "keepachangelog"
+version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+```
+
 ## Output a changelog
+
+[(--output)](cli.md#output)
 
 To output a changelog for the current repository (current directory),
 simply run:
@@ -104,6 +180,8 @@ git-changelog --output CHANGELOG.md
 ```
 
 ## Choose the commit message convention
+
+[(--convention)](cli.md#convention)
 
 Different conventions, or styles, are supported by *git-changelog*.
 To select a different convention than the default one (basic, see below),
@@ -174,6 +252,8 @@ appears right before the colon in the message summary
 
 ## Choose the sections to render
 
+[(--sections)](cli.md#sections)
+
 Each commit message convention has a default set of sections
 that will be rendered in the output. The other sections will be ignored.
 To override this, you can provide a list of sections to render to *git-changelog*
@@ -191,6 +271,8 @@ See the previous paragraphs to get the list of available sections
 for each commit message convetions.
 
 ## Choose a changelog template
+
+[(--template)](cli.md#template)
 
 *git-changelog* provides two built-in templates: `keepachangelog` and `angular`.
 Both are very similar, they just differ with the formatting a bit.
@@ -215,6 +297,8 @@ git-changelog --template path:mytemplate.md
 
 ## Filter commits
 
+[(--filter-commits)](cli.md#filter_commits)
+
 Sometimes it may be useful to use a limited set of commits, for example, if your
 project has migrated to semver recently and you want to ignore old non-conventional commits.
 
@@ -237,6 +321,9 @@ git-changelog --filter-commits "2c0dbb8.."
 ```
 
 ## Understand the relationship with SemVer
+
+[(--bump)](cli.md#bump)<br>
+[(--zerover)](cli.md#zerover)
 
 [Semver][semver], or Semantic Versioning, helps users of tools and libraries
 understand the impact of version changes. To quote SemVer itself:
@@ -308,6 +395,9 @@ to find additional information.
 
 ### Provider-specific references
 
+[(--parse-refs)](cli.md#parse_refs)<br>
+[(--provider)](cli.md#provider)
+
 *git-changelog* will detect when you are using GitHub, GitLab or Bitbucket
 by checking the `origin` remote configured in your local clone
 (or the remote indicated by the value of the `GIT_CHANGELOG_REMOTE` environment variable).
@@ -338,6 +428,8 @@ Provider-references are a bit limited, difficult to parse and favor vendor lock-
 so for these reasons we do not recommend them. Instead, we recommend using Git trailers.
 
 ### Git trailers
+
+[(--trailers)](cli.md#parse_trailers)
 
 Git has an [`interpret-trailers`][git-trailers] command
 that allows to add or parse trailers line to commit messages.
@@ -377,7 +469,7 @@ Example of how the previous trailers are rendered:
 - Fix atrocious bug ([aafa779](https://github.com/super/repo/commit/aafa7793ec02a) by John Doe).
     [Fixes issue #14](https://github.com/super/repo/issues/14),
     [Follow-up of PR #7](https://github.com/super/repo/pull/7),
-    [Part of epic #5](https://agile-software.com/super/project/epics/5),
+    [Part of epic #5](https://agile-software.com/super/project/epics/5)
 ```
 
 To enable Git trailers parsing, use the `-T` or `--trailers` CLI option:
@@ -387,6 +479,10 @@ git-changelog --trailers
 ```
 
 ## Update changelog in place
+
+[(--in-place)](cli.md#in_place)<br>
+[(--marker-line)](cli.md#marker_line)<br>
+[(--version-regex)](cli.md#version_regex)
 
 Writing the whole generated changelog to a file is nice,
 but sometimes you need to tweak the entries in your changelog
@@ -443,6 +539,9 @@ each time you update your changelog in-place.
 
 ## Output release notes
 
+[(--input)](cli.md#input)<br>
+[(--release-notes)](cli.md#release_notes)
+
 Some platforms allow to announce releases with additional "release notes".
 *git-changelog* can help generating release notes too, by simply
 reading your existing changelog and printing the latest entry.
@@ -483,73 +582,6 @@ option to specify another file to read from.
 Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
-
-## Configuration files
-
-Project-wise, permanent configuration of *git-changelog* is possible.
-By default, *git-changelog* will search for the existence a suitable configuration
-in the `pyproject.toml` file or otherwise, the following configuration files 
-in this particular order:
-
-- `.git-changelog.toml`
-- `config/git-changelog.toml`
-- `.config/git-changelog.toml`
-- `<current-user-config-path>/git-changelog.toml`
-
-In the last case (`<current-user-config-path>/git-changelog.toml`), the `<current-user-config-path>`
-is platform-dependent and will be automatically inferred from your settings.
-In Unix systems, this will typically point at `$HOME/.config/git-changelog.toml`.
-The use of a configuration file can be disabled or overridden with the `--config-file`
-option.
-To disable the configuration file, pass `no`, `none`, `false`, `off`, `0` or empty string (`''`):
-
-```bash
-git-changelog --config-file no
-```
-
-To override the configuration file, pass the path to the new file:
-
-```bash
-git-changelog --config-file $HOME/.custom-git-changelog-config
-```
-
-The configuration file must be written in TOML language, and may take values
-for most of the command line options:
-
-```toml
-bump = "auto"
-convention = "basic"
-in-place = false
-filter-commits = "0.5.0.."
-marker-line = "<!-- insertion marker -->"
-output = "output.log"
-parse-refs = false
-parse-trailers = false
-repository = "."
-sections = ["fix", "maint"]
-template = "angular"
-version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
-provider = "gitlab"
-zerover = true
-```
-
-In the case of configuring *git-changelog* within `pyproject.toml`, these
-settings must be found in the appropriate section:
-
-```toml
-[tool.git-changelog]
-bump = "minor"
-convention = "conventional"
-in-place = false
-marker-line = "<!-- insertion marker -->"
-output = "output.log"
-parse-refs = false
-parse-trailers = false
-repository = "."
-sections = "fix,maint"
-template = "keepachangelog"
-version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
-```
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/

@@ -140,6 +140,8 @@ def get_parser() -> argparse.ArgumentParser:
             in your changelog. Commits in each version will be grouped
             by sections, depending on the commit convention you follow.
 
+            ### Conventions
+
             {BasicConvention._format_sections_help()}
             {AngularConvention._format_sections_help()}
             {ConventionalCommitConvention._format_sections_help()}
@@ -180,8 +182,8 @@ def get_parser() -> argparse.ArgumentParser:
         dest="bump",
         metavar="VERSION",
         help="Specify the bump from latest version for the set of unreleased commits. "
-        "Can be one of 'auto', 'major', 'minor', 'patch' or a valid semver version (eg. 1.2.3). "
-        "With 'auto', if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions), "
+        "Can be one of `auto`, `major`, `minor`, `patch` or a valid semver version (eg. 1.2.3). "
+        "With `auto`, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions), "
         "else if there are new features, bump the minor number, else just bump the patch number. "
         "Default: unset (false).",
     )
@@ -199,8 +201,8 @@ def get_parser() -> argparse.ArgumentParser:
         dest="in_place",
         help="Insert new entries (versions missing from changelog) in-place. "
         "An output file must be specified. With custom templates, "
-        "you can pass two additional arguments: --version-regex and --marker-line. "
-        "When writing in-place, an 'in_place' variable "
+        "you can pass two additional arguments: `--version-regex` and `--marker-line`. "
+        "When writing in-place, an `in_place` variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
         "(for example to skip changelog headers or footers). Default: unset (false).",
@@ -209,35 +211,39 @@ def get_parser() -> argparse.ArgumentParser:
         "-g",
         "--version-regex",
         action="store",
+        metavar="REGEX",
         dest="version_regex",
         help="A regular expression to match versions in the existing changelog "
         "(used to find the latest release) when writing in-place. "
-        "The regular expression must be a Python regex with a 'version' named group. "
-        f"Default: '{DEFAULT_VERSION_REGEX}'.",
+        "The regular expression must be a Python regex with a `version` named group. "
+        f"Default: `{DEFAULT_VERSION_REGEX}`.",
     )
 
     parser.add_argument(
         "-m",
         "--marker-line",
         action="store",
+        metavar="MARKER",
         dest="marker_line",
         help="A marker line at which to insert new entries "
         "(versions missing from changelog). "
         "If two marker lines are present in the changelog, "
         "the contents between those two lines will be overwritten "
         "(useful to update an 'Unreleased' entry for example). "
-        f"Default: '{DEFAULT_MARKER_LINE}'.",
+        f"Default: `{DEFAULT_MARKER_LINE}`.",
     )
     parser.add_argument(
         "-o",
         "--output",
         action="store",
+        metavar="FILE",
         dest="output",
         help="Output to given file. Default: standard output.",
     )
     parser.add_argument(
         "-p",
         "--provider",
+        metavar="PROVIDER",
         dest="provider",
         choices=providers.keys(),
         help="Explicitly specify the repository provider. Default: unset.",
@@ -260,23 +266,26 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-I",
         "--input",
+        metavar="FILE",
         dest="input",
-        help=f"Read from given file when creating release notes. Default: '{DEFAULT_CHANGELOG_FILE}'.",
+        help=f"Read from given file when creating release notes. Default: `{DEFAULT_CHANGELOG_FILE}`.",
     )
     parser.add_argument(
         "-c",
-        "--style",
-        "--commit-style",
         "--convention",
+        "--commit-style",
+        "--style",
+        metavar="CONVENTION",
         choices=CONVENTIONS,
         dest="convention",
-        help=f"The commit convention to match against. Default: '{DEFAULT_SETTINGS['convention']}'.",
+        help=f"The commit convention to match against. Default: `{DEFAULT_SETTINGS['convention']}`.",
     )
     parser.add_argument(
         "-s",
         "--sections",
         action="store",
         type=_comma_separated_list,
+        metavar="SECTIONS",
         dest="sections",
         help="A comma-separated list of sections to render. "
         "See the available sections for each supported convention in the description. "
@@ -286,10 +295,11 @@ def get_parser() -> argparse.ArgumentParser:
         "-t",
         "--template",
         choices=Templates(("angular", "keepachangelog")),
+        metavar="TEMPLATE",
         dest="template",
-        help="The Jinja2 template to use. Prefix it with 'path:' to specify the path "
+        help="The Jinja2 template to use. Prefix it with `path:` to specify the path "
         "to a Jinja templated file. "
-        f"Default: '{DEFAULT_SETTINGS['template']}'.",
+        f"Default: `{DEFAULT_SETTINGS['template']}`.",
     )
     parser.add_argument(
         "-T",
@@ -319,8 +329,9 @@ def get_parser() -> argparse.ArgumentParser:
         "-F",
         "--filter-commits",
         action="store",
+        metavar="RANGE",
         dest="filter_commits",
-        help="The Git revision-range filter to use (e.g. 'v1.2.0..'). Default: no filter.",
+        help="The Git revision-range filter to use (e.g. `v1.2.0..`). Default: no filter.",
     )
     parser.add_argument(
         "-V",
