@@ -1,5 +1,10 @@
 """Tests for the `cli` module."""
 
+# IMPORTANT: Do not call `git_changelog.cli.main()`
+# without passing a config file path, otherwise
+# it will use its own config file and possibly modify
+# the CHANGELOG!
+
 from __future__ import annotations
 
 import os
@@ -31,11 +36,17 @@ else:
             os.chdir(old_wd)
 
 
-def test_main() -> None:
-    """Basic CLI test."""
-    assert cli.main([]) == 0
+# IMPORTANT: See top module comment.
+def test_main(tmp_path: Path) -> None:
+    """Basic CLI test.
+
+    Parameters:
+        tmp_path: A temporary path to write an empty config to.
+    """
+    assert cli.main(["--config-file", str(tmp_path / "conf.toml")]) == 0
 
 
+# IMPORTANT: See top module comment.
 def test_show_help(capsys: pytest.CaptureFixture) -> None:
     """Show help.
 
@@ -174,6 +185,7 @@ def test_settings_warning(
                 assert len(record) == 2
 
 
+# IMPORTANT: See top module comment.
 def test_show_version(capsys: pytest.CaptureFixture) -> None:
     """Show version.
 
@@ -186,6 +198,7 @@ def test_show_version(capsys: pytest.CaptureFixture) -> None:
     assert debug.get_version() in captured.out
 
 
+# IMPORTANT: See top module comment.
 def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
     """Show debug information.
 
