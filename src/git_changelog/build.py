@@ -240,8 +240,7 @@ class Changelog:
         self.commits: list[Commit] = self.parse_commits()
 
         # apply dates to commits and group them by version
-        dates = self._apply_versions_to_commits()
-        v_list, v_dict = self._group_commits_by_version(dates)
+        v_list, v_dict = self._group_commits_by_version()
         self.versions_list = v_list
         self.versions_dict = v_dict
 
@@ -361,55 +360,47 @@ class Changelog:
 
         return commits
 
-    def _apply_versions_to_commits(self) -> dict[str, datetime.date]:
-        versions_dates = {"": datetime.date.today()}  # noqa: DTZ011
+    def _group_commits_by_version(self) -> tuple[list[Version], dict[str, Version]]:
         version = None
-        for commit in self.commits:
-            if commit.version:
-                version = commit.version
-                versions_dates[version] = commit.committer_date.date()
-            elif version:
-                commit.version = version
-        return versions_dates
-
-    def _group_commits_by_version(
-        self,
-        dates: dict[str, datetime.date],
-    ) -> tuple[list[Version], dict[str, Version]]:
-        versions_list = []
-        versions_dict = {}
-        versions_types_dict: dict[str, dict[str, Section]] = {}
         next_version = None
+        versions_dict = {}
+        versions_list = []
         for commit in self.commits:
-            if commit.version not in versions_dict:
-                version = Version(tag=commit.version, date=dates[commit.version])
+            if not version or commit.version:
+                version = self._create_version(commit, next_version)
                 versions_dict[commit.version] = version
-                if self.provider:
-                    version.url = self.provider.get_tag_url(tag=commit.version)
-                if next_version:
-                    version.next_version = next_version
-                    next_version.previous_version = version
-                    if self.provider:
-                        next_version.compare_url = self.provider.get_compare_url(
-                            base=version.tag,
-                            target=next_version.tag or "HEAD",
-                        )
-                next_version = version
                 versions_list.append(version)
-                versions_types_dict[commit.version] = {}
-            versions_dict[commit.version].commits.append(commit)
-            if "type" in commit.convention and commit.convention["type"] not in versions_types_dict[commit.version]:
-                section = Section(section_type=commit.convention["type"])
-                versions_types_dict[commit.version][commit.convention["type"]] = section
-                versions_dict[commit.version].sections_list.append(section)
-                versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
-            versions_types_dict[commit.version][commit.convention["type"]].commits.append(commit)
+                next_version = version
+            else:
+                commit.version = version.tag
+            version.commits.append(commit)
+            _type = commit.convention["type"]
+            if "type" in commit.convention and _type not in version.sections_dict:
+                section = Section(section_type=_type)
+                version.sections_list.append(section)
+                version.sections_dict[_type] = section
+            version.sections_dict[_type].commits.append(commit)
         if next_version is not None and self.provider:
             next_version.compare_url = self.provider.get_compare_url(
                 base=versions_list[-1].commits[-1].hash,
                 target=next_version.tag or "HEAD",
             )
         return versions_list, versions_dict
+
+    def _create_version(self, commit: Commit, next_version: Version | None) -> Version:
+        date = commit.committer_date.date() if commit.version else datetime.date.today()  # noqa: DTZ011
+        version = Version(tag=commit.version, date=date)
+        if self.provider:
+            version.url = self.provider.get_tag_url(tag=commit.version)
+        if next_version:
+            version.next_version = next_version
+            next_version.previous_version = version
+            if self.provider:
+                next_version.compare_url = self.provider.get_compare_url(
+                    base=version.tag,
+                    target=next_version.tag or "HEAD",
+                )
+        return version
 
     def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
