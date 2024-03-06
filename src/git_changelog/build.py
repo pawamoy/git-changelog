@@ -257,8 +257,8 @@ class Changelog:
         if bump:
             self._bump(bump)
 
-        # fix a single, initial version to 0.1.0
-        self._fix_single_version()
+        # fix a single, initial version to the user specified version or 0.1.0 if none is specified
+        self._fix_single_version(bump)
 
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
@@ -441,10 +441,10 @@ class Changelog:
                     target=last_version.planned_tag,
                 )
 
-    def _fix_single_version(self) -> None:
+    def _fix_single_version(self, version: str | None) -> None:
         last_version = self.versions_list[0]
         if len(self.versions_list) == 1 and last_version.planned_tag is None:
-            planned_tag = "0.1.0"
+            planned_tag = version if version and version not in {"auto", "major", "minor", "patch"} else "0.1.0"
             last_version.tag = planned_tag
             last_version.url += planned_tag
             last_version.compare_url = last_version.compare_url.replace("HEAD", planned_tag)
