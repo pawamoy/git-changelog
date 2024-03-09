@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from time import sleep
 from typing import TYPE_CHECKING
 
 import pytest
@@ -10,6 +11,7 @@ from git_changelog import Changelog
 from git_changelog.commit import AngularConvention
 
 if TYPE_CHECKING:
+    from git_changelog.build import Version
     from tests.helpers import GitRepo
 
 
@@ -73,11 +75,11 @@ def test_one_release_branch_with_feat_branch(repo: GitRepo) -> None:
     changelog = Changelog(repo.path, convention=AngularConvention)
 
     assert len(changelog.versions_list) == 1
-    version = changelog.versions_list[0]
-    assert version.tag == "1.0.0"
-    assert len(version.commits) == 4
-    hashes = [commit.hash for commit in version.commits]
-    assert hashes == [commit_d, commit_b, commit_c, commit_a]
+    _assert_version(
+        changelog.versions_list[0],
+        expected_tag="1.0.0",
+        expected_commits=[commit_d, commit_b, commit_c, commit_a],
+    )
 
 
 def test_one_release_branch_with_two_versions(repo: GitRepo) -> None:
@@ -111,12 +113,59 @@ def test_one_release_branch_with_two_versions(repo: GitRepo) -> None:
     changelog = Changelog(repo.path, convention=AngularConvention)
 
     assert len(changelog.versions_list) == 2
-    version = changelog.versions_list[0]
-    assert version.tag == "1.1.0"
-    hashes = [commit.hash for commit in version.commits]
-    assert hashes == [commit_d, commit_c]
+    _assert_version(changelog.versions_list[0], expected_tag="1.1.0", expected_commits=[commit_d, commit_c])
+    _assert_version(changelog.versions_list[1], expected_tag="1.0.0", expected_commits=[commit_b, commit_a])
 
-    version = changelog.versions_list[1]
-    assert version.tag == "1.0.0"
+
+def test_two_release_branches(repo: GitRepo) -> None:
+    r"""Test parsing and grouping commits to versions.
+
+    Commit graph:
+                   1.1.0
+               1.0.0 |
+                 |   |
+    main       A-B---D-----G
+                \     \   /
+    develop      --C---E-F
+                       |
+                     2.0.0
+    Expected:
+    - Unreleased: G F
+    - 2.0.0: E C
+    - 1.1.0: D
+    - 1.0.0: B A
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    commit_a = repo.first_hash
+    repo.branch("develop")
+    commit_b = repo.commit("fix: B")
+    repo.tag("1.0.0")
+    repo.checkout("develop")
+    commit_c = repo.commit("feat: C")
+    repo.checkout("main")
+    commit_d = repo.commit("fix: C")
+    repo.tag("1.1.0")
+    repo.checkout("develop")
+    sleep(1)  # Git timestamp only has second precision, delay commit to ensure git log lists it before commit C
+    commit_e = repo.merge("main")
+    repo.tag("2.0.0")
+    commit_f = repo.commit("feat: F")
+    repo.checkout("main")
+    commit_g = repo.merge("develop")
+
+    changelog = Changelog(repo.path, convention=AngularConvention)
+
+    assert len(changelog.versions_list) == 4
+    versions = iter(changelog.versions_list)
+    _assert_version(next(versions), expected_tag="", expected_commits=[commit_g, commit_f])
+    _assert_version(next(versions), expected_tag="2.0.0", expected_commits=[commit_e, commit_c])
+    _assert_version(next(versions), expected_tag="1.1.0", expected_commits=[commit_d])
+    _assert_version(next(versions), expected_tag="1.0.0", expected_commits=[commit_b, commit_a])
+
+
+def _assert_version(version: Version, expected_tag: str, expected_commits: list[str]) -> None:
+    assert version.tag == expected_tag
     hashes = [commit.hash for commit in version.commits]
-    assert hashes == [commit_b, commit_a]
+    assert hashes == expected_commits
