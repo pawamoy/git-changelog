@@ -22,8 +22,24 @@ def test_bump_with_semver_on_new_repo(repo: GitRepo, bump: str, expected: str) -
 
     Parameters:
         repo: GitRepo to a temporary repository.
+        bump: The bump parameter value.
         expected: Expected version for the new changelog entry.
     """
     changelog = Changelog(repo.path, convention=AngularConvention, bump=bump)
     assert len(changelog.versions_list) == 1
     assert changelog.versions_list[0].tag == expected
+
+
+@pytest.mark.parametrize("bump", ["auto", "major", "minor", "2.0.0"])
+def test_no_bump_on_first_tag(repo: GitRepo, bump: str) -> None:
+    """Ignore bump on new git repo without unreleased commits.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+        bump: The bump parameter value.
+    """
+    repo.tag("1.1.1")
+
+    changelog = Changelog(repo.path, convention=AngularConvention, bump=bump)
+    assert len(changelog.versions_list) == 1
+    assert changelog.versions_list[0].tag == "1.1.1"
