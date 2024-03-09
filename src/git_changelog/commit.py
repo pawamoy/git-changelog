@@ -34,6 +34,7 @@ class Commit:
         committer_email: str = "",
         committer_date: str | datetime = "",
         refs: str = "",
+        parent_hashes: str | list[str] = "",
         subject: str = "",
         body: list[str] | None = None,
         url: str = "",
@@ -84,6 +85,12 @@ class Commit:
                 break
         self.tag: str = tag
         self.version: str = tag
+
+        if isinstance(parent_hashes, str):
+            self.parent_hashes = parent_hashes.split(" ")
+        else:
+            self.parent_hashes = parent_hashes
+        self.parent_commits: list[Commit] = []
 
         self.text_refs: dict[str, list[Ref]] = {}
         self.convention: dict[str, Any] = {}
