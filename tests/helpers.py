@@ -24,7 +24,7 @@ class GitRepo:
             repo: Path to the git repository.
         """
         self.path = repo
-        self.git("init")
+        self.git("init", "-b", "main")
         self.git("config", "user.name", "dummy")
         self.git("config", "user.email", "dummy@example.com")
         self.git("remote", "add", "origin", "git@github.com:example/example")
