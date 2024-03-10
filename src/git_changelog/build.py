@@ -443,7 +443,7 @@ class Changelog:
 
     def _fix_single_version(self, version: str | None) -> None:
         last_version = self.versions_list[0]
-        if len(self.versions_list) == 1 and last_version.planned_tag is None:
+        if len(self.versions_list) == 1 and last_version.planned_tag is None and not last_version.tag:
             planned_tag = version if version and version not in {"auto", "major", "minor", "patch"} else "0.1.0"
             last_version.tag = planned_tag
             last_version.url += planned_tag

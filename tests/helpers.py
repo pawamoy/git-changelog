@@ -58,3 +58,11 @@ class GitRepo:
         self.git("add", "-A")
         self.git("commit", "-m", message)
         return self.git("rev-parse", "HEAD")
+
+    def tag(self, tagname: str) -> None:
+        """Create a new tag in the GIt repository.
+
+        Parameters:
+            tagname: The name of the new tag.
+        """
+        self.git("tag", tagname)
