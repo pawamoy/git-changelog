@@ -451,8 +451,8 @@ class Changelog:
                 else:
                     # Only follow the left branch of the commit tree
                     next_commit = next_commit.parent_commits[0]
-                    if next_commit.version:
-                        previous_version = next_commit.version
+                    if next_commit.tag:
+                        previous_version = next_commit.tag
             if self.provider:
                 version.compare_url = self.provider.get_compare_url(
                     base=previous_version,
