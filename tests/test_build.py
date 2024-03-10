@@ -78,6 +78,7 @@ def test_one_release_branch_with_feat_branch(repo: GitRepo) -> None:
     _assert_version(
         changelog.versions_list[0],
         expected_tag="1.0.0",
+        expected_prev_tag=None,
         expected_commits=[commit_d, commit_b, commit_c, commit_a],
     )
 
@@ -113,8 +114,18 @@ def test_one_release_branch_with_two_versions(repo: GitRepo) -> None:
     changelog = Changelog(repo.path, convention=AngularConvention)
 
     assert len(changelog.versions_list) == 2
-    _assert_version(changelog.versions_list[0], expected_tag="1.1.0", expected_commits=[commit_d, commit_c])
-    _assert_version(changelog.versions_list[1], expected_tag="1.0.0", expected_commits=[commit_b, commit_a])
+    _assert_version(
+        changelog.versions_list[0],
+        expected_tag="1.1.0",
+        expected_prev_tag="1.0.0",
+        expected_commits=[commit_d, commit_c],
+    )
+    _assert_version(
+        changelog.versions_list[1],
+        expected_tag="1.0.0",
+        expected_prev_tag=None,
+        expected_commits=[commit_b, commit_a],
+    )
 
 
 def test_two_release_branches(repo: GitRepo) -> None:
@@ -165,11 +176,17 @@ def test_two_release_branches(repo: GitRepo) -> None:
     _assert_version(next(versions), expected_tag="1.0.0", expected_prev_tag=None, expected_commits=[commit_b, commit_a])
 
 
-def _assert_version(version: Version, expected_tag: str, expected_prev_tag: str, expected_commits: list[str]) -> None:
+def _assert_version(
+    version: Version,
+    expected_tag: str,
+    expected_prev_tag: str | None,
+    expected_commits: list[str],
+) -> None:
     assert version.tag == expected_tag
     if expected_prev_tag:
+        assert version.previous_version is not None, f"Expected previous version '{expected_prev_tag}', but was None"
         assert version.previous_version.tag == expected_prev_tag
     else:
-        assert version.previous_version == None
+        assert version.previous_version is None
     hashes = [commit.hash for commit in version.commits]
     assert hashes == expected_commits
