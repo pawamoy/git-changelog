@@ -144,12 +144,12 @@ class Version:
         """
         self.commits.append(commit)
         commit.version = self.tag
-        commit_type = commit.convention.get("type")
-        if commit_type not in self.sections_dict:
-            section = Section(section_type=commit_type)
-            self.sections_list.append(section)
-            self.sections_dict[commit_type] = section
-        self.sections_dict[commit_type].commits.append(commit)
+        if commit_type := commit.convention.get("type"):
+            if commit_type not in self.sections_dict:
+                section = Section(section_type=commit_type)
+                self.sections_list.append(section)
+                self.sections_dict[commit_type] = section
+            self.sections_dict[commit_type].commits.append(commit)
 
 
 class Changelog:
@@ -252,7 +252,9 @@ class Changelog:
 
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
-        self.tag_commits: list[Commit] = self.parse_commits()
+        self.commits: list[Commit] = self.parse_commits()
+        self.tag_commits: list[Commit] = [commit for commit in self.commits[1:] if commit.tag]
+        self.tag_commits.insert(0, self.commits[0])
 
         # apply dates to commits and group them by version
         v_list, v_dict = self._group_commits_by_version()
@@ -335,19 +337,20 @@ class Changelog:
             The list of commits.
         """
         lines = self.raw_log.split("\n")
-        size = len(lines) - 1  # don't count last blank line
-        commits: list[Commit] = []
-        tag_commits: list[Commit] = []
+        size = len(lines) - 1  # Don't count last blank line.
         pos = 0
+
+        commits_map: dict[str, Commit] = {}
+
         while pos < size:
-            # build body
+            # Build message body.
             nbl_index = 10
             body = []
             while lines[pos + nbl_index] != self.MARKER:
                 body.append(lines[pos + nbl_index].strip("\r"))
                 nbl_index += 1
 
-            # build commit
+            # Build commit object.
             commit = Commit(
                 commit_hash=lines[pos],
                 author_name=lines[pos + 1],
@@ -358,6 +361,7 @@ class Changelog:
                 committer_date=lines[pos + 6],
                 refs=lines[pos + 7],
                 parent_hashes=lines[pos + 8],
+                commits_map=commits_map,
                 subject=lines[pos + 9],
                 body=body,
                 parse_trailers=self.parse_trailers,
@@ -365,35 +369,21 @@ class Changelog:
 
             pos += nbl_index + 1
 
-            # find all commits that have this commit as a parent to build the commit graph
-            # TODO could be made more performant by keeping track which commits do have missing parent commits and only iterate over those
-            for child_commit in commits:
-                if commit.hash in child_commit.parent_hashes:
-                    index = child_commit.parent_hashes.index(commit.hash)
-                    child_commit.parent_commits.insert(index, commit)
-
-            # expand commit object with provider parsing
+            # Expand commit object with provider parsing.
             if self.provider:
                 commit.update_with_provider(self.provider, parse_refs=self.parse_provider_refs)
 
-            # set the commit url based on remote_url (could be wrong)
+            # Set the commit url based on remote_url (could be wrong).
             elif self.remote_url:
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
-            # expand commit object with convention parsing
+            # Expand commit object with convention parsing.
             if self.convention:
                 commit.update_with_convention(self.convention)
 
-            commits.append(commit)
+            commits_map[commit.hash] = commit
 
-            if commit.tag:
-                tag_commits.append(commit)
-
-        # Add first commit to result, if it is part of an unreleased version
-        if not commits[0].tag:
-            tag_commits.insert(0, commits[0])
-
-        return tag_commits
+        return list(commits_map.values())
 
     def _group_commits_by_version(self) -> tuple[list[Version], dict[str, Version]]:
         """Groups commits into versions.
@@ -408,6 +398,7 @@ class Changelog:
         """
         versions_dict: dict[str, Version] = {}
         versions_list: list[Version] = []
+
         # Iterate in reversed order (oldest to newest tag) to assigns commits to the first version it was released with
         for tag_commit in reversed(self.tag_commits):
             # Create new version object
@@ -417,12 +408,13 @@ class Changelog:
 
             # Find all commits for this version by following the commit graph
             version.add_commit(tag_commit)
-            next_commits = tag_commit.parent_commits.copy()
-            while len(next_commits) > 0:
+            next_commits = tag_commit.parent_commits  # Always new: we can mutate it.
+            while next_commits:
                 next_commit = next_commits.pop(0)
                 if not next_commit.tag and not next_commit.version:
                     version.add_commit(next_commit)
                     next_commits.extend(next_commit.parent_commits)
+
         return versions_list, versions_dict
 
     def _create_version(self, commit: Commit) -> Version:
@@ -433,24 +425,25 @@ class Changelog:
         return version
 
     def _assign_previous_versions(self) -> None:
-        """Assign each version its previous version and creates the compare url.
+        """Assign each version its previous version and create the compare URL.
 
         The previous version is defined as the first version, that is found
         by following the left branch of the commit graph.
 
         If no previous version is found, either because it is the first commit or
-        due to the commit filter excluding it, the compare url is created with the
+        due to the commit filter excluding it, the compare URL is created with the
         first commit (oldest).
         """
         for version in self.versions_list:
             next_commit = version.commits[0]
             previous_version: str = ""
             while not previous_version:
-                if len(next_commit.parent_commits) == 0:
+                parent_commits = next_commit.parent_commits
+                if not parent_commits:
                     previous_version = next_commit.hash
                 else:
-                    # Only follow the left branch of the commit tree
-                    next_commit = next_commit.parent_commits[0]
+                    # Only follow the left branch of the commit tree.
+                    next_commit = parent_commits[0]
                     if next_commit.tag:
                         previous_version = next_commit.tag
             if self.provider:
