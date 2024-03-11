@@ -386,27 +386,26 @@ class Changelog:
         return list(commits_map.values())
 
     def _group_commits_by_version(self) -> tuple[list[Version], dict[str, Version]]:
-        """Groups commits into versions.
+        """Group commits into versions.
 
-        Commits are assigned to the version, it was first released with.
+        Commits are assigned to the version they were first released with.
         A commit is assigned to exactly one version.
 
         Returns:
-            A tuple of:
-            - The list of versions order descending by timestamp
-            - A dict of versions with the tagname as keys
+            versions_list: The list of versions order descending by timestamp.
+            versions_dict: A dictionary of versions with the tag name as keys.
         """
         versions_dict: dict[str, Version] = {}
         versions_list: list[Version] = []
 
-        # Iterate in reversed order (oldest to newest tag) to assigns commits to the first version it was released with
+        # Iterate in reversed order (oldest to newest tag) to assign commits to the first version they were released with.
         for tag_commit in reversed(self.tag_commits):
-            # Create new version object
+            # Create new version object.
             version = self._create_version(tag_commit)
             versions_dict[tag_commit.version] = version
             versions_list.insert(0, version)
 
-            # Find all commits for this version by following the commit graph
+            # Find all commits for this version by following the commit graph.
             version.add_commit(tag_commit)
             next_commits = tag_commit.parent_commits  # Always new: we can mutate it.
             while next_commits:

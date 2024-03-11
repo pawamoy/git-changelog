@@ -88,9 +88,8 @@ class Commit:
         self.version: str = tag
 
         if isinstance(parent_hashes, str):
-            self.parent_hashes = parent_hashes.split(" ")
-        else:
-            self.parent_hashes = parent_hashes
+            parent_hashes = parent_hashes.split()
+        self.parent_hashes = parent_hashes
         self._commits_map = commits_map
 
         self.text_refs: dict[str, list[Ref]] = {}
