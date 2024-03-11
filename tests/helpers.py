@@ -68,7 +68,7 @@ class GitRepo:
         self.git("tag", tagname)
 
     def branch(self, branchname: str) -> None:
-        """Create a new branch in the GIt repository.
+        """Create a new branch in the Git repository.
 
         Parameters:
             branchname: The name of the new branch.

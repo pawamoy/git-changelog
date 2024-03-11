@@ -159,7 +159,9 @@ def test_two_release_branches(repo: GitRepo) -> None:
     commit_d = repo.commit("fix: C")
     repo.tag("1.1.0")
     repo.checkout("develop")
-    sleep(1)  # Git timestamp only has second precision, delay commit to ensure git log lists it before commit C
+    # Git timestamp only has second precision,
+    # so we delay to ensure git-log lists it before commit C.
+    sleep(1)
     commit_e = repo.merge("main")
     repo.tag("2.0.0")
     commit_f = repo.commit("feat: F")
