@@ -137,7 +137,7 @@ class Version:
         return bool(self.tag.split(".", 2)[2])
 
     def add_commit(self, commit: Commit) -> None:
-        """Adds the given commit and assigns it a section based on the chosen commit convention.
+        """Register the given commit and add it to the relevant section based on its message convention.
 
         Arguments:
             commit: The git commit.
