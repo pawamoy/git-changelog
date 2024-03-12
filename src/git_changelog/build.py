@@ -111,6 +111,7 @@ class Version:
         self.url: str = url
         self.compare_url: str = compare_url
         self.previous_version: Version | None = None
+        self.next_version: Version | None = None
         self.planned_tag: str | None = None
 
     @property
@@ -463,12 +464,14 @@ class Changelog:
             if not previous_version:
                 previous_version = version.commits[-1].hash
 
+            version.previous_version = self.versions_dict.get(previous_version)
+            if version.previous_version:
+                version.previous_version.next_version = version
             if self.provider:
                 version.compare_url = self.provider.get_compare_url(
                     base=previous_version,
                     target=version.tag or "HEAD",
                 )
-            version.previous_version = self.versions_dict.get(previous_version)
 
     def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
