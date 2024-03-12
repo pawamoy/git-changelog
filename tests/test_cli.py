@@ -19,6 +19,8 @@ from git_changelog import cli, debug
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from tests.helpers import GitRepo
+
 
 if sys.version_info >= (3, 11):
     from contextlib import chdir
@@ -212,3 +214,49 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
     assert "system" in captured
     assert "environment" in captured
     assert "packages" in captured
+
+
+# IMPORTANT: See top module comment.
+def test_additional_template_vars(repo: GitRepo) -> None:
+    """Render template with custom template variables.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    repo.path.joinpath("conf.toml").write_text(
+        """[template_vars]
+        k1 = "ignored"
+        k2 = "v2"
+        k3 = "v3"
+        """.lstrip(),
+    )
+
+    template = repo.path.joinpath(".custom_template.md.jinja")
+    with template.open("w") as fh:
+        fh.write("{% for key, val in template_vars.items() %}{{ key }} = {{ val }}\n{% endfor %}")
+
+    exit_code = cli.main(
+        [
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "-o",
+            str(repo.path / "CHANGELOG.md"),
+            "-t",
+            f"path:{template}",
+            "--template-var",
+            "k1",
+            "v1",
+            "--template-var",
+            "k3",
+            "v3",
+            str(repo.path),
+        ],
+    )
+
+    assert exit_code == 0
+
+    changelog = repo.path.joinpath("CHANGELOG.md")
+    with changelog.open("r") as fh:
+        contents = fh.read()
+
+    assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"

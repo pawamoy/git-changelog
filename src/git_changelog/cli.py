@@ -53,7 +53,7 @@ DEFAULT_CONFIG_FILES = [
 ]
 """Default configuration files read by git-changelog."""
 
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,
     "bump_latest": None,
     "convention": "basic",
@@ -70,6 +70,7 @@ DEFAULT_SETTINGS = {
     "repository": ".",
     "sections": None,
     "template": "keepachangelog",
+    "template_vars": {},
     "version_regex": DEFAULT_VERSION_REGEX,
     "zerover": True,
 }
@@ -98,6 +99,21 @@ def get_version() -> str:
 
 def _comma_separated_list(value: str) -> list[str]:
     return value.split(",")
+
+
+class _ParseDictAction(argparse.Action):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,  # noqa: ARG002
+        namespace: argparse.Namespace,
+        values: str | Sequence[Any] | None,
+        option_string: str | Sequence[Any] | None = None,  # noqa: ARG002
+    ):
+        attribute = getattr(namespace, self.dest)
+        if not isinstance(attribute, dict):
+            setattr(namespace, self.dest, {})
+        if isinstance(values, list) and len(values) == 2:  # noqa: PLR2004
+            getattr(namespace, self.dest)[values[0]] = values[1]
 
 
 providers: dict[str, type[ProviderRefParser]] = {
@@ -334,6 +350,15 @@ def get_parser() -> argparse.ArgumentParser:
         help="The Git revision-range filter to use (e.g. `v1.2.0..`). Default: no filter.",
     )
     parser.add_argument(
+        "--template-var",
+        action=_ParseDictAction,
+        metavar=("KEY", "VALUE"),
+        nargs=2,
+        dest="template_vars",
+        help="Pass additional key/value pairs to the template. Option can be used multiple times. "
+        "The key/value pairs are accessible as 'template_vars' in the Jinja2 template.",
+    )
+    parser.add_argument(
         "-V",
         "--version",
         action="version",
@@ -442,6 +467,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
     """
     parser = get_parser()
     opts = vars(parser.parse_args(args=args))
+    print(opts)
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
@@ -458,10 +484,18 @@ def parse_settings(args: list[str] | None = None) -> dict:
     elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
         config_file = DEFAULT_CONFIG_FILES
 
+    template_vars = explicit_opts_dict.pop("template_vars", {})
+
     settings = read_config(config_file)
 
     # CLI arguments override the config file settings
     settings.update(explicit_opts_dict)
+
+    # Merge template_vars
+    if template_vars and settings.get("template_vars"):
+        settings["template_vars"].update(template_vars)
+    elif template_vars:
+        settings["template_vars"] = template_vars
 
     # TODO: remove at some point
     if "bump_latest" in explicit_opts_dict:
@@ -487,6 +521,7 @@ def build_and_render(
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
+    template_vars: str | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -593,7 +628,9 @@ def build_and_render(
             )
 
         # render new entries
-        rendered = jinja_template.render(changelog=changelog, in_place=True).rstrip("\n") + "\n"
+        rendered = (
+            jinja_template.render(changelog=changelog, template_vars=template_vars, in_place=True).rstrip("\n") + "\n"
+        )
 
         # find marker line(s) in current changelog
         marker = lines.index(marker_line)
@@ -612,7 +649,7 @@ def build_and_render(
 
     # overwrite output file
     else:
-        rendered = jinja_template.render(changelog=changelog)
+        rendered = jinja_template.render(changelog=changelog, template_vars=template_vars)
 
         # write result in specified output
         if output is sys.stdout:
