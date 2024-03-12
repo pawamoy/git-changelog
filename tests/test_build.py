@@ -172,8 +172,13 @@ def test_two_release_branches(repo: GitRepo) -> None:
 
     assert len(changelog.versions_list) == 4
     versions = iter(changelog.versions_list)
-    _assert_version(next(versions), expected_tag="", expected_prev_tag="1.1.0", expected_commits=[commit_g, commit_f])
-    _assert_version(next(versions), expected_tag="2.0.0", expected_prev_tag=None, expected_commits=[commit_e, commit_c])
+    _assert_version(next(versions), expected_tag="", expected_prev_tag="2.0.0", expected_commits=[commit_g, commit_f])
+    _assert_version(
+        next(versions),
+        expected_tag="2.0.0",
+        expected_prev_tag="1.1.0",
+        expected_commits=[commit_e, commit_c],
+    )
     _assert_version(next(versions), expected_tag="1.1.0", expected_prev_tag="1.0.0", expected_commits=[commit_d])
     _assert_version(next(versions), expected_tag="1.0.0", expected_prev_tag=None, expected_commits=[commit_b, commit_a])
 

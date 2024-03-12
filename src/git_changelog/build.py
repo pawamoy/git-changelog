@@ -10,6 +10,7 @@ from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 from urllib.parse import urlsplit, urlunsplit
 
+from semver import Version as SemverVersion
 from semver import VersionInfo
 
 from git_changelog.commit import (
@@ -38,12 +39,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     Returns:
         The bumped version.
     """
-    prefix = ""
-    if version[0] == "v":
-        prefix = "v"
-        version = version[1:]
-
-    semver_version = VersionInfo.parse(version)
+    semver_version, prefix = parse_version(version)
     if part == "major" and (semver_version.major != 0 or not zerover):
         semver_version = semver_version.bump_major()
     elif part == "minor" or (part == "major" and semver_version.major == 0):
@@ -51,6 +47,23 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     elif part == "patch" and not semver_version.prerelease:
         semver_version = semver_version.bump_patch()
     return prefix + str(semver_version)
+
+
+def parse_version(version: str) -> tuple[SemverVersion, str]:
+    """Parse a version.
+
+    Arguments:
+        version: The version to parse.
+
+    Returns:
+        semver_version: The semantic version.
+        prefix: The version prefix.
+    """
+    prefix = ""
+    if version[0] == "v":
+        prefix = "v"
+        version = version[1:]
+    return VersionInfo.parse(version), prefix
 
 
 class Section:
@@ -426,25 +439,30 @@ class Changelog:
     def _assign_previous_versions(self) -> None:
         """Assign each version its previous version and create the compare URL.
 
-        The previous version is defined as the first version, that is found
-        by following the left branch of the commit graph.
+        The previous version is defined as the version with the highest semantic version,
+        that is found by following the the commit graph.
 
         If no previous version is found, either because it is the first commit or
         due to the commit filter excluding it, the compare URL is created with the
         first commit (oldest).
         """
         for version in self.versions_list:
-            next_commit = version.commits[0]
-            previous_version: str = ""
-            while not previous_version:
-                parent_commits = next_commit.parent_commits
-                if not parent_commits:
-                    previous_version = next_commit.hash
-                else:
-                    # Only follow the left branch of the commit tree.
-                    next_commit = parent_commits[0]
-                    if next_commit.tag:
+            next_commits = version.commits[0].parent_commits.copy()
+            previous_semver: SemverVersion | None = None
+            previous_version = ""
+            while len(next_commits) > 0:
+                next_commit = next_commits.pop(0)
+                if next_commit.tag:
+                    semver, _ = parse_version(next_commit.tag)
+                    if not previous_semver or semver.compare(previous_semver) > 0:
+                        previous_semver = semver
                         previous_version = next_commit.tag
+                else:
+                    next_commits = next_commit.parent_commits + next_commits
+
+            if not previous_version:
+                previous_version = version.commits[-1].hash
+
             if self.provider:
                 version.compare_url = self.provider.get_compare_url(
                     base=previous_version,
