@@ -450,7 +450,7 @@ class Changelog:
                     base=previous_version,
                     target=version.tag or "HEAD",
                 )
-                version.previous_version = self.versions_dict.get(previous_version)
+            version.previous_version = self.versions_dict.get(previous_version)
 
     def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
