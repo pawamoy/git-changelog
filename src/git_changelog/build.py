@@ -451,7 +451,7 @@ class Changelog:
             next_commits = version.commits[0].parent_commits  # Always new: we can mutate it.
             previous_semver: SemverVersion | None = None
             previous_version = ""
-            while len(next_commits) > 0:
+            while next_commits:
                 next_commit = next_commits.pop(0)
                 if next_commit.tag:
                     semver, _ = parse_version(next_commit.tag)
