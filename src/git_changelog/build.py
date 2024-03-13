@@ -459,7 +459,7 @@ class Changelog:
                         previous_semver = semver
                         previous_version = next_commit.tag
                 else:
-                    next_commits = next_commit.parent_commits + next_commits
+                    next_commits.extend(next_commit.parent_commits)
 
             if not previous_version:
                 previous_version = version.commits[-1].hash
