@@ -448,7 +448,7 @@ class Changelog:
         first commit (oldest).
         """
         for version in self.versions_list:
-            next_commits = version.commits[0].parent_commits.copy()
+            next_commits = version.commits[0].parent_commits  # Always new: we can mutate it.
             previous_semver: SemverVersion | None = None
             previous_version = ""
             while len(next_commits) > 0:
