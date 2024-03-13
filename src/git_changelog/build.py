@@ -441,7 +441,7 @@ class Changelog:
         """Assign each version its previous version and create the compare URL.
 
         The previous version is defined as the version with the highest semantic version,
-        that is found by following the the commit graph.
+        that is found by following the commit graph.
 
         If no previous version is found, either because it is the first commit or
         due to the commit filter excluding it, the compare URL is created with the
