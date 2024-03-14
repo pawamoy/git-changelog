@@ -5,7 +5,7 @@ build-backend = "pdm.backend"
 [project]
 name = "git-changelog"
 description = "Automatic Changelog generator using Jinja2 templates."
-authors = [{name = "Timothée Mazzucotelli", email = "pawamoy@pm.me"}]
+authors = [{name = "Timothée Mazzucotelli", email = "dev@pawamoy.fr"}]
 license = {text = "ISC"}
 readme = "README.md"
 requires-python = ">=3.8"

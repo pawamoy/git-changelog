@@ -1,5 +1,5 @@
 target-version = "py38"
-line-length = 132
+line-length = 120
 exclude = [
     "fixtures",
     "site",
@@ -103,3 +103,7 @@ known-first-party = ["git_changelog"]
 
 [pydocstyle]
 convention = "google"
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 80
