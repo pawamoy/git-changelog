@@ -10,6 +10,7 @@ from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 from urllib.parse import urlsplit, urlunsplit
 
+from semver import Version as SemverVersion
 from semver import VersionInfo
 
 from git_changelog.commit import (
@@ -38,12 +39,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     Returns:
         The bumped version.
     """
-    prefix = ""
-    if version[0] == "v":
-        prefix = "v"
-        version = version[1:]
-
-    semver_version = VersionInfo.parse(version)
+    semver_version, prefix = parse_version(version)
     if part == "major" and (semver_version.major != 0 or not zerover):
         semver_version = semver_version.bump_major()
     elif part == "minor" or (part == "major" and semver_version.major == 0):
@@ -51,6 +47,23 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     elif part == "patch" and not semver_version.prerelease:
         semver_version = semver_version.bump_patch()
     return prefix + str(semver_version)
+
+
+def parse_version(version: str) -> tuple[SemverVersion, str]:
+    """Parse a version.
+
+    Arguments:
+        version: The version to parse.
+
+    Returns:
+        semver_version: The semantic version.
+        prefix: The version prefix.
+    """
+    prefix = ""
+    if version[0] == "v":
+        prefix = "v"
+        version = version[1:]
+    return VersionInfo.parse(version), prefix
 
 
 class Section:
@@ -137,6 +150,21 @@ class Version:
         """
         return bool(self.tag.split(".", 2)[2])
 
+    def add_commit(self, commit: Commit) -> None:
+        """Register the given commit and add it to the relevant section based on its message convention.
+
+        Arguments:
+            commit: The git commit.
+        """
+        self.commits.append(commit)
+        commit.version = self.tag
+        if commit_type := commit.convention.get("type"):
+            if commit_type not in self.sections_dict:
+                section = Section(section_type=commit_type)
+                self.sections_list.append(section)
+                self.sections_dict[commit_type] = section
+            self.sections_dict[commit_type].commits.append(commit)
+
 
 class Changelog:
     """The main changelog class."""
@@ -151,6 +179,7 @@ class Changelog:
         r"%ce%n"  # committer email
         r"%cd%n"  # committer date
         r"%D%n"  # tag
+        r"%P%n"  # parent hashes
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
@@ -238,12 +267,14 @@ class Changelog:
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
         self.commits: list[Commit] = self.parse_commits()
+        self.tag_commits: list[Commit] = [commit for commit in self.commits[1:] if commit.tag]
+        self.tag_commits.insert(0, self.commits[0])
 
         # apply dates to commits and group them by version
-        dates = self._apply_versions_to_commits()
-        v_list, v_dict = self._group_commits_by_version(dates)
+        v_list, v_dict = self._group_commits_by_version()
         self.versions_list = v_list
         self.versions_dict = v_dict
+        self._assign_previous_versions()
 
         # TODO: remove at some point
         if bump_latest:
@@ -313,22 +344,27 @@ class Changelog:
     def parse_commits(self) -> list[Commit]:
         """Parse the output of 'git log' into a list of commits.
 
+        The commits build a Git commit graph by referencing their parent commits.
+        Commits are ordered from newest to oldest.
+
         Returns:
             The list of commits.
         """
         lines = self.raw_log.split("\n")
-        size = len(lines) - 1  # don't count last blank line
-        commits = []
+        size = len(lines) - 1  # Don't count last blank line.
         pos = 0
+
+        commits_map: dict[str, Commit] = {}
+
         while pos < size:
-            # build body
-            nbl_index = 9
+            # Build message body.
+            nbl_index = 10
             body = []
             while lines[pos + nbl_index] != self.MARKER:
                 body.append(lines[pos + nbl_index].strip("\r"))
                 nbl_index += 1
 
-            # build commit
+            # Build commit object.
             commit = Commit(
                 commit_hash=lines[pos],
                 author_name=lines[pos + 1],
@@ -338,78 +374,104 @@ class Changelog:
                 committer_email=lines[pos + 5],
                 committer_date=lines[pos + 6],
                 refs=lines[pos + 7],
-                subject=lines[pos + 8],
+                parent_hashes=lines[pos + 8],
+                commits_map=commits_map,
+                subject=lines[pos + 9],
                 body=body,
                 parse_trailers=self.parse_trailers,
             )
 
             pos += nbl_index + 1
 
-            # expand commit object with provider parsing
+            # Expand commit object with provider parsing.
             if self.provider:
                 commit.update_with_provider(self.provider, parse_refs=self.parse_provider_refs)
 
-            # set the commit url based on remote_url (could be wrong)
+            # Set the commit url based on remote_url (could be wrong).
             elif self.remote_url:
                 commit.url = self.remote_url + "/commit/" + commit.hash
 
-            # expand commit object with convention parsing
+            # Expand commit object with convention parsing.
             if self.convention:
                 commit.update_with_convention(self.convention)
 
-            commits.append(commit)
+            commits_map[commit.hash] = commit
 
-        return commits
+        return list(commits_map.values())
 
-    def _apply_versions_to_commits(self) -> dict[str, datetime.date]:
-        versions_dates = {"": datetime.date.today()}  # noqa: DTZ011
-        version = None
-        for commit in self.commits:
-            if commit.version:
-                version = commit.version
-                versions_dates[version] = commit.committer_date.date()
-            elif version:
-                commit.version = version
-        return versions_dates
+    def _group_commits_by_version(self) -> tuple[list[Version], dict[str, Version]]:
+        """Group commits into versions.
 
-    def _group_commits_by_version(
-        self,
-        dates: dict[str, datetime.date],
-    ) -> tuple[list[Version], dict[str, Version]]:
-        versions_list = []
-        versions_dict = {}
-        versions_types_dict: dict[str, dict[str, Section]] = {}
-        next_version = None
-        for commit in self.commits:
-            if commit.version not in versions_dict:
-                version = Version(tag=commit.version, date=dates[commit.version])
-                versions_dict[commit.version] = version
-                if self.provider:
-                    version.url = self.provider.get_tag_url(tag=commit.version)
-                if next_version:
-                    version.next_version = next_version
-                    next_version.previous_version = version
-                    if self.provider:
-                        next_version.compare_url = self.provider.get_compare_url(
-                            base=version.tag,
-                            target=next_version.tag or "HEAD",
-                        )
-                next_version = version
-                versions_list.append(version)
-                versions_types_dict[commit.version] = {}
-            versions_dict[commit.version].commits.append(commit)
-            if "type" in commit.convention and commit.convention["type"] not in versions_types_dict[commit.version]:
-                section = Section(section_type=commit.convention["type"])
-                versions_types_dict[commit.version][commit.convention["type"]] = section
-                versions_dict[commit.version].sections_list.append(section)
-                versions_dict[commit.version].sections_dict = versions_types_dict[commit.version]
-            versions_types_dict[commit.version][commit.convention["type"]].commits.append(commit)
-        if next_version is not None and self.provider:
-            next_version.compare_url = self.provider.get_compare_url(
-                base=versions_list[-1].commits[-1].hash,
-                target=next_version.tag or "HEAD",
-            )
+        Commits are assigned to the version they were first released with.
+        A commit is assigned to exactly one version.
+
+        Returns:
+            versions_list: The list of versions order descending by timestamp.
+            versions_dict: A dictionary of versions with the tag name as keys.
+        """
+        versions_dict: dict[str, Version] = {}
+        versions_list: list[Version] = []
+
+        # Iterate in reversed order (oldest to newest tag) to assign commits to the first version they were released with.
+        for tag_commit in reversed(self.tag_commits):
+            # Create new version object.
+            version = self._create_version(tag_commit)
+            versions_dict[tag_commit.version] = version
+            versions_list.insert(0, version)
+
+            # Find all commits for this version by following the commit graph.
+            version.add_commit(tag_commit)
+            next_commits = tag_commit.parent_commits  # Always new: we can mutate it.
+            while next_commits:
+                next_commit = next_commits.pop(0)
+                if not next_commit.tag and not next_commit.version:
+                    version.add_commit(next_commit)
+                    next_commits.extend(next_commit.parent_commits)
+
         return versions_list, versions_dict
+
+    def _create_version(self, commit: Commit) -> Version:
+        date = commit.committer_date.date() if commit.version else datetime.date.today()  # noqa: DTZ011
+        version = Version(tag=commit.version, date=date)
+        if self.provider:
+            version.url = self.provider.get_tag_url(tag=commit.version)
+        return version
+
+    def _assign_previous_versions(self) -> None:
+        """Assign each version its previous version and create the compare URL.
+
+        The previous version is defined as the version with the highest semantic version,
+        that is found by following the commit graph.
+
+        If no previous version is found, either because it is the first commit or
+        due to the commit filter excluding it, the compare URL is created with the
+        first commit (oldest).
+        """
+        for version in self.versions_list:
+            next_commits = version.commits[0].parent_commits  # Always new: we can mutate it.
+            previous_semver: SemverVersion | None = None
+            previous_version = ""
+            while next_commits:
+                next_commit = next_commits.pop(0)
+                if next_commit.tag:
+                    semver, _ = parse_version(next_commit.tag)
+                    if not previous_semver or semver.compare(previous_semver) > 0:
+                        previous_semver = semver
+                        previous_version = next_commit.tag
+                else:
+                    next_commits.extend(next_commit.parent_commits)
+
+            if not previous_version:
+                previous_version = version.commits[-1].hash
+
+            version.previous_version = self.versions_dict.get(previous_version)
+            if version.previous_version:
+                version.previous_version.next_version = version
+            if self.provider:
+                version.compare_url = self.provider.get_compare_url(
+                    base=previous_version,
+                    target=version.tag or "HEAD",
+                )
 
     def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]

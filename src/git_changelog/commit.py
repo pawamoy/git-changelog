@@ -39,6 +39,8 @@ class Commit:
         url: str = "",
         *,
         parse_trailers: bool = False,
+        parent_hashes: str | list[str] = "",
+        commits_map: dict[str, Commit] | None = None,
     ):
         """Initialization method.
 
@@ -85,6 +87,11 @@ class Commit:
         self.tag: str = tag
         self.version: str = tag
 
+        if isinstance(parent_hashes, str):
+            parent_hashes = parent_hashes.split()
+        self.parent_hashes = parent_hashes
+        self._commits_map = commits_map
+
         self.text_refs: dict[str, list[Ref]] = {}
         self.convention: dict[str, Any] = {}
 
@@ -93,6 +100,15 @@ class Commit:
 
         if parse_trailers:
             self._parse_trailers()
+
+    @property
+    def parent_commits(self) -> list[Commit]:
+        """Parent commits of this commit."""
+        if not self._commits_map:
+            return []
+        return [
+            self._commits_map[parent_hash] for parent_hash in self.parent_hashes if parent_hash in self._commits_map
+        ]
 
     def update_with_convention(self, convention: CommitConvention) -> None:
         """Apply the convention-parsed data to this commit.
