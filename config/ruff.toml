@@ -1,53 +1,27 @@
 target-version = "py38"
 line-length = 120
+
+[lint]
 exclude = [
     "fixtures",
     "site",
 ]
 select = [
-    "A",
-    "ANN",
-    "ARG",
-    "B",
-    "BLE",
-    "C",
-    "C4",
+    "A", "ANN", "ARG",
+    "B", "BLE",
+    "C", "C4",
     "COM",
-    "D",
-    "DTZ",
-    "E",
-    "ERA",
-    "EXE",
-    "F",
-    "FBT",
+    "D", "DTZ",
+    "E", "ERA", "EXE",
+    "F", "FBT",
     "G",
-    "I",
-    "ICN",
-    "INP",
-    "ISC",
+    "I", "ICN", "INP", "ISC",
     "N",
-    "PGH",
-    "PIE",
-    "PL",
-    "PLC",
-    "PLE",
-    "PLR",
-    "PLW",
-    "PT",
-    "PYI",
+    "PGH", "PIE", "PL", "PLC", "PLE", "PLR", "PLW", "PT", "PYI",
     "Q",
-    "RUF",
-    "RSE",
-    "RET",
-    "S",
-    "SIM",
-    "SLF",
-    "T",
-    "T10",
-    "T20",
-    "TCH",
-    "TID",
-    "TRY",
+    "RUF", "RSE", "RET",
+    "S", "SIM", "SLF",
+    "T", "T10", "T20", "TCH", "TID", "TRY",
     "UP",
     "W",
     "YTT",
@@ -74,7 +48,7 @@ ignore = [
     "UP032",  # Use f-string instead of `format` call
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "src/*/cli.py" = [
     "T201",  # Print statement
 ]
@@ -92,16 +66,16 @@ ignore = [
     "S101",  # Use of assert detected
 ]
 
-[flake8-quotes]
+[lint.flake8-quotes]
 docstring-quotes = "double"
 
-[flake8-tidy-imports]
+[lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[isort]
+[lint.isort]
 known-first-party = ["git_changelog"]
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "google"
 
 [format]
