@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.4.1](https://github.com/pawamoy/git-changelog/releases/tag/2.4.1) - 2024-03-14
+
+<small>[Compare with 2.4.0](https://github.com/pawamoy/git-changelog/compare/2.4.0...2.4.1)</small>
+
+### Bug Fixes
+
+- Assign commits to versions following their commit graph (follow semver) ([f191ed7](https://github.com/pawamoy/git-changelog/commit/f191ed7c05029674e52c8ada55e0d9e861c320cc) by Christian Meffert). [Issue-70](https://github.com/pawamoy/git-changelog/issues/70), [Issue-42](https://github.com/pawamoy/git-changelog/issues/42), [PR-72](https://github.com/pawamoy/git-changelog/pull/72), Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
+- Ignore bump on new Git repo without unreleased commits ([438968c](https://github.com/pawamoy/git-changelog/commit/438968c711da86bc7398246deb8679e534d67453) by Christian Meffert). [PR-71](https://github.com/pawamoy/git-changelog/pull/71)
+- Use provided version when creating first changelog entry ([dd264cc](https://github.com/pawamoy/git-changelog/commit/dd264cc9f8c530371b33c1e5d3b5083839659bd9) by Christian Meffert). [PR-69](https://github.com/pawamoy/git-changelog/pull/69)
+
 ## [2.4.0](https://github.com/pawamoy/git-changelog/releases/tag/2.4.0) - 2023-11-04
 
 <small>[Compare with 2.3.2](https://github.com/pawamoy/git-changelog/compare/2.3.2...2.4.0)</small>
