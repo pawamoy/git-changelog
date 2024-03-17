@@ -47,6 +47,39 @@ def test_no_bump_on_first_tag(repo: GitRepo, bump: str) -> None:
     assert changelog.versions_list[0].tag == "1.1.1"
 
 
+def test_ignore_nonsemver_tag(repo: GitRepo) -> None:
+    r"""Test parsing and grouping commits to versions.
+
+    Commit graph:
+                 1.0.0
+                   |
+    main       A-B-C
+                 |
+               dummy
+
+    Expected:
+    - 1.0.0: C B A
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    commit_a = repo.first_hash
+    commit_b = repo.commit("fix: B")
+    repo.tag("dummy")
+    commit_c = repo.commit("feat: C")
+    repo.tag("1.0.0")
+
+    changelog = Changelog(repo.path, convention=AngularConvention)
+
+    assert len(changelog.versions_list) == 1
+    _assert_version(
+        changelog.versions_list[0],
+        expected_tag="1.0.0",
+        expected_prev_tag=None,
+        expected_commits=[commit_c, commit_b, commit_a],
+    )
+
+
 def test_one_release_branch_with_feat_branch(repo: GitRepo) -> None:
     r"""Test parsing and grouping commits to versions.
 
