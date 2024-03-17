@@ -200,7 +200,7 @@ def _assert_version(
 
 
 def test_no_remote_url(repo: GitRepo) -> None:
-    r"""Test parsing and grouping commits to versions without a git remote.
+    """Test parsing and grouping commits to versions without a git remote.
 
     Parameters:
         repo: GitRepo to a temporary repository.
