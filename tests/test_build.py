@@ -197,3 +197,24 @@ def _assert_version(
         assert version.previous_version is None
     hashes = [commit.hash for commit in version.commits]
     assert hashes == expected_commits
+
+
+def test_no_remote_url(repo: GitRepo) -> None:
+    r"""Test parsing and grouping commits to versions without a git remote.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.git("remote", "remove", "origin")
+    commit_a = repo.first_hash
+    repo.tag("1.0.0")
+
+    changelog = Changelog(repo.path, convention=AngularConvention)
+
+    assert len(changelog.versions_list) == 1
+    _assert_version(
+        changelog.versions_list[0],
+        expected_tag="1.0.0",
+        expected_prev_tag=None,
+        expected_commits=[commit_a],
+    )
