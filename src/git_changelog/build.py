@@ -157,7 +157,7 @@ class Version:
             commit: The git commit.
         """
         self.commits.append(commit)
-        commit.version = self.tag
+        commit.version = self.tag or "HEAD"
         if commit_type := commit.convention.get("type"):
             if commit_type not in self.sections_dict:
                 section = Section(section_type=commit_type)

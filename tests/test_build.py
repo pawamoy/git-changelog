@@ -218,3 +218,41 @@ def test_no_remote_url(repo: GitRepo) -> None:
         expected_prev_tag=None,
         expected_commits=[commit_a],
     )
+
+
+def test_merge_into_unreleased(repo: GitRepo) -> None:
+    r"""Test parsing and grouping commits to versions.
+
+    Commit graph:
+    main       A---C---E
+                \ / \ /
+    feat         B   D
+
+    Expected:
+    - Unreleased: E D C B A
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    commit_a = repo.first_hash
+    repo.branch("feat/1")
+    repo.checkout("feat/1")
+    commit_b = repo.commit("feat: B")
+    repo.checkout("main")
+    commit_c = repo.merge("feat/1")
+    repo.branch("feat/2")
+    repo.checkout("feat/2")
+    commit_d = repo.commit("feat: D")
+    repo.checkout("main")
+    commit_e = repo.merge("feat/2")
+
+    changelog = Changelog(repo.path, convention=AngularConvention)
+
+    assert len(changelog.versions_list) == 1
+    version = changelog.versions_list[0]
+    _assert_version(
+        version,
+        expected_tag="0.1.0",
+        expected_prev_tag=None,
+        expected_commits=[commit_e, commit_c, commit_d, commit_a, commit_b],
+    )
