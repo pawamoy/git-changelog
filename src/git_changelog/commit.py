@@ -88,11 +88,11 @@ class Commit:
 
         tag = ""
         for ref in refs.split(","):
-            tag_ref = ref.strip()
-            if tag_ref.startswith("tag: "):
-                tag_ref = tag_ref.replace("tag: ", "")
-                if _is_semver(tag_ref):
-                    tag = tag_ref
+            ref = ref.strip()  # noqa: PLW2901
+            if ref.startswith("tag: "):
+                ref = ref.replace("tag: ", "")  # noqa: PLW2901
+                if _is_semver(ref):
+                    tag = ref
                     break
         self.tag: str = tag
         self.version: str = tag
