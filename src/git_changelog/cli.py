@@ -70,7 +70,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "repository": ".",
     "sections": None,
     "template": "keepachangelog",
-    "template_vars": {},
+    "jinja_context": {},
     "version_regex": DEFAULT_VERSION_REGEX,
     "zerover": True,
 }
@@ -350,13 +350,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="The Git revision-range filter to use (e.g. `v1.2.0..`). Default: no filter.",
     )
     parser.add_argument(
-        "--template-var",
+        "-j",
+        "--jinja-context",
         action=_ParseDictAction,
         metavar=("KEY", "VALUE"),
         nargs=2,
-        dest="template_vars",
+        dest="jinja_context",
         help="Pass additional key/value pairs to the template. Option can be used multiple times. "
-        "The key/value pairs are accessible as 'template_vars' in the Jinja2 template.",
+        "The key/value pairs are accessible as 'jinja_context' in the template.",
     )
     parser.add_argument(
         "-V",
@@ -467,7 +468,6 @@ def parse_settings(args: list[str] | None = None) -> dict:
     """
     parser = get_parser()
     opts = vars(parser.parse_args(args=args))
-    print(opts)
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
@@ -484,18 +484,18 @@ def parse_settings(args: list[str] | None = None) -> dict:
     elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
         config_file = DEFAULT_CONFIG_FILES
 
-    template_vars = explicit_opts_dict.pop("template_vars", {})
+    jinja_context = explicit_opts_dict.pop("jinja_context", {})
 
     settings = read_config(config_file)
 
     # CLI arguments override the config file settings
     settings.update(explicit_opts_dict)
 
-    # Merge template_vars
-    if template_vars and settings.get("template_vars"):
-        settings["template_vars"].update(template_vars)
-    elif template_vars:
-        settings["template_vars"] = template_vars
+    # Merge jinja context, CLI values override config file values.
+    if jinja_context and settings.get("jinja_context"):
+        settings["jinja_context"].update(jinja_context)
+    elif jinja_context:
+        settings["jinja_context"] = jinja_context
 
     # TODO: remove at some point
     if "bump_latest" in explicit_opts_dict:
@@ -521,7 +521,7 @@ def build_and_render(
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
-    template_vars: str | None = None,
+    jinja_context: dict[str, str] | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -546,6 +546,7 @@ def build_and_render(
         bump: Whether to try and bump to a given version.
         zerover: Keep major version at zero, even for breaking changes.
         filter_commits: The Git revision-range used to filter commits in git-log.
+        jinja_context: Key/value pairs passed to the Jinja template.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -629,7 +630,12 @@ def build_and_render(
 
         # render new entries
         rendered = (
-            jinja_template.render(changelog=changelog, template_vars=template_vars, in_place=True).rstrip("\n") + "\n"
+            jinja_template.render(
+                changelog=changelog,
+                jinja_context=jinja_context,
+                in_place=True,
+            ).rstrip("\n")
+            + "\n"
         )
 
         # find marker line(s) in current changelog
@@ -649,7 +655,7 @@ def build_and_render(
 
     # overwrite output file
     else:
-        rendered = jinja_template.render(changelog=changelog, template_vars=template_vars)
+        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
 
         # write result in specified output
         if output is sys.stdout:

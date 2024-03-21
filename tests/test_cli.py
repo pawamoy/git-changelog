@@ -217,14 +217,14 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
 
 
 # IMPORTANT: See top module comment.
-def test_additional_template_vars(repo: GitRepo) -> None:
+def test_jinja_context(repo: GitRepo) -> None:
     """Render template with custom template variables.
 
     Parameters:
         repo: Temporary Git repository (fixture).
     """
     repo.path.joinpath("conf.toml").write_text(
-        """[template_vars]
+        """[jinja_context]
         k1 = "ignored"
         k2 = "v2"
         k3 = "v3"
@@ -232,8 +232,7 @@ def test_additional_template_vars(repo: GitRepo) -> None:
     )
 
     template = repo.path.joinpath(".custom_template.md.jinja")
-    with template.open("w") as fh:
-        fh.write("{% for key, val in template_vars.items() %}{{ key }} = {{ val }}\n{% endfor %}")
+    template.write_text("{% for key, val in jinja_context.items() %}{{ key }} = {{ val }}\n{% endfor %}")
 
     exit_code = cli.main(
         [
@@ -243,10 +242,10 @@ def test_additional_template_vars(repo: GitRepo) -> None:
             str(repo.path / "CHANGELOG.md"),
             "-t",
             f"path:{template}",
-            "--template-var",
+            "--jinja-context",
             "k1",
             "v1",
-            "--template-var",
+            "-j",
             "k3",
             "v3",
             str(repo.path),
@@ -255,8 +254,7 @@ def test_additional_template_vars(repo: GitRepo) -> None:
 
     assert exit_code == 0
 
-    changelog = repo.path.joinpath("CHANGELOG.md")
-    with changelog.open("r") as fh:
-        contents = fh.read()
+    contents = repo.path.joinpath("CHANGELOG.md").read_text()
+    assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"
 
     assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"
