@@ -25,14 +25,13 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 - Parses [Git trailers][git-trailers], allowing to reference
   issues, PRs, etc., in your commit messages
   in a clean, provider-agnostic way.
+- Template context injection,
+  to furthermore customize how your changelog will be rendered.
 
 - Todo:
     - [Plugin architecture][issue-19],
       to support more commit conventions and git services.
-    - [Template context injection][issue-17],
-      to furthermore customize how your changelog will be rendered.
     - [Easy access to "Breaking Changes"][issue-14] in the templates.
-    - [Commits/dates/versions range limitation ability][issue-16].
 
 [jinja2]:                 http://jinja.pocoo.org/
 [keep-a-changelog]:       http://keepachangelog.com/en/1.0.0/
@@ -47,9 +46,6 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [git-trailers]:           https://git-scm.com/docs/git-interpret-trailers
 
 [issue-14]: https://github.com/pawamoy/git-changelog/issues/14
-[issue-15]: https://github.com/pawamoy/git-changelog/issues/15
-[issue-16]: https://github.com/pawamoy/git-changelog/issues/16
-[issue-17]: https://github.com/pawamoy/git-changelog/issues/17
 [issue-19]: https://github.com/pawamoy/git-changelog/issues/19
 
 ## Installation
@@ -68,16 +64,6 @@ pipx install git-changelog
 ```
 
 ## Usage
-
-```
-git-changelog [--config-file [PATH ...]] [-b] [-B VERSION] [-h] [-i]
-              [-g VERSION_REGEX] [-m MARKER_LINE] [-o OUTPUT]
-              [-p {github,gitlab,bitbucket}] [-r] [-R] [-I INPUT]
-              [-c {angular,conventional,basic}] [-s SECTIONS]
-              [-t {angular,keepachangelog}] [-T] [-E] [-Z] [-F FILTER_COMMITS]
-              [-V] [--debug-info]
-              [REPOSITORY]
-```
 
 Simply run `git-changelog` in your repository to output a changelog on standard output.
 To show the different options and their descriptions, use `git-changelog -h`.

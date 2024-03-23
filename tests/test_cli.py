@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+from textwrap import dedent
 from typing import TYPE_CHECKING, Any, Iterator
 
 import pytest
@@ -18,6 +19,8 @@ from git_changelog import cli, debug
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from tests.helpers import GitRepo
 
 
 if sys.version_info >= (3, 11):
@@ -212,3 +215,45 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
     assert "system" in captured
     assert "environment" in captured
     assert "packages" in captured
+
+
+# IMPORTANT: See top module comment.
+def test_jinja_context(repo: GitRepo) -> None:
+    """Render template with custom template variables.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    repo.path.joinpath("conf.toml").write_text(
+        dedent(
+            """[jinja_context]
+            k1 = "ignored"
+            k2 = "v2"
+            k3 = "v3"
+            """,
+        ),
+    )
+
+    template = repo.path.joinpath(".custom_template.md.jinja")
+    template.write_text("{% for key, val in jinja_context.items() %}{{ key }} = {{ val }}\n{% endfor %}")
+
+    exit_code = cli.main(
+        [
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "-o",
+            str(repo.path / "CHANGELOG.md"),
+            "-t",
+            f"path:{template}",
+            "--jinja-context",
+            "k1=v1",
+            "-j",
+            "k3=v3",
+            str(repo.path),
+        ],
+    )
+
+    assert exit_code == 0
+
+    contents = repo.path.joinpath("CHANGELOG.md").read_text()
+    assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"

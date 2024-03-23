@@ -287,12 +287,107 @@ git-changelog --template keepachangelog
 You can also write and use your own changelog templates.
 Templates are single files written using the [Jinja][jinja] templating engine.
 You can get inspiration from
-[the source of our built-in templates](https://github.com/pawamoy/git-changelog/tree/master/src/git_changelog/templates).
+[the source of our built-in templates][builtin-templates].
 
-Prefix value passed to the `--template` option with `path:` to use a custom template:
+Prefix the value passed to the `--template` option with `path:` to use a custom template:
 
 ```bash
 git-changelog --template path:mytemplate.md
+```
+
+### Writing a changelog template
+
+To write your own changelog template,
+we recommend using our [keepachangelog built-in template][keepachangelog-template]
+as a starting point.
+
+From there, simply modify the different Jinja macros:
+
+- `render_commit()`, which accepts a [Commit][git_changelog.build.Commit] object
+- `render_section()`, which accepts a [Section][git_changelog.build.Section] object
+- `render_version()`, which accepts a [Version][git_changelog.build.Version] object
+
+Then, also update the template at the end, to change the changelog's header
+or add a changelog footer for example.
+
+The variables available in the template are `changelog`,
+which is a [Changelog][git_changelog.build.Changelog] instance,
+and `in_place`, which is a boolean, and tells whether the changelog
+is being updated in-place.
+
+> QUESTION: **How to get spacing right?**
+> Although spacing (line jumps) is not super important in Markdown contents
+> (it won't change HTML output), it is best if you get spacing right,
+> as it makes prettier changelog files, and will reduce the noise
+> in diffs when you commit an update to your changelog.
+>
+> To manage spacing (in Jinja terms, [control whitespace][control-whitespace])
+> Jinja allows to "eat" spaces on the left or right of an expression,
+> by adding a dash after/before the percent sign: `{%-` and `-%}`.
+> However, spacing is not always easy to get right with Jinja,
+> so here are two tips that we find helpful:
+>
+> - **To collapse content up**, eat spaces on the **left**, and add new lines
+>     at the **top** of the Jinja block:
+>
+>     ```django
+>     Some text.
+>     {%- if some_condition %}
+>
+>     Some content.
+>     {%- endif %}
+>     ```
+>
+>     If the condition is true, there will be exactly one blank line
+>     between "Some text" and "Some content". If not, there won't be
+>     extreanous trailing blank lines :+1:
+>
+> - **To collapse content down**, eat spaces on the **right**, and add new lines
+>     at the **bottom** of the Jinja block:
+>
+>     ```django
+>     {% if some_condition -%}
+>     Some content.
+>
+>     {% endif -%}
+>     Some text.
+>     ```
+>
+>     If the condition is true, there will be exactly one blank line
+>     between "Some content" and "Some text". If not, there won't be
+>     extreanous leading blank lines :+1:
+
+### Extra Jinja context
+
+[(--jinja-context)](cli.md#jinja_context)
+
+Your custom changelog templates can support user-provided extra Jinja context.
+This extra context is available in the `jinja_context` variable, which is a dictionary,
+and is passed by users with the `-j`, `--jinja-context` CLI option
+or with the `jinja_context` configuration option.
+
+For example, you could let users specify their own changelog footer
+by adding this at the end of your template:
+
+```django
+{% if jinja_context.footer %}
+{{ jinja_context.footer }}
+{% endif %}
+```
+
+Then users would be able to provide their own footer with the CLI option:
+
+```bash
+git-changelog -t path:changelog.md -j footer="Copyright 2024 My Company"
+```
+
+...or with the configuration option:
+
+```toml
+template = "path:changelog.md"
+
+[jinja_context]
+footer = "Copyright 2024 My Company"
 ```
 
 ## Filter commits
@@ -589,3 +684,6 @@ and `--marker-line`.
 [semver]: https://semver.org/
 [git-trailers]: https://git-scm.com/docs/git-interpret-trailers
 [softprops/action-gh-release]: https://github.com/softprops/action-gh-release
+[keepachangelog-template]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates/keepachangelog.md
+[builtin-templates]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates
+[control-whitespace]: https://jinja.palletsprojects.com/en/3.1.x/templates/#whitespace-control
