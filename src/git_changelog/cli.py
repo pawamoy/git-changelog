@@ -492,10 +492,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
     settings.update(explicit_opts_dict)
 
     # Merge jinja context, CLI values override config file values.
-    if jinja_context and settings.get("jinja_context"):
-        settings["jinja_context"].update(jinja_context)
-    elif jinja_context:
-        settings["jinja_context"] = jinja_context
+    settings["jinja_context"].update(jinja_context)
 
     # TODO: remove at some point
     if "bump_latest" in explicit_opts_dict:
