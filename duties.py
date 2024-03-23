@@ -5,26 +5,21 @@ from __future__ import annotations
 import os
 import sys
 from contextlib import contextmanager
+from cProfile import Profile
 from importlib.metadata import version as pkgversion
 from pathlib import Path
+from pstats import SortKey, Stats
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Iterator
 
 from duty import duty
 from duty.callables import coverage, lazy, mkdocs, mypy, pytest, ruff, safety
 
-if TYPE_CHECKING:
-    from duty.context import Context
-
-from cProfile import Profile
-from pstats import SortKey, Stats
-from typing import TYPE_CHECKING
-
 from git_changelog import Changelog
 from git_changelog.commit import AngularConvention
 
 if TYPE_CHECKING:
-    from tests.helpers import GitRepo
+    from duty.context import Context
 
 PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py", "scripts"))
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
