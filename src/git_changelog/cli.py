@@ -521,7 +521,7 @@ def build_and_render(
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
-    jinja_context: dict[str, str] | None = None,
+    jinja_context: dict[str, Any] | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 

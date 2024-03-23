@@ -256,5 +256,3 @@ def test_jinja_context(repo: GitRepo) -> None:
 
     contents = repo.path.joinpath("CHANGELOG.md").read_text()
     assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"
-
-    assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"
