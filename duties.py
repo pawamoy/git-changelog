@@ -21,6 +21,7 @@ from git_changelog.commit import AngularConvention
 if TYPE_CHECKING:
     from duty.context import Context
 
+
 PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py", "scripts"))
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
 PY_SRC = " ".join(PY_SRC_LIST)
