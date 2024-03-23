@@ -5,12 +5,18 @@ from __future__ import annotations
 import os
 import sys
 from contextlib import contextmanager
+from cProfile import Profile
 from importlib.metadata import version as pkgversion
 from pathlib import Path
+from pstats import SortKey, Stats
+from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Iterator
 
 from duty import duty
 from duty.callables import coverage, lazy, mkdocs, mypy, pytest, ruff, safety
+
+from git_changelog import Changelog
+from git_changelog.commit import AngularConvention
 
 if TYPE_CHECKING:
     from duty.context import Context
@@ -283,3 +289,36 @@ def vscode(ctx: Context) -> None:
 
     for filename in ("launch.json", "settings.json", "tasks.json"):
         ctx.run(update_config, args=[filename], title=f"Update .vscode/{filename}")
+
+
+@duty
+def profile(ctx: Context, merge: int = 15) -> None:
+    """Profile the parsing and grouping of commits.
+
+    Parameters:
+        merge: Number of times to merge a branch in the temporary repository.
+    """
+    try:
+        from tests.helpers import GitRepo
+    except ModuleNotFoundError:
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).parent))
+        from tests.helpers import GitRepo
+
+    def merge_branches(repo: GitRepo, branch: str = "feat", times: int = 15) -> None:
+        for _ in range(times):
+            repo.branch(branch)
+            repo.checkout(branch)
+            repo.commit(f"feat: {branch}")
+            repo.checkout("main")
+            repo.merge(branch)
+            repo.git("branch", "-d", branch)
+
+    with TemporaryDirectory() as tmp_dir:
+        repo = GitRepo(Path(tmp_dir) / "repo")
+        ctx.run(merge_branches, args=(repo, "feat", merge), title="Creating temporary repository")
+
+        with Profile() as profile:
+            Changelog(repo.path, convention=AngularConvention)
+        Stats(profile).strip_dirs().sort_stats(SortKey.TIME).print_stats()

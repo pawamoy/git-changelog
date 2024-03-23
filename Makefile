@@ -16,6 +16,7 @@ actions = \
 	docs-deploy \
 	format \
 	help \
+	profile \
 	release \
 	run \
 	setup \

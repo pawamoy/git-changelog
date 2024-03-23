@@ -274,7 +274,6 @@ class Changelog:
         v_list, v_dict = self._group_commits_by_version()
         self.versions_list = v_list
         self.versions_dict = v_dict
-        self._assign_previous_versions()
 
         # TODO: remove at some point
         if bump_latest:
@@ -411,6 +410,7 @@ class Changelog:
         """
         versions_dict: dict[str, Version] = {}
         versions_list: list[Version] = []
+        previous_versions: dict[str, str] = {}
 
         # Iterate in reversed order (oldest to newest tag) to assign commits to the first version they were released with.
         for tag_commit in reversed(self.tag_commits):
@@ -421,13 +421,20 @@ class Changelog:
 
             # Find all commits for this version by following the commit graph.
             version.add_commit(tag_commit)
+            previous_semver: SemverVersion | None = None
             next_commits = tag_commit.parent_commits  # Always new: we can mutate it.
             while next_commits:
                 next_commit = next_commits.pop(0)
-                if not next_commit.tag and not next_commit.version:
+                if next_commit.tag:
+                    semver, _ = parse_version(next_commit.tag)
+                    if not previous_semver or semver.compare(previous_semver) > 0:
+                        previous_semver = semver
+                        previous_versions[version.tag] = next_commit.tag
+                elif not next_commit.version:
                     version.add_commit(next_commit)
                     next_commits.extend(next_commit.parent_commits)
 
+        self._assign_previous_versions(versions_dict, previous_versions)
         return versions_list, versions_dict
 
     def _create_version(self, commit: Commit) -> Version:
@@ -437,7 +444,7 @@ class Changelog:
             version.url = self.provider.get_tag_url(tag=commit.version)
         return version
 
-    def _assign_previous_versions(self) -> None:
+    def _assign_previous_versions(self, versions_dict: dict[str, Version], previous_versions: dict[str, str]) -> None:
         """Assign each version its previous version and create the compare URL.
 
         The previous version is defined as the version with the highest semantic version,
@@ -446,25 +453,14 @@ class Changelog:
         If no previous version is found, either because it is the first commit or
         due to the commit filter excluding it, the compare URL is created with the
         first commit (oldest).
+
+        Arguments:
+            versions_dict: A dictionary of versions with the tag name as keys.
+            previous_versions: A dictonary with version and previous version.
         """
-        for version in self.versions_list:
-            next_commits = version.commits[0].parent_commits  # Always new: we can mutate it.
-            previous_semver: SemverVersion | None = None
-            previous_version = ""
-            while next_commits:
-                next_commit = next_commits.pop(0)
-                if next_commit.tag:
-                    semver, _ = parse_version(next_commit.tag)
-                    if not previous_semver or semver.compare(previous_semver) > 0:
-                        previous_semver = semver
-                        previous_version = next_commit.tag
-                else:
-                    next_commits.extend(next_commit.parent_commits)
-
-            if not previous_version:
-                previous_version = version.commits[-1].hash
-
-            version.previous_version = self.versions_dict.get(previous_version)
+        for version in versions_dict.values():
+            previous_version = previous_versions.get(version.tag, version.commits[-1].hash)
+            version.previous_version = versions_dict.get(previous_version)
             if version.previous_version:
                 version.previous_version.next_version = version
             if self.provider:
