@@ -384,8 +384,9 @@ git-changelog -t path:changelog.md -j footer="Copyright 2024 My Company"
 ...or with the configuration option:
 
 ```toml
-[jinja_context]
 template = "path:changelog.md"
+
+[jinja_context]
 footer = "Copyright 2024 My Company"
 ```
 

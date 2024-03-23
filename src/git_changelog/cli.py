@@ -112,8 +112,9 @@ class _ParseDictAction(argparse.Action):
         attribute = getattr(namespace, self.dest)
         if not isinstance(attribute, dict):
             setattr(namespace, self.dest, {})
-        if isinstance(values, list) and len(values) == 2:  # noqa: PLR2004
-            getattr(namespace, self.dest)[values[0]] = values[1]
+        if isinstance(values, str):
+            key, value = values.split("=", 1)
+            getattr(namespace, self.dest)[key] = value
 
 
 providers: dict[str, type[ProviderRefParser]] = {
@@ -353,8 +354,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-j",
         "--jinja-context",
         action=_ParseDictAction,
-        metavar=("KEY", "VALUE"),
-        nargs=2,
+        metavar="KEY=VALUE",
         dest="jinja_context",
         help="Pass additional key/value pairs to the template. Option can be used multiple times. "
         "The key/value pairs are accessible as 'jinja_context' in the template.",

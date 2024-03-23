@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+from textwrap import dedent
 from typing import TYPE_CHECKING, Any, Iterator
 
 import pytest
@@ -224,11 +225,13 @@ def test_jinja_context(repo: GitRepo) -> None:
         repo: Temporary Git repository (fixture).
     """
     repo.path.joinpath("conf.toml").write_text(
-        """[jinja_context]
-        k1 = "ignored"
-        k2 = "v2"
-        k3 = "v3"
-        """.lstrip(),
+        dedent(
+            """[jinja_context]
+            k1 = "ignored"
+            k2 = "v2"
+            k3 = "v3"
+            """,
+        ),
     )
 
     template = repo.path.joinpath(".custom_template.md.jinja")
@@ -243,11 +246,9 @@ def test_jinja_context(repo: GitRepo) -> None:
             "-t",
             f"path:{template}",
             "--jinja-context",
-            "k1",
-            "v1",
+            "k1=v1",
             "-j",
-            "k3",
-            "v3",
+            "k3=v3",
             str(repo.path),
         ],
     )
