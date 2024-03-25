@@ -9,8 +9,6 @@ from contextlib import suppress
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, ClassVar, Pattern
 
-from semver import VersionInfo
-
 if TYPE_CHECKING:
     from git_changelog.providers import ProviderRefParser, Ref
 
@@ -21,12 +19,6 @@ def _clean_body(lines: list[str]) -> list[str]:
     while lines and not lines[-1].strip():
         lines.pop()
     return lines
-
-
-def _is_semver(version: str) -> bool:
-    if version[0] == "v":
-        version = version[1:]
-    return VersionInfo.is_valid(version)
 
 
 class Commit:
@@ -90,10 +82,8 @@ class Commit:
         for ref in refs.split(","):
             ref = ref.strip()  # noqa: PLW2901
             if ref.startswith("tag: "):
-                ref = ref.replace("tag: ", "")  # noqa: PLW2901
-                if _is_semver(ref):
-                    tag = ref
-                    break
+                tag = ref.replace("tag: ", "")
+                break
         self.tag: str = tag
         self.version: str = tag
 
