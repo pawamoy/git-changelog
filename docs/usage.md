@@ -74,6 +74,7 @@ build_and_render(
     parse_trailers=True,
     parse_refs=False,
     sections=("build", "deps", "feat", "fix", "refactor"),
+    versioning="pep440",
     bump="auto",
     in_place=True,
 )
@@ -129,6 +130,7 @@ repository = "."
 sections = ["fix", "maint"]
 template = "angular"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+versioning = "semver"
 zerover = true
 ```
 
@@ -150,6 +152,7 @@ repository = "."
 sections = "fix,maint"
 template = "keepachangelog"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+versioning = "semver"
 zerover = true
 ```
 
@@ -421,7 +424,11 @@ git-changelog --filter-commits "2c0dbb8.."
 ## Understand the relationship with SemVer
 
 [(--bump)](cli.md#bump)<br>
+[(--versioning)](cli.md#versioning)<br>
 [(--zerover)](cli.md#zerover)
+
+*Although git-changelog supports several [versioning schemes](#choose-a-versioning-scheme),
+SemVer plays a particular role when managing versions.*
 
 [SemVer][semver], or Semantic Versioning, helps users of tools and libraries
 understand the impact of version changes. To quote SemVer itself:
@@ -460,6 +467,10 @@ git-changelog --bump major  # 1.2.3 -> 2.0.0
 git-changelog --bump minor  # 1.2.3 -> 1.3.0
 git-changelog --bump patch  # 1.2.3 -> 1.2.4
 ```
+
+As different schemes have different bumping strategies,
+the selected scheme will affect the `--bump` option.
+See [PEP 440 strategies](#pep-440) and [SemVer strategies](#semver).
 
 ### ZeroVer
 
@@ -502,6 +513,153 @@ On a fresh project, start by setting `zerover = true` in one of the supported
 to bump to v1, set `zerover = false` and commit it as a breaking change.
 Once v1 is released, the setting has no use anymore, and you can remove it
 from your configuration file.
+
+## Choose a versioning scheme
+
+[(--bump)](cli.md#bump)<br>
+[(--versioning)](cli.md#versioning)<br>
+[(--zerover)](cli.md#zerover)
+
+*git-changelog* currently supports the following versioning schemes:
+
+- `pep440`, see [PEP 440][pep440]
+- `semver`, see [SemVer][semver]
+
+Versioning schemes are useful to *git-changelog* when grouping commits
+from your Git history into versions, and when bumping versions.
+
+To choose a specific scheme, use the `-n`, `--versioning` CLI option:
+
+```bash
+git-changelog -n pep440
+```
+
+For backward compatibility reasons, it uses the SemVer scheme by default.
+
+As different schemes have different bumping strategies,
+the selected scheme will affect the `--bump` option.
+
+### PEP 440
+
+The bumping strategies supported by the PEP 440 scheme
+are described in the table below.
+Bumping a specific part of the version will remove or reset the parts
+on its right to 0.
+
+Strategy              | Example               | Description
+--------------------- | --------------------- | -----------
+`auto`                | -                     | Guess which of major, minor or micro to bump<br>thanks to the Git history and commit message conventions.
+`epoch`               | `1!1` → `2!1`         | Bump [epoch][pep440-epoch], keeping [final release][pep440-release] only.
+`release`             | `1rc2` → `1`          | Bump version to a [final release][pep440-release].
+`major`               | `1.1` → `2.0`         | Bump major version.
+`minor`               | `1.1.1` → `1.2.0`     | Bump minor version.
+`micro` (or `patch`)  | `1.1.1.1` → `1.1.2.0` | Bump micro version.
+`pre`                 | `1a0` → `1a1`         | Bump current [pre-release][pep440-pre] (alpha `a`, beta `b` or release candidate `rc`).
+`alpha`               | `1a0` → `1a1`         | Bump current alpha pre-release.
+`beta`                | `1b0` → `1b1`         | Bump current beta pre-release.
+`candidate`           | `1rc0` → `1rc1`       | Bump current candidate pre-release.
+`post`                | `1` → `1.post0`       | Bump to a [post-release][pep440-post].
+`dev`                 | `1.dev0` → `1.dev1`   | Bump current [dev-release][pep440-dev].
+`auto+alpha`          | -                     | Guess major/minor/micro bump, and set it to alpha pre-release.
+`auto+beta`           | -                     | Guess major/minor/micro bump, and set it to beta pre-release.
+`auto+candidate`      | -                     | Guess major/minor/micro bump, and set it to candidate pre-release.
+`auto+dev`            | -                     | Guess major/minor/micro bump, and set it to dev-release.
+`auto+alpha+dev`      | -                     | Guess major/minor/micro bump, and set it to alpha pre-release and dev-release.
+`auto+beta+dev`       | -                     | Guess major/minor/micro bump, and set it to beta pre-release and dev-release.
+`auto+candidate+dev`  | -                     | Guess major/minor/micro bump, and set it to candidate pre-release and dev-release.
+`major+alpha`         | `1` → `2a0`           | Bump major version and set it to alpha pre-release.
+`major+beta`          | `1` → `2b0`           | Bump major version and set it to beta pre-release.
+`major+candidate`     | `1` → `2rc0`          | Bump major version and set it to candidate pre-release.
+`major+dev`           | `1` → `2.dev0`        | Bump major version and set it to dev-release.
+`major+alpha+dev`     | `1` → `2a0.dev0`      | Bump major version and set it to alpha pre-release and dev-release.
+`major+beta+dev`      | `1` → `2b0.dev0`      | Bump major version and set it to beta pre-release and dev-release.
+`major+candidate+dev` | `1` → `2rc0.dev0`     | Bump major version and set it to candidate pre-release and dev-release.
+`minor+alpha`         | `1` → `1.1a0`         | Bump minor version and set it to alpha pre-release.
+`minor+beta`          | `1` → `1.1b0`         | Bump minor version and set it to beta pre-release.
+`minor+candidate`     | `1` → `1.1rc0`        | Bump minor version and set it to candidate pre-release.
+`minor+dev`           | `1` → `1.1.dev0`      | Bump minor version and set it to dev-release.
+`minor+alpha+dev`     | `1` → `1.1a0.dev0`    | Bump minor version and set it to alpha pre-release and dev-release.
+`minor+beta+dev`      | `1` → `1.1b0.dev0`    | Bump minor version and set it to beta pre-release and dev-release.
+`minor+candidate+dev` | `1` → `1.1rc0.dev0`   | Bump minor version and set it to candidate pre-release and dev-release.
+`micro+alpha`         | `1` → `1.0.1a0`       | Bump micro version and set it to alpha pre-release.
+`micro+beta`          | `1` → `1.0.1b0`       | Bump micro version and set it to beta pre-release.
+`micro+candidate`     | `1` → `1.0.1rc0`      | Bump micro version and set it to candidate pre-release.
+`micro+dev`           | `1` → `1.0.1.dev0`    | Bump micro version and set it to dev-release.
+`micro+alpha+dev`     | `1` → `1.0.1a0.dev0`  | Bump micro version and set it to alpha pre-release and dev-release.
+`micro+beta+dev`      | `1` → `1.0.1b0.dev0`  | Bump micro version and set it to beta pre-release and dev-release.
+`micro+candidate+dev` | `1` → `1.0.1rc0.dev0` | Bump micro version and set it to candidate pre-release and dev-release.
+`alpha+dev`           | `1a0` → `1a1.dev0`    | Bump current alpha pre-release and set it to a dev-release.
+`beta+dev`            | `1b0` → `1b1.dev0`    | Bump current beta pre-release and set it to a dev-release.
+`candidate+dev`       | `1rc0` → `1rc1.dev0`  | Bump current candidate pre-release and set it to a dev-release.
+
+Try it out:
+
+```pyodide install="git-changelog"
+from git_changelog.versioning import bump_pep440
+
+# "auto" strategies are not directly supported by this function
+print(bump_pep440("1.2.3", "minor+alpha"))
+```
+
+The `v` prefix will be preserved when bumping a version: `v1` -> `v2`.
+
+The bumping strategies for PEP 440 try to make the most sense,
+allowing you to bump in a semantic way and preventing version downgrade mistakes.
+Specifically, it is not possible:
+
+- to bump from a final release version to a pre-release or a dev-release version
+- to bump from a pre-release version to a lower pre-release version or a dev-version
+- more generally, to bump from any version to any lower version
+
+If you need to "bump" to a version that is lower than the latest released one,
+you must explicitely pass the version to the `--bump` option:
+
+```bash
+# latest release is 1.1
+git-changelog --bump 1.0
+```
+
+### SemVer
+
+The bumping strategies supported by the SemVer scheme
+are described in the table below.
+Bumping a specific part of the version will remove or reset the parts
+on its right to 0.
+
+Strategy              | Example               | Description
+--------------------- | --------------------- | -----------
+`auto`                | -                     | Guess which of major, minor or patch to bump<br>thanks to the Git history and commit message conventions.
+`major`               | `1.1.1` → `2.0.0`     | Bump major version.
+`minor`               | `1.1.1` → `1.2.0`     | Bump minor version.
+`patch`               | `1.1.1` → `1.1.2`     | Bump micro version.
+`release`             | `1.1.1-a2` → `1.1.1`  | Bump version to a final release (remove pre-release and build metadata).
+
+Try it out:
+
+```pyodide install="git-changelog"
+from git_changelog.versioning import bump_semver
+
+# the "auto" strategy is not directly supported by this function
+print(bump_semver("1.2.3", "minor"))
+```
+
+The `v` prefix will be preserved when bumping a version: `v1.0.0` -> `v2.0.0`.
+
+The bumping strategies for SemVer will prevent you from bumping from any version to a lower one.
+It does not support bump pre-release metadata or build metadata
+because these are not standardized.
+
+If you need to "bump" to a version that is lower than the latest released one,
+or to add pre-release or build metadata,
+you must explicitely pass the version to the `--bump` option:
+
+```bash
+# downgrade
+git-changelog --bump 1.1.0
+
+# add pre-release metadata
+git-changelog --bump 2.0.0-alpha1
+```
 
 ## Parse additional information in commit messages
 
@@ -707,3 +865,9 @@ and `--marker-line`.
 [keepachangelog-template]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates/keepachangelog.md
 [builtin-templates]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates
 [control-whitespace]: https://jinja.palletsprojects.com/en/3.1.x/templates/#whitespace-control
+[pep440]: https://peps.python.org/pep-0440/
+[pep440-epoch]: https://peps.python.org/pep-0440/#version-epochs
+[pep440-pre]: https://peps.python.org/pep-0440/#pre-releases
+[pep440-post]: https://peps.python.org/pep-0440/#post-releases
+[pep440-dev]: https://peps.python.org/pep-0440/#developmental-releases
+[pep440-release]: https://peps.python.org/pep-0440/#final-releases

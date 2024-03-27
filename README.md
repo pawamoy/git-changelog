@@ -19,8 +19,7 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 - Git service/provider agnostic,
   plus references parsing (issues, commits, etc.).
   Built-in [GitHub][github-refs], [Gitlab][gitlab-refs] and [Bitbucket][bitbucket-refs] support.
-- Understands [Semantic Versioning][semantic-versioning]:
-  major/minor/patch for versions and commits.
+- Understands [SemVer][semver] and [PEP 440][pep-440] versioning schemes.
   Guesses next version based on last commits.
 - Parses [Git trailers][git-trailers], allowing to reference
   issues, PRs, etc., in your commit messages
@@ -37,13 +36,14 @@ Automatic Changelog generator using Jinja2 templates. From git logs to change lo
 [keep-a-changelog]:       http://keepachangelog.com/en/1.0.0/
 [angular]:                https://github.com/angular/angular/blob/master/CHANGELOG.md
 [conventional-changelog]: https://github.com/conventional-changelog/conventional-changelog
-[semantic-versioning]:    http://semver.org/spec/v2.0.0.html
+[semver]:                 http://semver.org/spec/v2.0.0.html
 [angular-convention]:     https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit
 [conventional-commit]:    https://www.conventionalcommits.org/en/v1.0.0/
 [github-refs]:            https://help.github.com/articles/autolinked-references-and-urls/
 [gitlab-refs]:            https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references
 [bitbucket-refs]:         https://support.atlassian.com/bitbucket-cloud/docs/markup-comments
 [git-trailers]:           https://git-scm.com/docs/git-interpret-trailers
+[pep-440]:                https://peps.python.org/pep-0440/
 
 [issue-14]: https://github.com/pawamoy/git-changelog/issues/14
 [issue-19]: https://github.com/pawamoy/git-changelog/issues/19
