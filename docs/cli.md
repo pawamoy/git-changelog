@@ -43,7 +43,7 @@ option_to_docs = {
     "sections": "#choose-the-sections-to-render",
     "template": "#choose-a-changelog-template",
     "version_regex": "#update-changelog-in-place",
-    "zerover": "#understand-the-relationship-with-semver",
+    "zerover": "#zerover",
 }
 
 

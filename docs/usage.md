@@ -148,6 +148,7 @@ repository = "."
 sections = "fix,maint"
 template = "keepachangelog"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
+zerover = true
 ```
 
 ## Output a changelog
@@ -395,7 +396,7 @@ footer = "Copyright 2024 My Company"
 [(--filter-commits)](cli.md#filter_commits)
 
 Sometimes it may be useful to use a limited set of commits, for example, if your
-project has migrated to semver recently and you want to ignore old non-conventional commits.
+project has migrated to SemVer recently and you want to ignore old non-conventional commits.
 
 This is possible through the option `-F`, `--filter-commits`, which takes a
 *revision-range* to select the commits that will be used in the changelog.
@@ -420,7 +421,7 @@ git-changelog --filter-commits "2c0dbb8.."
 [(--bump)](cli.md#bump)<br>
 [(--zerover)](cli.md#zerover)
 
-[Semver][semver], or Semantic Versioning, helps users of tools and libraries
+[SemVer][semver], or Semantic Versioning, helps users of tools and libraries
 understand the impact of version changes. To quote SemVer itself:
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
@@ -458,21 +459,38 @@ git-changelog --bump minor  # 1.2.3 -> 1.3.0
 git-changelog --bump patch  # 1.2.3 -> 1.2.4
 ```
 
-Note that, by default the major number won't be bumped if the latest version is 0.x.
-Instead, the minor number will be bumped:
+### ZeroVer
+
+Note that by default, "ZeroVer" mode is activated,
+which means that a breaking change will only bump the major version
+if the major version is already at `1` or more,
+otherwise it will bump the minor version.
+
+While this behavior is described in SemVer's specification,
+the "ZeroVer" name comes from the satyrical
+[ZeroVer (or zer0ver, 0ver) versioning scheme](https://0ver.org/).
+
+When you are ready to bump to 1.0.0,
+just pass this version as value, or use the `-Z`, `--no-zerover` flag.
+
+Let say we are at version `0.1.0`, and unreleased commits
+contain breaking changes:
 
 ```bash
-git-changelog --bump major  # 0.1.2 -> 0.2.0, same as minor because 0.x
-git-changelog --bump minor  # 0.1.2 -> 0.2.0
+git-changelog --bump auto      # 0.2.0
+git-changelog --bump auto -Z   # 1.0.0
+git-changelog --bump major     # 0.2.0
+git-changelog --bump major -Z  # 1.0.0
 ```
 
-In that case, when you are ready to bump to 1.0.0,
-just pass this version as value, or use the `-Z`, `--no-zerover` flag:
+If we are already at version `1.0.0`, and unreleased commits
+contain breaking changes again:
 
 ```bash
-git-changelog --bump 1.0.0
-git-changelog --bump auto --no-zerover
-git-changelog --bump major --no-zerover
+git-changelog --bump auto      # 2.0.0
+git-changelog --bump auto -Z   # 2.0.0, same
+git-changelog --bump major     # 2.0.0
+git-changelog --bump major -Z  # 2.0.0, same
 ```
 
 If you use *git-changelog* in CI, to update your changelog automatically,

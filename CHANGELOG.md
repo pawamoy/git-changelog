@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Bug Fixes
 
-- Assign commits to versions following their commit graph (follow semver) ([f191ed7](https://github.com/pawamoy/git-changelog/commit/f191ed7c05029674e52c8ada55e0d9e861c320cc) by Christian Meffert). [Issue-70](https://github.com/pawamoy/git-changelog/issues/70), [Issue-42](https://github.com/pawamoy/git-changelog/issues/42), [PR-72](https://github.com/pawamoy/git-changelog/pull/72), Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
+- Assign commits to versions following their commit graph (follow SemVer) ([f191ed7](https://github.com/pawamoy/git-changelog/commit/f191ed7c05029674e52c8ada55e0d9e861c320cc) by Christian Meffert). [Issue-70](https://github.com/pawamoy/git-changelog/issues/70), [Issue-42](https://github.com/pawamoy/git-changelog/issues/42), [PR-72](https://github.com/pawamoy/git-changelog/pull/72), Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
 - Ignore bump on new Git repo without unreleased commits ([438968c](https://github.com/pawamoy/git-changelog/commit/438968c711da86bc7398246deb8679e534d67453) by Christian Meffert). [PR-71](https://github.com/pawamoy/git-changelog/pull/71)
 - Use provided version when creating first changelog entry ([dd264cc](https://github.com/pawamoy/git-changelog/commit/dd264cc9f8c530371b33c1e5d3b5083839659bd9) by Christian Meffert). [PR-69](https://github.com/pawamoy/git-changelog/pull/69)
 
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Features
 
-- Add option to enable/disable "zerover" behavior ([7d0c259](https://github.com/pawamoy/git-changelog/commit/7d0c259f2ec4c5666d15a3616de8765f52fb282c) by Mark Minakov). [Issue #57](https://github.com/pawamoy/git-changelog/issues/57), [PR #58](https://github.com/pawamoy/git-changelog/pull/58), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
+- Add option to enable/disable "ZeroVer" behavior ([7d0c259](https://github.com/pawamoy/git-changelog/commit/7d0c259f2ec4c5666d15a3616de8765f52fb282c) by Mark Minakov). [Issue #57](https://github.com/pawamoy/git-changelog/issues/57), [PR #58](https://github.com/pawamoy/git-changelog/pull/58), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
 - Add `-F,--filter-commits` to filter by revision-range ([e016965](https://github.com/pawamoy/git-changelog/commit/e0169654c917497ce88966fca1baf47d0a4586f7) by Pedro Brochado). [Issue #63](https://github.com/pawamoy/git-changelog/issues/63), [Issue #16](https://github.com/pawamoy/git-changelog/issues/16), [PR #64](https://github.com/pawamoy/git-changelog/pull/64), Co-authored-by: Timothée Mazzucotelli <pawamoy@pm.me>
 
 ### Bug Fixes
@@ -150,7 +150,7 @@ Lots of new features! Usage is documented here: https://pawamoy.github.io/git-ch
 - Clean up body to fix parsing trailers ([1183c25](https://github.com/pawamoy/git-changelog/commit/1183c259c9b16eea2043a930f7ff775e058c9733) by Timothée Mazzucotelli).
 - Fix building commit body ([f76bf32](https://github.com/pawamoy/git-changelog/commit/f76bf3205ab4e696ec9907e95517817e6c04af70) by Timothée Mazzucotelli).
 - Fix spacing in keepachangelog templates ([cf5117a](https://github.com/pawamoy/git-changelog/commit/cf5117a27fc28503a12bc133c5ed663628b02740) by Timothée Mazzucotelli).
-- Don't crash when trying to parse the latest tag as semver ([e90aa2b](https://github.com/pawamoy/git-changelog/commit/e90aa2be1c94fa792f26b82e0db86b10924a8c83) by Timothée Mazzucotelli).
+- Don't crash when trying to parse the latest tag as SemVer ([e90aa2b](https://github.com/pawamoy/git-changelog/commit/e90aa2be1c94fa792f26b82e0db86b10924a8c83) by Timothée Mazzucotelli).
 - Keep a Changelog template: don't capitalize commit summary ([87348ed](https://github.com/pawamoy/git-changelog/commit/87348ed1503b043d6bfae2e113c09f7c9c166501) by Timothée Mazzucotelli).
 - Keep a Changelog template: respect sections order (don't sort) ([f645e62](https://github.com/pawamoy/git-changelog/commit/f645e62bf49ed61601ba095715f9098b6935ad2f) by Timothée Mazzucotelli).
 - Use `importlib.metadata` instead of `pkg_resources` to get current version ([79109d0](https://github.com/pawamoy/git-changelog/commit/79109d0f4e55f821bb8c8299477c7d0693435445) by Timothée Mazzucotelli).
@@ -191,12 +191,12 @@ Lots of new features! Usage is documented here: https://pawamoy.github.io/git-ch
 
 ### Bug Fixes
 
-- Properly bump semver version ([ecc7dd4](https://github.com/pawamoy/git-changelog/commit/ecc7dd430719c90b289acf7f29adb0b82e193fa8) by Kevin Squire). References: [#31](https://github.com/pawamoy/git-changelog/issues/31)
+- Properly bump SemVer version ([ecc7dd4](https://github.com/pawamoy/git-changelog/commit/ecc7dd430719c90b289acf7f29adb0b82e193fa8) by Kevin Squire). References: [#31](https://github.com/pawamoy/git-changelog/issues/31)
 - Fix typo in keepachangelog template ([fa9b434](https://github.com/pawamoy/git-changelog/commit/fa9b4349c1a954a3029e5b35ac306a22fc08babe) by Alexander Schleifer). [PR #28](https://github.com/pawamoy/git-changelog/pull/28)
 
 ### Code Refactoring
 
-- Use semver to bump version more reliably ([b68a565](https://github.com/pawamoy/git-changelog/commit/b68a565fce51f8d0e94f0f67c98dea30e421dd8f) by Timothée Mazzucotelli).
+- Use SemVer to bump version more reliably ([b68a565](https://github.com/pawamoy/git-changelog/commit/b68a565fce51f8d0e94f0f67c98dea30e421dd8f) by Timothée Mazzucotelli).
 
 ## [0.4.2](https://github.com/pawamoy/git-changelog/releases/tag/0.4.2) - 2021-01-06
 
