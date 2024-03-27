@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
 import random
 import shutil
 import subprocess
 import uuid
-from typing import TYPE_CHECKING
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Iterator
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -95,3 +97,13 @@ class GitRepo:
         """
         self.git("merge", "--no-ff", "--commit", "-m", f"merge: Merge branch '{branchname}'", branchname)
         return self.git("rev-parse", "HEAD").rstrip()
+
+    @contextmanager
+    def enter(self) -> Iterator[None]:
+        """Context manager to enter the repository directory."""
+        old_cwd = os.getcwd()
+        os.chdir(self.path)
+        try:
+            yield
+        finally:
+            os.chdir(old_cwd)
