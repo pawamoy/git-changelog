@@ -36,7 +36,7 @@ to guess the new version by bumping the latest version
 based on the semantics of your commits:
 
 ```bash
-git-changelog -bio CHANGELOG.md -c angular
+git-changelog -B auto -io CHANGELOG.md -c angular
 ```
 
 Same thing, but also parse Git trailers
@@ -44,7 +44,7 @@ and choose the sections to render, and their order
 (author's favorite!):
 
 ```bash
-git-changelog -Tbio CHANGELOG.md -c angular -s build,deps,fix,feat,refactor
+git-changelog -B auto -Tio CHANGELOG.md -c angular -s build,deps,fix,feat,refactor
 ```
 
 Generate a changelog using a custom template,
@@ -124,11 +124,11 @@ marker-line = "<!-- insertion marker -->"
 output = "output.log"
 parse-refs = false
 parse-trailers = false
+provider = "gitlab"
 repository = "."
 sections = ["fix", "maint"]
 template = "angular"
 version-regex = "^## \\\\[(?P<version>v?[^\\\\]]+)"
-provider = "gitlab"
 zerover = true
 ```
 
@@ -140,10 +140,12 @@ settings must be found in the appropriate section:
 bump = "minor"
 convention = "conventional"
 in-place = false
+filter-commits = "0.5.0.."
 marker-line = "<!-- insertion marker -->"
 output = "output.log"
 parse-refs = false
 parse-trailers = false
+provider = "gitlab"
 repository = "."
 sections = "fix,maint"
 template = "keepachangelog"
