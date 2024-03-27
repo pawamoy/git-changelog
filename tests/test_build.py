@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     [("auto", "0.1.0"), ("major", "0.1.0"), ("minor", "0.1.0"), ("1.1.1", "1.1.1")],
 )
 def test_bump_with_semver_on_new_repo(repo: GitRepo, bump: str, expected: str) -> None:
-    """Bump to user specified version (semver) on new git repo.
+    """Bump to user specified version (SemVer) on new git repo.
 
     Parameters:
         repo: GitRepo to a temporary repository.
