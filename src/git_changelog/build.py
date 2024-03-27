@@ -7,11 +7,8 @@ import os
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
-from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
+from typing import TYPE_CHECKING, Callable, ClassVar, Literal, Type, Union
 from urllib.parse import urlsplit, urlunsplit
-
-from semver import Version as SemverVersion
-from semver import VersionInfo
 
 from git_changelog.commit import (
     AngularConvention,
@@ -21,15 +18,19 @@ from git_changelog.commit import (
     ConventionalCommitConvention,
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+from git_changelog.versioning import ParsedVersion, VersionBumper, bump_pep440, bump_semver, parse_pep440, parse_semver
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from git_changelog.versioning import SemVerVersion
+
 ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
 
 
+# TODO: Remove at some point.
 def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
-    """Bump a version.
+    """Bump a version. Deprecated, use [`bump_semver`][git_changelog.versioning.bump_semver] instead.
 
     Arguments:
         version: The version to bump.
@@ -39,18 +40,17 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     Returns:
         The bumped version.
     """
-    semver_version, prefix = parse_version(version)
-    if part == "major" and (semver_version.major != 0 or not zerover):
-        semver_version = semver_version.bump_major()
-    elif part == "minor" or (part == "major" and semver_version.major == 0):
-        semver_version = semver_version.bump_minor()
-    elif part == "patch" and not semver_version.prerelease:
-        semver_version = semver_version.bump_patch()
-    return prefix + str(semver_version)
+    warnings.warn(
+        "This function is deprecated in favor of `git_changelog.versioning.bump_semver`",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return bump_semver(version, part, zerover=zerover)
 
 
-def parse_version(version: str) -> tuple[SemverVersion, str]:
-    """Parse a version.
+# TODO: Remove at some point.
+def parse_version(version: str) -> tuple[SemVerVersion, str]:
+    """Parse a version. Deprecated, use [`bump_semver`][git_changelog.versioning.parse_semver] instead.
 
     Arguments:
         version: The version to parse.
@@ -59,11 +59,12 @@ def parse_version(version: str) -> tuple[SemverVersion, str]:
         semver_version: The semantic version.
         prefix: The version prefix.
     """
-    prefix = ""
-    if version[0] == "v":
-        prefix = "v"
-        version = version[1:]
-    return VersionInfo.parse(version), prefix
+    warnings.warn(
+        "This function is deprecated in favor of `git_changelog.versioning.parse_semver`",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return parse_semver(version)
 
 
 class Section:
