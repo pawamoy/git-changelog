@@ -15,9 +15,6 @@ from typing import TYPE_CHECKING, Iterator
 from duty import duty
 from duty.callables import coverage, lazy, mkdocs, mypy, pytest, ruff, safety
 
-from git_changelog import Changelog
-from git_changelog.commit import AngularConvention
-
 if TYPE_CHECKING:
     from duty.context import Context
 
@@ -298,6 +295,12 @@ def profile(ctx: Context, merge: int = 15) -> None:
     Parameters:
         merge: Number of times to merge a branch in the temporary repository.
     """
+    # Do not import those from the top level,
+    # as it prevents the pytest-cov plugin for marking
+    # lines executed at import time as covered.
+    from git_changelog import Changelog
+    from git_changelog.commit import AngularConvention
+
     try:
         from tests.helpers import GitRepo
     except ModuleNotFoundError:
