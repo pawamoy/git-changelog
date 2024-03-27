@@ -258,3 +258,23 @@ def test_jinja_context(repo: GitRepo) -> None:
 
     contents = repo.path.joinpath("CHANGELOG.md").read_text()
     assert contents == "k1 = v1\nk2 = v2\nk3 = v3\n"
+
+
+# IMPORTANT: See top module comment.
+def test_versioning(repo: GitRepo) -> None:
+    """Use a specific versioning scheme.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+    """
+    repo.commit("feat: Feature")
+    repo.tag("1.0.0")
+    repo.commit("fix: Fix")
+    with repo.enter():
+        assert cli.main(["-cconventional", "-nsemver", "-Bauto"]) == 0
+        assert cli.main(["-cconventional", "-npep440", "-Bauto"]) == 0
+        assert cli.main(["-cconventional", "-nsemver", "-B1.1.0"]) == 0
+        assert cli.main(["-cconventional", "-npep440", "-B1.1.0"]) == 0
+        assert cli.main(["-cconventional", "-nsemver", "-Bunknown"]) == 1
+        assert cli.main(["-cconventional", "-npep440", "-Bunknown"]) == 1
+        assert cli.main(["-cconventional", "-npep440", "-Balpha"]) == 1

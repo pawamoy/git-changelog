@@ -19,7 +19,7 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Any, Pattern, Sequence, TextIO
+from typing import Any, Literal, Pattern, Sequence, TextIO
 
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
@@ -33,6 +33,7 @@ from git_changelog.commit import (
     ConventionalCommitConvention,
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+from git_changelog.versioning import bump_pep440, bump_semver
 
 # TODO: Remove once support for Python 3.10 is dropped.
 if sys.version_info >= (3, 11):
@@ -40,6 +41,7 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib
 
+DEFAULT_VERSIONING = "semver"
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
 DEFAULT_CHANGELOG_FILE = "CHANGELOG.md"
@@ -72,6 +74,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "template": "keepachangelog",
     "jinja_context": {},
     "version_regex": DEFAULT_VERSION_REGEX,
+    "versioning": DEFAULT_VERSIONING,
     "zerover": True,
 }
 
@@ -199,10 +202,28 @@ def get_parser() -> argparse.ArgumentParser:
         dest="bump",
         metavar="VERSION",
         help="Specify the bump from latest version for the set of unreleased commits. "
-        "Can be one of `auto`, `major`, `minor`, `patch` or a valid semver version (eg. 1.2.3). "
-        "With `auto`, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions), "
-        "else if there are new features, bump the minor number, else just bump the patch number. "
+        "Can be one of `auto`, `major`, `minor`, `patch` or a valid SemVer version (eg. 1.2.3). "
+        "For both SemVer and PEP 440 versioning schemes (see -n), `auto` will bump the major number "
+        "if a commit contains breaking changes (or the minor number for 0.x versions, see -Z), "
+        "else the minor number if there are new features, else the patch number. "
         "Default: unset (false).",
+    )
+    parser.add_argument(
+        "-n",
+        "--versioning",
+        action="store",
+        dest="versioning",
+        metavar="SCHEME",
+        help="Versioning scheme to use when bumping and comparing versions. "
+        "The selected scheme will impact the values accepted by the `--bump` option. "
+        "Supported: `pep440`, `semver`. PEP 440 provides the following bump strategies: `auto`, "
+        f"`{'`, `'.join(part for part in bump_pep440.strategies if '+' not in part)}`. "
+        "Values `auto`, `major`, `minor`, `micro` can be suffixed with one of `+alpha`, `+beta`, `+candidate`, "
+        "and/or `+dev`. Values `alpha`, `beta` and `candidate` can be suffixed with `+dev`. "
+        "Examples: `auto+alpha`, `major+beta+dev`, `micro+dev`, `candidate+dev`, etc.. "
+        "SemVer provides the following bump strategies: `auto`, "
+        f"`{'`, `'.join(bump_semver.strategies)}`. "
+        "See the docs for more information. Default: unset (`semver`).",
     )
     parser.add_argument(
         "-h",
@@ -519,6 +540,7 @@ def build_and_render(
     zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
+    versioning: Literal["pep440", "semver"] = "semver",
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -544,6 +566,7 @@ def build_and_render(
         zerover: Keep major version at zero, even for breaking changes.
         filter_commits: The Git revision-range used to filter commits in git-log.
         jinja_context: Key/value pairs passed to the Jinja template.
+        versioning: Versioning scheme to use when grouping commits and bumping versions.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -588,6 +611,7 @@ def build_and_render(
         bump=bump,
         zerover=zerover,
         filter_commits=filter_commits,
+        versioning=versioning,
     )
 
     # remove empty versions from changelog data

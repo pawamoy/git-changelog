@@ -256,3 +256,19 @@ def test_merge_into_unreleased(repo: GitRepo) -> None:
         expected_prev_tag=None,
         expected_commits=[commit_e, commit_c, commit_d, commit_a, commit_b],
     )
+
+
+def test_build_changelog_with_pep440_versions(repo: GitRepo) -> None:
+    """Test parsing and grouping commits to PEP440 versions.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.commit("feat: Feature")
+    repo.tag("1.0.0")
+    repo.commit("fix: Fix")
+    repo.tag("1.0.0.post0")
+    repo.commit("feat: Feat")
+    changelog = Changelog(repo.path, convention=AngularConvention, versioning="pep440")
+    assert len(changelog.versions_list) == 3
+    assert changelog.versions_list[1].tag == "1.0.0.post0"
