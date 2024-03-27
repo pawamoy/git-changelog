@@ -226,7 +226,8 @@ def test_jinja_context(repo: GitRepo) -> None:
     """
     repo.path.joinpath("conf.toml").write_text(
         dedent(
-            """[jinja_context]
+            """
+            [jinja_context]
             k1 = "ignored"
             k2 = "v2"
             k3 = "v3"
