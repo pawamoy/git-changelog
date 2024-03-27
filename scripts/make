@@ -127,7 +127,7 @@ main() {
         # All commands except `run` and `multirun` can be chained on a single line.
         # Some of them accept options in two formats: `-f`, `--flag` and `param=value`.
         # Some of them don't, and will print warnings/errors if options were given.
-        opts=($(options "$@")) || shift $?
+        opts=("$(options "$@")") && opts=() || shift $?
 
         case "${cmd}" in
             # The following commands require special handling.
