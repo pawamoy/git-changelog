@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 class GitRepo:
     """Test utility class to initalize and work with a Git repository."""
 
+    _git_exec = shutil.which("git") or "git"
+
     def __init__(self, repo: Path) -> None:
         """Initialization the Git repository wrapper.
 
@@ -43,7 +45,7 @@ class GitRepo:
             The output of the command.
         """
         return subprocess.check_output(
-            [shutil.which("git") or "git", "-C", str(self.path), *args],  # noqa: S603
+            [self._git_exec, "-C", str(self.path), *args],  # noqa: S603
             text=True,
         )
 
