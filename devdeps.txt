@@ -14,7 +14,6 @@ mkdocstrings[python]>=0.23
 tomli>=2.0; python_version < '3.11'
 black>=23.9
 blacken-docs>=1.16
-git-changelog>=2.3
 ruff>=0.0
 pytest>=7.4
 pytest-cov>=4.1
