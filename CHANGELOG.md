@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.5.0](https://github.com/pawamoy/git-changelog/releases/tag/2.5.0) - 2024-04-02
+
+<small>[Compare with 2.4.1](https://github.com/pawamoy/git-changelog/compare/2.4.1...2.5.0)</small>
+
+### Features
+
+- Add CLI and configuration option `-n`, `--versioning` to select versioning scheme ([f9c91f1](https://github.com/pawamoy/git-changelog/commit/f9c91f1c58ba647de133e09ee4f0645816d5e603) by Timothée Mazzucotelli).
+- Implement SemVer and PEP 440 versioning schemes ([f7c8bfa](https://github.com/pawamoy/git-changelog/commit/f7c8bfa2d29358718e2d22f213f93bb1b99d9e05) by Timothée Mazzucotelli).
+- Support for additional template variables ([58a4d88](https://github.com/pawamoy/git-changelog/commit/58a4d885f1e7a20542e7eb00e5912c30df33c717) by Christian Meffert). [Issue-17](https://github.com/pawamoy/git-changelog/issues/17), [PR-73](https://github.com/pawamoy/git-changelog/pull/73), Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
+
+### Bug Fixes
+
+- Deduplicate commits for unreleased version with merged branches ([b61199f](https://github.com/pawamoy/git-changelog/commit/b61199ff7a06e8614754baadf18ba31cda810d6a) by Christian Meffert). [PR-76](https://github.com/pawamoy/git-changelog/pull/76)
+- Handle no remote gracefully ([92f6f94](https://github.com/pawamoy/git-changelog/commit/92f6f945dafb18350f42e64a1c07cbbf0b4c6b05) by Christian Meffert). [Issue-24](https://github.com/pawamoy/git-changelog/issues/24), [PR-75](https://github.com/pawamoy/git-changelog/pull/75)
+
+### Code Refactoring
+
+- Ignore tags that are not valid given versioning scheme ([5fdc68a](https://github.com/pawamoy/git-changelog/commit/5fdc68ae0c1ecb10d223744da154a0dc34821bb9) by Timothée Mazzucotelli). Co-authored-by: Christian Meffert <chme@users.noreply.github.com>
+
 ## [2.4.1](https://github.com/pawamoy/git-changelog/releases/tag/2.4.1) - 2024-03-14
 
 <small>[Compare with 2.4.0](https://github.com/pawamoy/git-changelog/compare/2.4.0...2.4.1)</small>
