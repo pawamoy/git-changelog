@@ -36,6 +36,7 @@ classifiers = [
 dependencies = [
     "appdirs>=1.4",
     "Jinja2>=2.10",
+    "packaging>=24.0",
     "semver>=2.13",
     "tomli>=2.0; python_version < '3.11'",
 ]
