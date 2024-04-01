@@ -7,7 +7,7 @@ import os
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
-from typing import TYPE_CHECKING, Callable, ClassVar, Literal, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from git_changelog.commit import (
@@ -18,7 +18,7 @@ from git_changelog.commit import (
     ConventionalCommitConvention,
 )
 from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
-from git_changelog.versioning import ParsedVersion, VersionBumper, bump_pep440, bump_semver, parse_pep440, parse_semver
+from git_changelog.versioning import ParsedVersion, bump_pep440, bump_semver, parse_pep440, parse_semver
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -266,20 +266,20 @@ class Changelog:
         )
         self.sections = sections
 
+        # get version parser based on selected versioning scheme
+        self.version_parser, self.version_bumper = {
+            "semver": (parse_semver, bump_semver),
+            "pep440": (parse_pep440, bump_pep440),
+        }[versioning]
+
         # get git log and parse it into list of commits
         self.raw_log: str = self.get_log()
         self.commits: list[Commit] = self.parse_commits()
         self.tag_commits: list[Commit] = [commit for commit in self.commits[1:] if commit.tag]
         self.tag_commits.insert(0, self.commits[0])
 
-        # get version parser based on selected versioning scheme
-        version_parser, version_bumper = {
-            "semver": (parse_semver, bump_semver),
-            "pep440": (parse_pep440, bump_pep440),
-        }[versioning]
-
         # apply dates to commits and group them by version
-        v_list, v_dict = self._group_commits_by_version(version_parser=version_parser)
+        v_list, v_dict = self._group_commits_by_version()
         self.versions_list = v_list
         self.versions_dict = v_dict
 
@@ -293,7 +293,7 @@ class Changelog:
             if bump is None:
                 bump = "auto"
         if bump:
-            self._bump(bump, version_bumper=version_bumper)
+            self._bump(bump)
 
         # fix a single, initial version to the user specified version or 0.1.0 if none is specified
         self._fix_single_version(bump)
@@ -386,6 +386,7 @@ class Changelog:
                 subject=lines[pos + 9],
                 body=body,
                 parse_trailers=self.parse_trailers,
+                version_parser=self.version_parser,
             )
 
             pos += nbl_index + 1
@@ -406,18 +407,11 @@ class Changelog:
 
         return list(commits_map.values())
 
-    def _group_commits_by_version(
-        self,
-        version_parser: Callable[[str], tuple[ParsedVersion, str]],
-    ) -> tuple[list[Version], dict[str, Version]]:
+    def _group_commits_by_version(self) -> tuple[list[Version], dict[str, Version]]:
         """Group commits into versions.
 
         Commits are assigned to the version they were first released with.
         A commit is assigned to exactly one version.
-
-        Parameters:
-            version_parser: Version parser to use when grouping commits by versions.
-                Versions that cannot be parsed by the given parser will be ignored.
 
         Returns:
             versions_list: The list of versions order descending by timestamp.
@@ -441,7 +435,7 @@ class Changelog:
             while next_commits:
                 next_commit = next_commits.pop(0)
                 if next_commit.tag:
-                    parsed_version, _ = version_parser(next_commit.tag)
+                    parsed_version, _ = self.version_parser(next_commit.tag)
                     if not previous_parsed_version or parsed_version > previous_parsed_version:
                         previous_parsed_version = parsed_version
                         previous_versions[version.tag] = next_commit.tag
@@ -484,7 +478,7 @@ class Changelog:
                     target=version.tag or "HEAD",
                 )
 
-    def _bump(self, version: str, version_bumper: VersionBumper) -> None:
+    def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
         if not last_version.tag and last_version.previous_version:
             last_tag = last_version.previous_version.tag
@@ -499,13 +493,13 @@ class Changelog:
                     if commit.convention["is_minor"]:
                         version = "minor"
             version = "+".join((version, *plus))
-            if version in version_bumper.strategies:
+            if version in self.version_bumper.strategies:
                 # bump version
-                last_version.planned_tag = version_bumper(last_tag, version, zerover=self.zerover)
+                last_version.planned_tag = self.version_bumper(last_tag, version, zerover=self.zerover)
             else:
                 # user specified version
                 try:
-                    version_bumper(version)
+                    self.version_bumper(version)
                 except ValueError as error:
                     raise ValueError(f"{error}; typo in bumping strategy? Check the CLI help and our docs") from error
                 last_version.planned_tag = version

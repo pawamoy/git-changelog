@@ -7,10 +7,11 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, ClassVar, Pattern
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Pattern
 
 if TYPE_CHECKING:
     from git_changelog.providers import ProviderRefParser, Ref
+    from git_changelog.versioning import ParsedVersion
 
 
 def _clean_body(lines: list[str]) -> list[str]:
@@ -19,6 +20,14 @@ def _clean_body(lines: list[str]) -> list[str]:
     while lines and not lines[-1].strip():
         lines.pop()
     return lines
+
+
+def _is_valid_version(version: str, version_parser: Callable[[str], tuple[ParsedVersion, str]]) -> bool:
+    try:
+        version_parser(version)
+    except ValueError:
+        return False
+    return True
 
 
 class Commit:
@@ -41,6 +50,7 @@ class Commit:
         parse_trailers: bool = False,
         parent_hashes: str | list[str] = "",
         commits_map: dict[str, Commit] | None = None,
+        version_parser: Callable[[str], tuple[ParsedVersion, str]] | None = None,
     ):
         """Initialization method.
 
@@ -82,8 +92,10 @@ class Commit:
         for ref in refs.split(","):
             ref = ref.strip()  # noqa: PLW2901
             if ref.startswith("tag: "):
-                tag = ref.replace("tag: ", "")
-                break
+                ref = ref.replace("tag: ", "")  # noqa: PLW2901
+                if version_parser is None or _is_valid_version(ref, version_parser):
+                    tag = ref
+                    break
         self.tag: str = tag
         self.version: str = tag
 
