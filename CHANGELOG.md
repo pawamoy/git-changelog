@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.5.2](https://github.com/pawamoy/git-changelog/releases/tag/2.5.2) - 2024-04-04
+
+<small>[Compare with 2.5.1](https://github.com/pawamoy/git-changelog/compare/2.5.1...2.5.2)</small>
+
+### Bug Fixes
+
+- Fix bumping initial version ([37a3b62](https://github.com/pawamoy/git-changelog/commit/37a3b62e23c010ee0c7283c8870d6625e97cd8d1) by Timothée Mazzucotelli). [Issue-82](https://github.com/pawamoy/git-changelog/issues/82)
+
 ## [2.5.1](https://github.com/pawamoy/git-changelog/releases/tag/2.5.1) - 2024-04-02
 
 <small>[Compare with 2.5.0](https://github.com/pawamoy/git-changelog/compare/2.5.0...2.5.1)</small>
