@@ -645,6 +645,8 @@ def parse_pep440(version: str) -> tuple[PEP440Version, str]:
 class VersionBumper:
     """Base class for version bumpers."""
 
+    initial: str
+
     def __init__(self, strategies: tuple[str, ...]) -> None:
         """Initialize the bumper.
 
@@ -669,6 +671,8 @@ class VersionBumper:
 
 class PEP440Bumper(VersionBumper):
     """PEP 440 version bumper."""
+
+    initial: str = "0.0.0"
 
     def __call__(  # type: ignore[override]
         self,
@@ -743,6 +747,8 @@ class PEP440Bumper(VersionBumper):
 
 class SemVerBumper(VersionBumper):
     """SemVer version bumper."""
+
+    initial: str = "0.0.0"
 
     def __call__(  # type: ignore[override]
         self,

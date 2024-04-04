@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from time import sleep
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import pytest
 
@@ -16,20 +16,36 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize(
-    ("bump", "expected"),
-    [("auto", "0.1.0"), ("major", "0.1.0"), ("minor", "0.1.0"), ("1.1.1", "1.1.1")],
+    ("versioning", "bump", "expected"),
+    [
+        ("semver", "auto", "0.0.1"),  # chore commit
+        ("semver", "major", "1.0.0"),
+        ("semver", "minor", "0.1.0"),
+        ("semver", "patch", "0.0.1"),
+        ("semver", "1.1.1", "1.1.1"),
+        ("pep440", "auto", "0.0.1"),  # chore commit
+        ("pep440", "major", "1.0.0"),
+        ("pep440", "minor+dev", "0.1.0.dev0"),
+        ("pep440", "micro+alpha+dev", "0.0.1a0.dev0"),
+        ("pep440", "1.1.1", "1.1.1"),
+    ],
 )
-def test_bump_with_semver_on_new_repo(repo: GitRepo, bump: str, expected: str) -> None:
-    """Bump to user specified version (SemVer) on new git repo.
+def test_bump_with_semver_on_new_repo(
+    repo: GitRepo,
+    versioning: Literal["pep440", "semver"],
+    bump: str,
+    expected: str,
+) -> None:
+    """Bump to user specified version on new Git repo.
 
     Parameters:
         repo: GitRepo to a temporary repository.
         bump: The bump parameter value.
         expected: Expected version for the new changelog entry.
     """
-    changelog = Changelog(repo.path, convention=AngularConvention, bump=bump)
+    changelog = Changelog(repo.path, convention=AngularConvention, bump=bump, versioning=versioning, zerover=False)
     assert len(changelog.versions_list) == 1
-    assert changelog.versions_list[0].tag == expected
+    assert changelog.versions_list[0].planned_tag == expected
 
 
 @pytest.mark.parametrize("bump", ["auto", "major", "minor", "2.0.0"])
@@ -189,7 +205,7 @@ def _assert_version(
     expected_prev_tag: str | None,
     expected_commits: list[str],
 ) -> None:
-    assert version.tag == expected_tag
+    assert expected_tag in (version.tag, version.planned_tag)
     if expected_prev_tag:
         assert version.previous_version is not None, f"Expected previous version '{expected_prev_tag}', but was None"
         assert version.previous_version.tag == expected_prev_tag
@@ -252,7 +268,7 @@ def test_merge_into_unreleased(repo: GitRepo) -> None:
     version = changelog.versions_list[0]
     _assert_version(
         version,
-        expected_tag="0.1.0",
+        expected_tag="",
         expected_prev_tag=None,
         expected_commits=[commit_e, commit_c, commit_d, commit_a, commit_b],
     )

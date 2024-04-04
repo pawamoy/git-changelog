@@ -295,9 +295,6 @@ class Changelog:
         if bump:
             self._bump(bump)
 
-        # fix a single, initial version to the user specified version or 0.1.0 if none is specified
-        self._fix_single_version(bump)
-
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
 
@@ -480,8 +477,11 @@ class Changelog:
 
     def _bump(self, version: str) -> None:
         last_version = self.versions_list[0]
-        if not last_version.tag and last_version.previous_version:
-            last_tag = last_version.previous_version.tag
+        if not last_version.tag:
+            if last_version.previous_version:
+                last_tag = last_version.previous_version.tag
+            else:
+                last_tag = self.version_bumper.initial
             version, *plus = version.split("+")
             if version == "auto":
                 # guess the next version number based on last version and recent commits
@@ -507,14 +507,8 @@ class Changelog:
             if self.provider:
                 last_version.url = self.provider.get_tag_url(tag=last_version.planned_tag)
                 last_version.compare_url = self.provider.get_compare_url(
-                    base=last_version.previous_version.tag,
+                    base=last_version.previous_version.tag
+                    if last_version.previous_version
+                    else last_version.commits[-1].hash,
                     target=last_version.planned_tag,
                 )
-
-    def _fix_single_version(self, version: str | None) -> None:
-        last_version = self.versions_list[0]
-        if len(self.versions_list) == 1 and last_version.planned_tag is None and not last_version.tag:
-            planned_tag = version if version and version not in {"auto", "major", "minor", "patch"} else "0.1.0"
-            last_version.tag = planned_tag
-            last_version.url += planned_tag
-            last_version.compare_url = last_version.compare_url.replace("HEAD", planned_tag)
