@@ -356,6 +356,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Omit empty versions from the output. Default: unset (false).",
     )
     parser.add_argument(
+        "-e",
+        "--encoding",
+        action="store",
+        dest="encoding",
+        help="Specify the encoding to use when reading and writing files. Default: utf-8.",
+        default="utf-8",
+    )
+    parser.add_argument(
         "-Z",
         "--no-zerover",
         action="store_false",
@@ -541,6 +549,7 @@ def build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    encoding: str = "utf-8",
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -627,7 +636,7 @@ def build_and_render(
     # render new entries in-place
     if in_place:
         # read current changelog lines
-        with open(output) as changelog_file:  # type: ignore[arg-type]
+        with open(output, encoding=encoding) as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # prepare version regex and marker line
@@ -671,7 +680,7 @@ def build_and_render(
             lines[marker : marker + marker2 + 2] = [rendered]
 
         # write back updated changelog lines
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+        with open(output, "w", encoding=encoding) as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # overwrite output file
@@ -682,7 +691,7 @@ def build_and_render(
         if output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w") as stream:  # type: ignore[arg-type]
+            with open(output, "w", encoding=encoding) as stream:  # type: ignore[arg-type]
                 stream.write(rendered)
 
     return changelog, rendered
@@ -692,6 +701,7 @@ def get_release_notes(
     input_file: str | Path = "CHANGELOG.md",
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
+    encoding: str = "utf-8",
 ) -> str:
     """Get release notes from existing changelog.
 
@@ -708,7 +718,7 @@ def get_release_notes(
     release_notes = []
     found_marker = False
     found_version = False
-    with open(input_file) as changelog:
+    with open(input_file, encoding=encoding) as changelog:
         for line in changelog:
             line = line.strip()  # noqa: PLW2901
             if not found_marker:
@@ -731,6 +741,7 @@ def output_release_notes(
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
     output_file: str | TextIO | None = None,
+    encoding: str = "utf-8",
 ) -> None:
     """Print release notes from existing changelog.
 
@@ -743,11 +754,11 @@ def output_release_notes(
         output_file: Where to print/write the release notes.
     """
     output_file = output_file or sys.stdout
-    release_notes = get_release_notes(input_file, version_regex, marker_line)
+    release_notes = get_release_notes(input_file, version_regex, marker_line, encoding=encoding)
     try:
         output_file.write(release_notes)  # type: ignore[union-attr]
     except AttributeError:
-        with open(output_file, "w") as file:  # type: ignore[arg-type]
+        with open(output_file, "w", encoding=encoding) as file:  # type: ignore[arg-type]
             file.write(release_notes)
 
 
@@ -770,6 +781,7 @@ def main(args: list[str] | None = None) -> int:
             version_regex=settings["version_regex"],
             marker_line=settings["marker_line"],
             output_file=None,  # force writing to stdout
+            encoding=settings["encoding"],
         )
         return 0
 
