@@ -321,3 +321,29 @@ def test_ignore_nonsemver_tag(repo: GitRepo) -> None:
         expected_prev_tag=None,
         expected_commits=[commit_c, commit_b, commit_a],
     )
+
+
+def test_untyped_commits(repo: GitRepo) -> None:
+    """Test capture of untyped (i.e. uncategorizable) commits.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    commit_a = repo.first_hash
+    commit_b = repo.commit("this commit is untyped and therefore does not have a section!")
+    repo.tag("1.0.0")
+    changelog = Changelog(repo.path, convention=AngularConvention)
+    assert len(changelog.versions_list) == 1
+    version, = changelog.versions_list
+    assert len(version.sections_list) == 2
+    typed_sections = changelog.versions_dict[version.tag].typed_sections
+    assert len(typed_sections) == 1
+    untyped = changelog.versions_dict[version.tag].untyped_section
+    assert untyped is not None
+    typed, = typed_sections
+    assert len(untyped.commits) == 1
+    assert len(typed.commits) == 1
+    untyped_commit, = untyped.commits
+    typed_commit, = typed.commits
+    assert untyped_commit.hash == commit_b
+    assert typed_commit.hash == commit_a

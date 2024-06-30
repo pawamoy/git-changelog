@@ -159,12 +159,12 @@ class Version:
         """
         self.commits.append(commit)
         commit.version = self.tag or "HEAD"
-        if commit_type := commit.convention.get("type"):
-            if commit_type not in self.sections_dict:
-                section = Section(section_type=commit_type)
-                self.sections_list.append(section)
-                self.sections_dict[commit_type] = section
-            self.sections_dict[commit_type].commits.append(commit)
+        commit_type = commit.convention.get("type")
+        if commit_type not in self.sections_dict:
+            section = Section(section_type=commit_type)
+            self.sections_list.append(section)
+            self.sections_dict[commit_type] = section
+        self.sections_dict[commit_type].commits.append(commit)
 
 
 class Changelog:
