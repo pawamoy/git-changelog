@@ -74,3 +74,7 @@ To show the different options and their descriptions, use `git-changelog -h`.
   to learn how to configure *git-changelog* for your project.
 - See the [CLI reference](https://pawamoy.github.io/git-changelog/cli)
   and the [API reference](https://pawamoy.github.io/git-changelog/reference) for more information.
+
+## Alternatives
+
+- [git-cliff](https://github.com/orhun/git-cliff): A highly customizable Changelog Generator that follows Conventional Commit specifications.
