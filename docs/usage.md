@@ -862,7 +862,7 @@ and `--marker-line`.
 [semver]: https://semver.org/
 [git-trailers]: https://git-scm.com/docs/git-interpret-trailers
 [softprops/action-gh-release]: https://github.com/softprops/action-gh-release
-[keepachangelog-template]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates/keepachangelog.md
+[keepachangelog-template]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates/keepachangelog.md.jinja
 [builtin-templates]: https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates
 [control-whitespace]: https://jinja.palletsprojects.com/en/3.1.x/templates/#whitespace-control
 [pep440]: https://peps.python.org/pep-0440/
