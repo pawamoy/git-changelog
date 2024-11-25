@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from typing import ClassVar, Match, Pattern
+from re import Match, Pattern
+from typing import ClassVar
 
 
 class RefRe:

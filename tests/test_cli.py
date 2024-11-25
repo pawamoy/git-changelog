@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import sys
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 import pytest
 import tomli_w
@@ -18,6 +18,7 @@ import tomli_w
 from git_changelog import cli, debug
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
     from tests.helpers import GitRepo

@@ -7,7 +7,7 @@ import os
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
-from typing import TYPE_CHECKING, ClassVar, Literal, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Literal, Union
 from urllib.parse import urlsplit, urlunsplit
 
 from git_changelog.commit import (
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
     from git_changelog.versioning import SemVerVersion
 
-ConventionType = Union[str, CommitConvention, Type[CommitConvention]]
+ConventionType = Union[str, CommitConvention, type[CommitConvention]]
 
 
 # TODO: Remove at some point.
@@ -159,7 +159,7 @@ class Version:
         """
         self.commits.append(commit)
         commit.version = self.tag or "HEAD"
-        commit_type = commit.convention.get("type")
+        commit_type: str = commit.convention.get("type")  # type: ignore[assignment]
         if commit_type not in self.sections_dict:
             section = Section(section_type=commit_type)
             self.sections_list.append(section)

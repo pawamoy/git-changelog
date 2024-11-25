@@ -7,7 +7,8 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Pattern
+from re import Pattern
+from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
 if TYPE_CHECKING:
     from git_changelog.providers import ProviderRefParser, Ref
@@ -241,7 +242,7 @@ class BasicConvention(CommitConvention):
         "doc": "Documented",
     }
 
-    TYPE_REGEX: ClassVar[Pattern] = re.compile(r"^(?P<type>(%s))" % "|".join(TYPES.keys()), re.I)
+    TYPE_REGEX: ClassVar[Pattern] = re.compile(rf"^(?P<type>({'|'.join(TYPES.keys())}))", re.I)
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
@@ -325,7 +326,7 @@ class AngularConvention(CommitConvention):
         "tests": "Tests",
     }
     SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
+        rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$",
     )
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
@@ -400,7 +401,7 @@ class ConventionalCommitConvention(AngularConvention):
     TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
     DEFAULT_RENDER: ClassVar[list[str]] = AngularConvention.DEFAULT_RENDER
     SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
-        r"^(?P<type>(%s))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$" % ("|".join(TYPES.keys())),  # (%)
+        rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$",
     )
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102

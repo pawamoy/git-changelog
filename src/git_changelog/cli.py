@@ -19,7 +19,8 @@ import sys
 import warnings
 from importlib import metadata
 from pathlib import Path
-from typing import Any, Literal, Pattern, Sequence, TextIO
+from re import Pattern
+from typing import TYPE_CHECKING, Any, Literal, TextIO
 
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
@@ -40,6 +41,10 @@ if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 DEFAULT_VERSIONING = "semver"
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"

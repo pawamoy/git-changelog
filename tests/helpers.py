@@ -8,9 +8,10 @@ import shutil
 import subprocess
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
 
@@ -44,8 +45,8 @@ class GitRepo:
         Returns:
             The output of the command.
         """
-        return subprocess.check_output(
-            [self._git_exec, "-C", str(self.path), *args],  # noqa: S603
+        return subprocess.check_output(  # noqa: S603
+            [self._git_exec, "-C", str(self.path), *args],
             text=True,
         )
 
