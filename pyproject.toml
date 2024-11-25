@@ -105,6 +105,7 @@ dev = [
     "mypy>=1.10",
     "types-markdown>=3.6",
     "types-pyyaml>=6.0",
+    "tomli-w>=1.0",
 
     # docs
     "black>=24.4",
