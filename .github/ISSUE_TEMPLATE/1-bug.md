@@ -53,7 +53,7 @@ PASTE TRACEBACK HERE
 git-changelog --debug-info  # | xclip -selection clipboard
 ```
 
-PASTE OUTPUT HERE
+PASTE MARKDOWN OUTPUT HERE
 
 ### Additional context
 <!-- Add any other relevant context about the problem here,

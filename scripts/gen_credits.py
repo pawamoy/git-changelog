@@ -5,17 +5,18 @@ from __future__ import annotations
 import os
 import sys
 from collections import defaultdict
+from collections.abc import Iterable
 from importlib.metadata import distributions
 from itertools import chain
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Iterable, Union
+from typing import Union
 
 from jinja2 import StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
 from packaging.requirements import Requirement
 
-# TODO: Remove once support for Python 3.10 is dropped.
+# YORE: EOL 3.10: Replace block with line 2.
 if sys.version_info >= (3, 11):
     import tomllib
 else:
@@ -26,11 +27,10 @@ with project_dir.joinpath("pyproject.toml").open("rb") as pyproject_file:
     pyproject = tomllib.load(pyproject_file)
 project = pyproject["project"]
 project_name = project["name"]
-with project_dir.joinpath("devdeps.txt").open() as devdeps_file:
-    devdeps = [line.strip() for line in devdeps_file if not line.startswith("-e")]
+devdeps = [dep for dep in pyproject["dependency-groups"]["dev"] if not dep.startswith("-e")]
 
-PackageMetadata = Dict[str, Union[str, Iterable[str]]]
-Metadata = Dict[str, PackageMetadata]
+PackageMetadata = dict[str, Union[str, Iterable[str]]]
+Metadata = dict[str, PackageMetadata]
 
 
 def _merge_fields(metadata: dict) -> PackageMetadata:
@@ -88,7 +88,7 @@ def _set_license(metadata: PackageMetadata) -> None:
 def _get_deps(base_deps: dict[str, Requirement], metadata: Metadata) -> Metadata:
     deps = {}
     for dep_name, dep_req in base_deps.items():
-        if dep_name not in metadata:
+        if dep_name not in metadata or dep_name == "git-changelog":
             continue
         metadata[dep_name]["spec"] |= {str(spec) for spec in dep_req.specifier}  # type: ignore[operator]
         metadata[dep_name]["extras"] |= dep_req.extras  # type: ignore[operator]
@@ -131,8 +131,8 @@ def _render_credits() -> str:
 
     template_data = {
         "project_name": project_name,
-        "prod_dependencies": sorted(prod_dependencies.values(), key=lambda dep: str(dep["name"])),
-        "dev_dependencies": sorted(dev_dependencies.values(), key=lambda dep: str(dep["name"])),
+        "prod_dependencies": sorted(prod_dependencies.values(), key=lambda dep: str(dep["name"]).lower()),
+        "dev_dependencies": sorted(dev_dependencies.values(), key=lambda dep: str(dep["name"]).lower()),
         "more_credits": "http://pawamoy.github.io/credits/",
     }
     template_text = dedent(

@@ -25,17 +25,20 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
-    - name: Fetch all tags
-      run: git fetch --depth=1 --tags
-
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
-    - name: Install uv
-      run: pip install uv
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
       run: make setup
@@ -49,9 +52,6 @@ jobs:
     - name: Check if the code is correctly typed
       run: make check-types
 
-    - name: Check for vulnerabilities in dependencies
-      run: make check-dependencies
-
     - name: Check for breaking changes in the API
       run: make check-api
 
@@ -64,28 +64,46 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - "3.8"
         - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
+        - "3.13"
+        - "3.14"
+        resolution:
+        - highest
+        - lowest-direct
+        exclude:
+        - os: macos-latest
+          resolution: lowest-direct
+        - os: windows-latest
+          resolution: lowest-direct
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.python-version == '3.12' }}
+    continue-on-error: ${{ matrix.python-version == '3.14' }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
 
-    - name: Install uv
-      run: pip install uv
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+        cache-suffix: py${{ matrix.python-version }}
 
     - name: Install dependencies
+      env:
+        UV_RESOLUTION: ${{ matrix.resolution }}
       run: make setup
 
     - name: Run the test suite
