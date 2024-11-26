@@ -3,14 +3,23 @@
 from __future__ import annotations
 
 import re
+import sys
+import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timezone
 from re import Pattern
-from typing import TYPE_CHECKING, Any, Callable, ClassVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, SupportsIndex, overload
+
+if sys.version_info < (3, 13):
+    from typing_extensions import deprecated
+else:
+    from warnings import deprecated
 
 if TYPE_CHECKING:
+    from collections.abc import ItemsView, Iterable, KeysView, ValuesView
+
     from git_changelog.providers import ProviderRefParser, Ref
     from git_changelog.versioning import ParsedVersion
 
@@ -29,6 +38,85 @@ def _is_valid_version(version: str, version_parser: Callable[[str], tuple[Parsed
     except ValueError:
         return False
     return True
+
+
+# YORE: Bump 3: Remove block.
+class _Trailers(list[tuple[str, str]]):
+    def __init__(self, values: Iterable[tuple[str, str]] | None = None):
+        super().__init__(values or ())
+
+    @property
+    def _dict(self) -> dict[str, str]:
+        return dict(iter(self))
+
+    def __contains__(self, key: str | tuple[str, str]) -> bool:  # type: ignore[override]
+        if isinstance(key, str):
+            warnings.warn(
+                "Checking membership of a string in trailers will stop being supported in version 3.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return key in (title for title, _ in self)
+        return super().__contains__(key)
+
+    @deprecated("Trailers are now a list of 2-tuples.", category=DeprecationWarning, stacklevel=2)
+    def items(self) -> ItemsView:
+        return self._dict.items()
+
+    @deprecated("Trailers are now a list of 2-tuples.", category=DeprecationWarning, stacklevel=2)
+    def keys(self) -> KeysView:
+        return self._dict.keys()
+
+    @deprecated("Trailers are now a list of 2-tuples.", category=DeprecationWarning, stacklevel=2)
+    def values(self) -> ValuesView:
+        return self._dict.values()
+
+    @deprecated("Trailers are now a list of 2-tuples.", category=DeprecationWarning, stacklevel=2)
+    def get(self, key: str, default: str | None = None) -> str | None:
+        return self._dict.get(key, default)
+
+    @overload
+    def __getitem__(self, key: str) -> str: ...
+
+    @overload
+    def __getitem__(self, key: SupportsIndex) -> tuple[str, str]: ...
+
+    @overload
+    def __getitem__(self, key: slice) -> list[tuple[str, str]]: ...
+
+    def __getitem__(self, key: str | SupportsIndex | slice) -> str | tuple[str, str] | list[tuple[str, str]]:
+        if isinstance(key, str):
+            warnings.warn(
+                "Getting a trailer with a string key will stop being supported in version 3. Instead, use an integer index, or iterate.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return self._dict[key]
+        return super().__getitem__(key)
+
+    @overload
+    def __setitem__(self, key: str, value: str) -> None: ...
+
+    @overload
+    def __setitem__(self, key: SupportsIndex, value: tuple[str, str]) -> None: ...
+
+    @overload
+    def __setitem__(self, key: slice, value: Iterable[tuple[str, str]]) -> None: ...
+
+    def __setitem__(
+        self,
+        key: str | SupportsIndex | slice,
+        value: str | tuple[str, str] | Iterable[tuple[str, str]],
+    ) -> None:
+        if isinstance(key, str):
+            warnings.warn(
+                "Setting a trailer with a string key will stop being supported in version 3. Instead, append a 2-tuple.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.append((key, value))  # type: ignore[arg-type]
+            return
+        super().__setitem__(key, value)  # type: ignore[assignment,index]
 
 
 class Commit:
@@ -108,7 +196,8 @@ class Commit:
         self.text_refs: dict[str, list[Ref]] = {}
         self.convention: dict[str, Any] = {}
 
-        self.trailers: dict[str, str] = {}
+        # YORE: Bump 3: Replace `_Trailers()` with `[]` within line.
+        self.trailers: list[tuple[str, str]] = _Trailers()
         self.body_without_trailers = self.body
 
         if parse_trailers:
@@ -172,14 +261,14 @@ class Commit:
         with suppress(ValueError):
             trailers = self._parse_trailers_block(self.body[last_blank_line + 1 :])
             if trailers:
-                self.trailers.update(trailers)
+                self.trailers.extend(trailers)
                 self.body_without_trailers = self.body[:last_blank_line]
 
-    def _parse_trailers_block(self, lines: list[str]) -> dict[str, str]:
-        trailers = {}
+    def _parse_trailers_block(self, lines: list[str]) -> list[tuple[str, str]]:
+        trailers = []
         for line in lines:
             title, value = line.split(": ", 1)
-            trailers[title] = value.strip()
+            trailers.append((title, value.strip()))
         return trailers  # or raise ValueError due to split unpacking
 
 

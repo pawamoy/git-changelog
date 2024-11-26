@@ -41,6 +41,7 @@ dependencies = [
     "packaging>=24.0",
     "semver>=2.13",
     "tomli>=2.0; python_version < '3.11'",
+    "typing-extensions>=4.9; python_version < '3.13'",
 ]
 
 [project.urls]
