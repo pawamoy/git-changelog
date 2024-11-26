@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.5.3](https://github.com/pawamoy/git-changelog/releases/tag/2.5.3) - 2024-11-26
+
+<small>[Compare with 2.5.2](https://github.com/pawamoy/git-changelog/compare/2.5.2...2.5.3)</small>
+
+### Build
+
+- Drop support for Python 3.8 ([ff2b8bb](https://github.com/pawamoy/git-changelog/commit/86b6f8ffe9afcf83d6d69e8697daf870e94e325d) by Timothée Mazzucotelli).
+
+### Bug Fixes
+
+- Support multiple trailers with same title ([0ef65f9](https://github.com/pawamoy/git-changelog/commit/0ef65f9c286a63ed704dde597201cdbcd3034586) by Timothée Mazzucotelli). [Issue-68](https://github.com/pawamoy/git-changelog/issues/68)
+- Restore "untyped section" feature ([fe041fa](https://github.com/pawamoy/git-changelog/commit/fe041fa44647ee6553262f50c25db3f8282f65f4) by Autumn Jolitz). [Issue-88](https://github.com/pawamoy/git-changelog/issues/88), [PR-89](https://github.com/pawamoy/git-changelog/pull/89), Co-authored-by: Autumn Jolitz <autumn@aible.com>
+
 ## [2.5.2](https://github.com/pawamoy/git-changelog/releases/tag/2.5.2) - 2024-04-04
 
 <small>[Compare with 2.5.1](https://github.com/pawamoy/git-changelog/compare/2.5.1...2.5.2)</small>
