@@ -140,6 +140,7 @@ class Commit:
         parent_hashes: str | list[str] = "",
         commits_map: dict[str, Commit] | None = None,
         version_parser: Callable[[str], tuple[ParsedVersion, str]] | None = None,
+        jira_info: dict[str, str] | None = None,
     ):
         """Initialization method.
 
@@ -195,6 +196,7 @@ class Commit:
 
         self.text_refs: dict[str, list[Ref]] = {}
         self.convention: dict[str, Any] = {}
+        self.jira_info = jira_info
 
         # YORE: Bump 3: Replace `_Trailers()` with `[]` within line.
         self.trailers: list[tuple[str, str]] = _Trailers()
@@ -281,7 +283,7 @@ class CommitConvention(ABC):
     DEFAULT_RENDER: ClassVar[list[str]]
 
     @abstractmethod
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+    def parse_commit(self, commit: Commit) -> dict[str, Any]:
         """Parse the commit to extract information.
 
         Arguments:
@@ -291,6 +293,17 @@ class CommitConvention(ABC):
             A dictionary containing the parsed data.
         """
         raise NotImplementedError
+
+    @staticmethod
+    def _parse_jira_issues(commit: Commit, message: str) -> dict[str, str]:
+        if commit.jira_info is None:
+            return {}
+
+        jira_regex = re.compile(rf"\b{commit.jira_info['project']}-[0-9]+\b", re.I | re.MULTILINE)
+        return {
+            issue.upper(): f"{commit.jira_info['base_url']}{issue.upper()}"
+            for issue in jira_regex.findall(message)
+        }
 
     @classmethod
     def _format_sections_help(cls) -> str:
@@ -343,18 +356,20 @@ class BasicConvention(CommitConvention):
         TYPES["remove"],
     ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, Any]:  # noqa: D102
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
         is_minor = not is_major and self.is_minor(commit_type)
         is_patch = not any((is_major, is_minor))
+        jira_issues = self._parse_jira_issues(commit, message)
 
         return {
             "type": commit_type,
             "is_major": is_major,
             "is_minor": is_minor,
             "is_patch": is_patch,
+            "jira_issues": jira_issues,
         }
 
     def parse_type(self, commit_subject: str) -> str:
@@ -429,12 +444,13 @@ class AngularConvention(CommitConvention):
         TYPES["perf"],
     ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, Any]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
         is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))
+        jira_issues = self._parse_jira_issues(commit, message)
 
         return {
             "type": subject["type"],
@@ -443,6 +459,7 @@ class AngularConvention(CommitConvention):
             "is_major": is_major,
             "is_minor": is_minor,
             "is_patch": is_patch,
+            "jira_issues": jira_issues,
         }
 
     def parse_subject(self, commit_subject: str) -> dict[str, str]:
@@ -493,12 +510,13 @@ class ConventionalCommitConvention(AngularConvention):
         rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$",
     )
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, Any]:  # noqa: D102
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message) or subject.get("breaking") == "!"
         is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))
+        jira_issues = self._parse_jira_issues(commit, message)
 
         return {
             "type": subject["type"],
@@ -507,4 +525,5 @@ class ConventionalCommitConvention(AngularConvention):
             "is_major": is_major,
             "is_minor": is_minor,
             "is_patch": is_patch,
+            "jira_issues": jira_issues,
         }

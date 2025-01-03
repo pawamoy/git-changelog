@@ -60,6 +60,12 @@ Generate a changelog using a specific provider (GitHub/GitLab/BitBucket):
 git-changelog --provider github
 ```
 
+Generate a changelog with a list of JIRA issues addressed per version:
+
+```bash
+git-changelog --jira-url https://<subdomain>.atlassian.net/browse/<project>-%
+```
+
 Author's favorite, from Python:
 
 ```python

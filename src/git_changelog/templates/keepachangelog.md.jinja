@@ -38,6 +38,12 @@
 {%- endwith %}
 {%- endif %}
 {%- endfor %}
+{%- if version.jira_issues|length > 0 %}
+### JIRA issues
+{% for issue_key, issue_url in version.jira_issues.items() %}
+- [{{ issue_key }}]({{ issue_url }})
+{%- endfor %}
+{% endif %}
 {%- if not (version.tag or version.planned_tag) %}
 <!-- insertion marker -->{% endif %}
 {% endmacro -%}

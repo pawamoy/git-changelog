@@ -151,6 +151,19 @@ class Version:
         """
         return bool(self.tag.split(".", 2)[2])
 
+    @property
+    def jira_issues(self) -> dict[str, str]:
+        """List the JIRA issues associated to this version.
+
+        Returns:
+           A dictionnary of all the JIRA issues referenced in this version's commits and their URLs.
+        """
+        return {
+            key: url
+            for commit in self.commits
+            for key, url in commit.convention.get("jira_issues", {}).items()
+        }
+
     def add_commit(self, commit: Commit) -> None:
         """Register the given commit and add it to the relevant section based on its message convention.
 
@@ -204,6 +217,7 @@ class Changelog:
         zerover: bool = True,
         filter_commits: str | None = None,
         versioning: Literal["semver", "pep440"] = "semver",
+        jira_info: dict[str, str] | None = None,
     ):
         """Initialization method.
 
@@ -224,6 +238,7 @@ class Changelog:
         self.parse_trailers: bool = parse_trailers
         self.zerover: bool = zerover
         self.filter_commits: str | None = filter_commits
+        self.jira_info: dict[str, str] | None = jira_info
 
         # set provider
         if not isinstance(provider, ProviderRefParser):
@@ -384,6 +399,7 @@ class Changelog:
                 body=body,
                 parse_trailers=self.parse_trailers,
                 version_parser=self.version_parser,
+                jira_info=self.jira_info,
             )
 
             pos += nbl_index + 1

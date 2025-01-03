@@ -58,6 +58,7 @@ DEFAULT_CONFIG_FILES = [
     ".config/git-changelog.toml",
     str(Path(user_config_dir()) / "git-changelog.toml"),
 ]
+JIRA_URL_REGEX = r"^(?P<base_url>https://\w+.atlassian.net/browse/)(?P<project>\w+)-%$"
 """Default configuration files read by git-changelog."""
 
 DEFAULT_SETTINGS: dict[str, Any] = {
@@ -109,6 +110,13 @@ def _comma_separated_list(value: str) -> list[str]:
     return value.split(",")
 
 
+def _jira_info(value: str) -> dict[str, str]:
+    m = re.match(JIRA_URL_REGEX, value)
+    if m is None:
+        raise argparse.ArgumentTypeError("Invalid JIRA URL")
+    return m.groupdict()
+
+
 class _ParseDictAction(argparse.Action):
     def __call__(
         self,
@@ -123,7 +131,6 @@ class _ParseDictAction(argparse.Action):
         if isinstance(values, str):
             key, value = values.split("=", 1)
             getattr(namespace, self.dest)[key] = value
-
 
 providers: dict[str, type[ProviderRefParser]] = {
     "github": GitHub,
@@ -386,6 +393,15 @@ def get_parser() -> argparse.ArgumentParser:
         "The key/value pairs are accessible as 'jinja_context' in the template.",
     )
     parser.add_argument(
+        "-J",
+        "--jira-url",
+        action="store",
+        type=_jira_info,
+        dest="jira_info",
+        help="A template JIRA URL used to parse commit messages and find addressed issues. "
+        "The template URL must be formatted as 'https://<subdomain>.atlassian.net/browse/<project>-%%'.",
+    )
+    parser.add_argument(
         "-V",
         "--version",
         action="version",
@@ -546,6 +562,7 @@ def build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    jira_info: dict[str, str] | None = None,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -617,6 +634,7 @@ def build_and_render(
         zerover=zerover,
         filter_commits=filter_commits,
         versioning=versioning,
+        jira_info=jira_info,
     )
 
     # remove empty versions from changelog data
