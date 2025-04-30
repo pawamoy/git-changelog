@@ -201,7 +201,7 @@ git-changelog --convention angular
 
 The basic convention, as the name implies, is very simple.
 If a commit message summary (the first line of the message)
-with a particular word/prefix (case-insensitive),
+starts with a particular word/prefix (case-insensitive),
 it is added to the corresponding section:
 
 Type     | Section
