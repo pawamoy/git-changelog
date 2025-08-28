@@ -21,7 +21,7 @@ from dataclasses import dataclass, field, fields
 from importlib import metadata
 from pathlib import Path
 from re import Pattern
-from typing import TYPE_CHECKING, Any, Literal, TextIO
+from typing import TYPE_CHECKING, Any, Literal, TextIO, overload
 
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
@@ -131,7 +131,7 @@ class _ParseDictAction(argparse.Action):
             getattr(namespace, self.dest)[key] = value
 
 
-PROVIDERS: dict[str, type[ProviderRefParser]] = {
+providers: dict[str, type[ProviderRefParser]] = {
     "github": GitHub,
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
@@ -300,7 +300,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--provider",
         metavar="PROVIDER",
         dest="provider",
-        choices=PROVIDERS.keys(),
+        choices=providers.keys(),
         help="Explicitly specify the repository provider. Default: unset.",
     )
     parser.add_argument(
@@ -542,7 +542,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
 
 @dataclass
-class RenderParameters:
+class RendererParameters:
     """Parameters for rendering the changelog."""
 
     template: str = DEFAULT_SETTINGS["template"]
@@ -573,7 +573,7 @@ class RenderParameters:
 
 def render(
     changelog: Changelog,
-    p: RenderParameters,
+    p: RendererParameters,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -666,7 +666,7 @@ def render(
 
 
 @dataclass
-class ParseParameters:
+class ParserParameters:
     """Parameters for parsing the changelog."""
 
     repository: str = DEFAULT_SETTINGS["repository"]
@@ -715,7 +715,7 @@ class ParseParameters:
     """
 
 
-def build_changelog(p: ParseParameters) -> Changelog:
+def build_changelog(p: ParserParameters) -> Changelog:
     """Build a changelog.
 
     This function returns the changelog instance.
@@ -727,7 +727,7 @@ def build_changelog(p: ParseParameters) -> Changelog:
         The built changelog.
     """
     # get provider
-    provider_class = PROVIDERS[p.provider] if p.provider else None
+    provider_class = providers[p.provider] if p.provider else None
 
     # build data
     changelog = Changelog(
@@ -754,6 +754,90 @@ def build_changelog(p: ParseParameters) -> Changelog:
             changelog.versions_dict.pop(version.tag)
 
     return changelog
+
+
+def build_and_render(
+    repository: str,
+    template: str,
+    convention: str | CommitConvention,
+    parse_refs: bool = False,  # noqa: FBT001,FBT002
+    parse_trailers: bool = False,  # noqa: FBT001,FBT002
+    sections: list[str] | None = None,
+    in_place: bool = False,  # noqa: FBT001,FBT002
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
+    omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
+    provider: str | None = None,
+    bump: str | None = None,
+    zerover: bool = True,  # noqa: FBT001,FBT002
+    filter_commits: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+    versioning: Literal["pep440", "semver"] = "semver",
+) -> tuple[Changelog, str]:
+    """Build a changelog and render it.
+
+    This function returns the changelog instance and the rendered contents,
+    but also updates the specified output file (side-effect) or writes to stdout.
+
+    Parameters:
+        repository: Path to a local repository.
+        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
+        convention: Name of a commit message style/convention.
+        parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+        parse_trailers: Whether to parse Git trailers.
+        sections: Sections to render (features, bug fixes, etc.).
+        in_place: Whether to update the changelog in-place.
+        output: Output/changelog file.
+        version_regex: Regular expression to match versions in an existing changelog file.
+        marker_line: Marker line used to insert contents in an existing changelog.
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
+        omit_empty_versions: Whether to omit empty versions from the output.
+        provider: Provider class used by this repository.
+        bump: Whether to try and bump to a given version.
+        zerover: Keep major version at zero, even for breaking changes.
+        filter_commits: The Git revision-range used to filter commits in git-log.
+        jinja_context: Key/value pairs passed to the Jinja template.
+        versioning: Versioning scheme to use when grouping commits and bumping versions.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The built changelog and the rendered contents.
+    """
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
+    parser_params = ParserParameters(
+        repository=repository,
+        convention=convention,
+        bump=bump,
+        filter_commits=filter_commits,
+        omit_empty_versions=omit_empty_versions,
+        parse_refs=parse_refs,
+        parse_trailers=parse_trailers,
+        provider=provider,
+        sections=sections,
+        versioning=versioning,
+        zerover=zerover,
+    )
+    renderer_params = RendererParameters(
+        template=template,
+        in_place=in_place,
+        output=output or sys.stdout,
+        version_regex=version_regex,
+        marker_line=marker_line,
+        jinja_context=jinja_context,
+    )
+    changelog = build_changelog(parser_params)
+    rendered = render(changelog, renderer_params)
+
+    return changelog, rendered
 
 
 def get_release_notes(
@@ -816,6 +900,26 @@ class ReleaseNotesParameters:
     """
 
 
+@overload
+def output_release_notes(
+    input_file: str = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    output_file: str | TextIO | None = None,
+) -> None:
+    """Print release notes from existing changelog.
+
+    This will print the latest entry in the changelog.
+
+    Parameters:
+        input_file: The changelog to read from.
+        version_regex: A regular expression to match version entries.
+        marker_line: The insertion marker line in the changelog.
+        output_file: Where to print/write the release notes.
+    """
+
+
+@overload
 def output_release_notes(p: ReleaseNotesParameters) -> None:
     """Print release notes from existing changelog.
 
@@ -824,6 +928,22 @@ def output_release_notes(p: ReleaseNotesParameters) -> None:
     Parameters:
         p: The parameters for getting release notes.
     """
+
+
+def output_release_notes(
+    input_file: str = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    output_file: str | TextIO | None = None,
+    p: ReleaseNotesParameters | None = None,
+) -> None:
+    p = p or ReleaseNotesParameters(
+        input_file=input_file,
+        version_regex=version_regex,
+        marker_line=marker_line,
+        output_file=output_file,
+    )
+
     release_notes = get_release_notes(p.input_file, p.version_regex, p.marker_line)
     try:
         p.output_file.write(release_notes)  # type: ignore[union-attr]
@@ -849,7 +969,7 @@ def main(args: list[str] | None = None) -> int:
         p = ReleaseNotesParameters(**_only_keys(settings, ReleaseNotesParameters))
         output_release_notes(p)
     elif settings.get("bumped_version"):
-        p = ParseParameters(**_only_keys(settings, ParseParameters))
+        p = ParserParameters(**_only_keys(settings, ParserParameters))
         p.bump = p.bump or "auto"
         p.output = sys.stdout
         changelog = build_changelog(p)
@@ -858,8 +978,8 @@ def main(args: list[str] | None = None) -> int:
             return 1
         print(changelog.versions_list[0].planned_tag)
     else:
-        parser_params = ParseParameters(**_only_keys(settings, ParseParameters))
-        render_params = RenderParameters(**_only_keys(settings, RenderParameters))
+        parser_params = ParserParameters(**_only_keys(settings, ParserParameters))
+        render_params = RendererParameters(**_only_keys(settings, RendererParameters))
         try:
             changelog = build_changelog(parser_params)
             render(changelog, render_params)

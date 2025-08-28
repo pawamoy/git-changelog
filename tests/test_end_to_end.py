@@ -3,13 +3,20 @@
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 from typing import TYPE_CHECKING
 from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 
 from git_changelog import Changelog
-from git_changelog.cli import build_and_render
+from git_changelog.cli import (
+    ParserParameters,
+    RendererParameters,
+    build_and_render,
+    build_changelog,
+    render,
+)
 from git_changelog.commit import AngularConvention
 from git_changelog.templates import get_template
 from git_changelog.versioning import bump_semver
@@ -78,6 +85,80 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
         tmp_path: A temporary path to write the changelog into.
     """
     output = tmp_path.joinpath("changelog.md")
+    parser_params = ParserParameters(
+        repository=str(repo.path),
+        convention="angular",
+        bump=None,
+    )
+    renderer_params = RendererParameters(
+        template="keepachangelog",
+        output=output.as_posix(),
+    )
+    changelog = build_changelog(parser_params)
+    rendered = render(changelog, renderer_params)
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 2
+    assert "Unreleased" in rendered
+    latest_tag = "91.6.14"
+    assert latest_tag not in rendered
+    repo.git("tag", latest_tag)
+    changelog = build_changelog(replace(parser_params, bump="auto"))
+    render(changelog, replace(renderer_params, in_place=True))
+    rendered = output.read_text()
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
+    assert "Unreleased" not in rendered
+    assert latest_tag in rendered
+    repo.git("tag", "-d", latest_tag)
+
+
+@pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
+def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
+    """Render changelog in-place, and check for duplicate entries.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog.md")
+    parser_params = ParserParameters(
+        repository=str(repo.path),
+        convention="angular",
+        bump="auto",
+    )
+    renderer_params = RendererParameters(
+        template="keepachangelog",
+        output=output.as_posix(),
+    )
+    changelog = build_changelog(parser_params)
+    rendered = render(changelog, renderer_params)
+
+    # When bump_latest is True, there's only one insertion marker
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
+    latest_tag = "1.2.0"
+    assert latest_tag in rendered
+
+    rendered = output.read_text()
+    # The latest tag should appear exactly three times in the changelog
+    assert rendered.count(latest_tag) == 3
+
+    changelog = build_changelog(parser_params)
+    # Without tagging a new version, we should get an error
+    with pytest.raises(ValueError, match=r"Version .* already in changelog"):
+        render(changelog, replace(renderer_params, in_place=True))
+
+    rendered = output.read_text()
+    # The latest tag should still appear exactly three times in the changelog
+    assert rendered.count(latest_tag) == 3
+
+
+@pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
+def test_legacy_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
+    """Render changelog in-place.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog.md")
     _, rendered = build_and_render(
         str(repo.path),
         convention="angular",
@@ -106,7 +187,7 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
-def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
+def test_legacy_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place, and check for duplicate entries.
 
     Parameters:
