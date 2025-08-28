@@ -56,7 +56,7 @@ Gitter = "https://gitter.im/git-changelog/community"
 Funding = "https://github.com/sponsors/pawamoy"
 
 [project.scripts]
-git-changelog = "git_changelog.cli:main"
+git-changelog = "git_changelog:main"
 
 [tool.pdm.version]
 source = "call"
