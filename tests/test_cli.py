@@ -68,6 +68,21 @@ def test_get_version() -> None:
     assert cli.get_version()
 
 
+def test_bumped_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Test --bumped-version CLI option outputs the expected bumped version string."""
+    cli.main(
+        [
+            "--config-file",
+            str(tmp_path / "conf.toml"),
+            "--bump",
+            "1.2.3",
+            "--bumped-version",
+        ],
+    )
+    captured = capsys.readouterr()
+    assert "1.2.3" in captured.out
+
+
 @pytest.mark.parametrize(
     "args",
     [

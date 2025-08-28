@@ -1,0 +1,7 @@
+{%- with version = changelog.versions_list | first -%}
+{%- if version.tag or version.planned_tag -%}
+{{ version.tag or version.planned_tag }}
+{% else -%}
+Unreleased
+{% endif -%}
+{%- endwith -%}

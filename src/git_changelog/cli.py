@@ -201,6 +201,12 @@ def get_parser() -> argparse.ArgumentParser:
         "Default: unset (false).",
     )
     parser.add_argument(
+        "--bumped-version",
+        action="store_true",
+        dest="bumped_version",
+        help="Show bumped version and exit.",
+    )
+    parser.add_argument(
         "-B",
         "--bump",
         action="store",
@@ -497,7 +503,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts})
+    sentinel_ns = argparse.Namespace(**dict.fromkeys(opts, sentinel))
     explicit_opts_dict = {
         key: opts.get(key, None)
         for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
@@ -514,8 +520,19 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
     settings = read_config(config_file)
 
+    show_bumped_version = explicit_opts_dict.pop("bumped_version", False)
+
     # CLI arguments override the config file settings
     settings.update(explicit_opts_dict)
+
+    if show_bumped_version:
+        settings.update(
+            {
+                "bump": settings["bump"] if settings["bump"] else "auto",
+                "template": "bumped_version",
+                "output": sys.stdout,
+            }
+        )
 
     # Merge jinja context, CLI values override config file values.
     settings["jinja_context"].update(jinja_context)

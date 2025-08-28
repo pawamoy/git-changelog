@@ -88,7 +88,7 @@ The following sections explain in more details all the features of *git-changelo
 
 Project-wise, permanent configuration of *git-changelog* is possible.
 By default, *git-changelog* will search for the existence a suitable configuration
-in the `pyproject.toml` file or otherwise, the following configuration files 
+in the `pyproject.toml` file or otherwise, the following configuration files
 in this particular order:
 
 - `.git-changelog.toml`
@@ -406,7 +406,7 @@ project has migrated to SemVer recently and you want to ignore old non-conventio
 This is possible through the option `-F`, `--filter-commits`, which takes a
 *revision-range* to select the commits that will be used in the changelog.
 This option will pass the [revision-range](https://git-scm.com/docs/git-log#
-Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow 
+Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow
 the rules defined by Git.
 
 For example, to use commits from tag `0.5.0` up to latest:
@@ -659,6 +659,18 @@ git-changelog --bump 1.1.0
 
 # add pre-release metadata
 git-changelog --bump 2.0.0-alpha1
+```
+
+## Show bumped version
+
+To retrieve the bumped version (for example, to pass the same version to your package builder) use the `--bumped-version` flag. This flag forces output to stdout (overriding `--output`), uses the `bumped_version` template, and sets `--bumped` to `auto` if it isn’t already set.
+
+```bash
+git-changelog --bumped-version
+# prints the next auto-bumped version, e.g. 1.2.3
+
+git-changelog --bump major --bumped-version
+# prints the next major version, e.g. 2.0.0
 ```
 
 ## Parse additional information in commit messages
