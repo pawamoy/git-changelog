@@ -309,7 +309,7 @@ as a starting point.
 
 From there, simply modify the different Jinja macros:
 
-- `render_commit()`, which accepts a [Commit][git_changelog.build.Commit] object
+- `render_commit()`, which accepts a [Commit][git_changelog.commit.Commit] object
 - `render_section()`, which accepts a [Section][git_changelog.build.Section] object
 - `render_version()`, which accepts a [Version][git_changelog.build.Version] object
 
