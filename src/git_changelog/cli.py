@@ -17,6 +17,7 @@ import argparse
 import re
 import sys
 import warnings
+from dataclasses import dataclass, field, fields
 from importlib import metadata
 from pathlib import Path
 from re import Pattern
@@ -105,6 +106,11 @@ def get_version() -> str:
         return "0.0.0"
 
 
+def _only_keys(d: dict[str, Any], cls: type) -> dict[str, Any]:
+    want = {f.name for f in fields(cls)}
+    return {k: v for k, v in d.items() if k in want}
+
+
 def _comma_separated_list(value: str) -> list[str]:
     return value.split(",")
 
@@ -125,7 +131,7 @@ class _ParseDictAction(argparse.Action):
             getattr(namespace, self.dest)[key] = value
 
 
-providers: dict[str, type[ProviderRefParser]] = {
+PROVIDERS: dict[str, type[ProviderRefParser]] = {
     "github": GitHub,
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
@@ -294,7 +300,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--provider",
         metavar="PROVIDER",
         dest="provider",
-        choices=providers.keys(),
+        choices=PROVIDERS.keys(),
         help="Explicitly specify the repository provider. Default: unset.",
     )
     parser.add_argument(
@@ -520,19 +526,8 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
     settings = read_config(config_file)
 
-    show_bumped_version = explicit_opts_dict.pop("bumped_version", False)
-
     # CLI arguments override the config file settings
     settings.update(explicit_opts_dict)
-
-    if show_bumped_version:
-        settings.update(
-            {
-                "bump": settings["bump"] if settings["bump"] else "auto",
-                "template": "bumped_version",
-                "output": sys.stdout,
-            }
-        )
 
     # Merge jinja context, CLI values override config file values.
     settings["jinja_context"].update(jinja_context)
@@ -540,120 +535,80 @@ def parse_settings(args: list[str] | None = None) -> dict:
     # TODO: remove at some point
     if "bump_latest" in explicit_opts_dict:
         warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
+    if settings.get("bump_latest"):
+        settings["bump"] = settings["bump"] or "auto"
 
     return settings
 
 
-def build_and_render(
-    repository: str,
-    template: str,
-    convention: str | CommitConvention,
-    parse_refs: bool = False,  # noqa: FBT001,FBT002
-    parse_trailers: bool = False,  # noqa: FBT001,FBT002
-    sections: list[str] | None = None,
-    in_place: bool = False,  # noqa: FBT001,FBT002
-    output: str | TextIO | None = None,
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
-    bump_latest: bool = False,  # noqa: FBT001,FBT002
-    omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
-    provider: str | None = None,
-    bump: str | None = None,
-    zerover: bool = True,  # noqa: FBT001,FBT002
-    filter_commits: str | None = None,
-    jinja_context: dict[str, Any] | None = None,
-    versioning: Literal["pep440", "semver"] = "semver",
+@dataclass
+class RenderParameters:
+    """Parameters for rendering the changelog."""
+
+    template: str = DEFAULT_SETTINGS["template"]
+    """
+    Name of a builtin template, or path to a custom template (prefixed with `path:`).
+    """
+    in_place: bool = False
+    """
+    Whether to update the changelog in-place.
+    """
+    output: str | TextIO = sys.stdout
+    """
+    Output/changelog file.
+    """
+    version_regex: str = DEFAULT_VERSION_REGEX
+    """
+    Regular expression to match versions in an existing changelog file.
+    """
+    marker_line: str = DEFAULT_MARKER_LINE
+    """
+    Marker line used to insert contents in an existing changelog.
+    """
+    jinja_context: dict[str, Any] = field(default_factory=dict)
+    """
+    Key/value pairs passed to the Jinja template.
+    """
+
+
+def render(
+    changelog: Changelog,
+    p: RenderParameters,
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
-    This function returns the changelog instance and the rendered contents,
+    This function returns the rendered contents,
     but also updates the specified output file (side-effect) or writes to stdout.
 
     Parameters:
-        repository: Path to a local repository.
-        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
-        convention: Name of a commit message style/convention.
-        parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
-        parse_trailers: Whether to parse Git trailers.
-        sections: Sections to render (features, bug fixes, etc.).
-        in_place: Whether to update the changelog in-place.
-        output: Output/changelog file.
-        version_regex: Regular expression to match versions in an existing changelog file.
-        marker_line: Marker line used to insert contents in an existing changelog.
-        bump_latest: Deprecated, use --bump=auto instead.
-            Whether to try and bump the latest version to guess the new one.
-        omit_empty_versions: Whether to omit empty versions from the output.
-        provider: Provider class used by this repository.
-        bump: Whether to try and bump to a given version.
-        zerover: Keep major version at zero, even for breaking changes.
-        filter_commits: The Git revision-range used to filter commits in git-log.
-        jinja_context: Key/value pairs passed to the Jinja template.
-        versioning: Versioning scheme to use when grouping commits and bumping versions.
-
-    Raises:
-        ValueError: When some arguments are incompatible or missing.
+        changelog: The changelog instance to render.
+        p: The render parameters.
 
     Returns:
-        The built changelog and the rendered contents.
+        The rendered contents.
     """
     # get template
-    if template.startswith("path:"):
-        path = template.replace("path:", "", 1)
+    if p.template.startswith("path:"):
+        path = p.template.replace("path:", "", 1)
         try:
             jinja_template = templates.get_custom_template(path)
         except TemplateNotFound as error:
             raise ValueError(f"No such file: {path}") from error
     else:
-        jinja_template = templates.get_template(template)
-
-    if output is None:
-        output = sys.stdout
+        jinja_template = templates.get_template(p.template)
 
     # handle misconfiguration early
-    if in_place and output is sys.stdout:
+    if p.in_place and p.output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
 
-    # get provider
-    provider_class = providers[provider] if provider else None
-
-    # TODO: remove at some point
-    if bump_latest:
-        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
-        if bump is None:
-            bump = "auto"
-
-    # build data
-    changelog = Changelog(
-        repository,
-        provider=provider_class,
-        convention=convention,
-        parse_provider_refs=parse_refs,
-        parse_trailers=parse_trailers,
-        sections=sections,
-        bump=bump,
-        zerover=zerover,
-        filter_commits=filter_commits,
-        versioning=versioning,
-    )
-
-    # remove empty versions from changelog data
-    if omit_empty_versions:
-        section_set = set(changelog.sections)
-        empty_versions = [
-            version for version in changelog.versions_list if section_set.isdisjoint(version.sections_dict.keys())
-        ]
-        for version in empty_versions:
-            changelog.versions_list.remove(version)
-            changelog.versions_dict.pop(version.tag)
-
     # render new entries in-place
-    if in_place:
+    if p.in_place:
         # read current changelog lines
-        with open(output) as changelog_file:  # type: ignore[arg-type]
+        with open(p.output) as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # prepare version regex and marker line
-        if template in {"angular", "keepachangelog"}:
+        if p.template in {"angular", "keepachangelog"}:
             version_regex = DEFAULT_VERSION_REGEX
             marker_line = DEFAULT_MARKER_LINE
 
@@ -675,7 +630,7 @@ def build_and_render(
         rendered = (
             jinja_template.render(
                 changelog=changelog,
-                jinja_context=jinja_context,
+                jinja_context=p.jinja_context,
                 in_place=True,
             ).rstrip("\n")
             + "\n"
@@ -693,21 +648,112 @@ def build_and_render(
             lines[marker : marker + marker2 + 2] = [rendered]
 
         # write back updated changelog lines
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+        with open(p.output, "w") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # overwrite output file
     else:
-        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
+        rendered = jinja_template.render(changelog=changelog, jinja_context=p.jinja_context)
 
         # write result in specified output
-        if output is sys.stdout:
+        if p.output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w") as stream:  # type: ignore[arg-type]
+            with open(p.output, "w") as stream:  # type: ignore[arg-type]
                 stream.write(rendered)
 
-    return changelog, rendered
+    return rendered
+
+
+@dataclass
+class ParseParameters:
+    """Parameters for parsing the changelog."""
+
+    repository: str = DEFAULT_SETTINGS["repository"]
+    """
+    Path to a local repository.
+    """
+    convention: str | CommitConvention = DEFAULT_SETTINGS["convention"]
+    """
+    Name of a commit message style/convention.
+    """
+    bump: str | None = None
+    """
+    Whether to try and bump to a given version.
+    """
+    filter_commits: str | None = None
+    """
+    The Git revision-range used to filter commits in git-log.
+    """
+    omit_empty_versions: bool = False
+    """
+    Whether to omit empty versions from the output.
+    """
+    parse_refs: bool = False
+    """
+    Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+    """
+    parse_trailers: bool = False
+    """
+    Whether to parse Git trailers.
+    """
+    provider: str | None = None
+    """
+    Provider class used by this repository.
+    """
+    sections: list[str] | None = None
+    """
+    Sections to render (features, bug fixes, etc.).
+    """
+    versioning: Literal["pep440", "semver"] = "semver"
+    """
+    Versioning scheme to use when grouping commits and bumping versions.
+    """
+    zerover: bool = True
+    """
+    Keep major version at zero, even for breaking changes.
+    """
+
+
+def build_changelog(p: ParseParameters) -> Changelog:
+    """Build a changelog.
+
+    This function returns the changelog instance.
+
+    Parameters:
+        p: The parameters for building the changelog.
+
+    Returns:
+        The built changelog.
+    """
+    # get provider
+    provider_class = PROVIDERS[p.provider] if p.provider else None
+
+    # build data
+    changelog = Changelog(
+        p.repository,
+        provider=provider_class,
+        convention=p.convention,
+        parse_provider_refs=p.parse_refs,
+        parse_trailers=p.parse_trailers,
+        sections=p.sections,
+        bump=p.bump,
+        zerover=p.zerover,
+        filter_commits=p.filter_commits,
+        versioning=p.versioning,
+    )
+
+    # remove empty versions from changelog data
+    if p.omit_empty_versions:
+        section_set = set(changelog.sections)
+        empty_versions = [
+            version for version in changelog.versions_list if section_set.isdisjoint(version.sections_dict.keys())
+        ]
+        for version in empty_versions:
+            changelog.versions_list.remove(version)
+            changelog.versions_dict.pop(version.tag)
+
+    return changelog
 
 
 def get_release_notes(
@@ -748,28 +794,41 @@ def get_release_notes(
     return result
 
 
-def output_release_notes(
-    input_file: str = "CHANGELOG.md",
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
-    output_file: str | TextIO | None = None,
-) -> None:
+@dataclass
+class ReleaseNotesParameters:
+    """Parameters for getting release notes."""
+
+    input_file: str = "CHANGELOG.md"
+    """
+    The changelog to read from.
+    """
+    version_regex: str = DEFAULT_VERSION_REGEX
+    """
+    A regular expression to match version entries.
+    """
+    marker_line: str = DEFAULT_MARKER_LINE
+    """
+    The insertion marker line in the changelog.
+    """
+    output_file: str | TextIO = sys.stdout
+    """
+    Where to print/write the release notes.
+    """
+
+
+def output_release_notes(p: ReleaseNotesParameters) -> None:
     """Print release notes from existing changelog.
 
     This will print the latest entry in the changelog.
 
     Parameters:
-        input_file: The changelog to read from.
-        version_regex: A regular expression to match version entries.
-        marker_line: The insertion marker line in the changelog.
-        output_file: Where to print/write the release notes.
+        p: The parameters for getting release notes.
     """
-    output_file = output_file or sys.stdout
-    release_notes = get_release_notes(input_file, version_regex, marker_line)
+    release_notes = get_release_notes(p.input_file, p.version_regex, p.marker_line)
     try:
-        output_file.write(release_notes)  # type: ignore[union-attr]
+        p.output_file.write(release_notes)  # type: ignore[union-attr]
     except AttributeError:
-        with open(output_file, "w") as file:  # type: ignore[arg-type]
+        with open(p.output_file, "w") as file:  # type: ignore[arg-type]
             file.write(release_notes)
 
 
@@ -786,21 +845,25 @@ def main(args: list[str] | None = None) -> int:
     """
     settings = parse_settings(args)
 
-    if settings.pop("release_notes"):
-        output_release_notes(
-            input_file=settings["input"],
-            version_regex=settings["version_regex"],
-            marker_line=settings["marker_line"],
-            output_file=None,  # force writing to stdout
-        )
-        return 0
-
-    # --input is not necessary anymore
-    settings.pop("input", None)
-    try:
-        build_and_render(**settings)
-    except ValueError as error:
-        print(f"git-changelog: {error}", file=sys.stderr)
-        return 1
-
+    if settings.get("release_notes"):
+        p = ReleaseNotesParameters(**_only_keys(settings, ReleaseNotesParameters))
+        output_release_notes(p)
+    elif settings.get("bumped_version"):
+        p = ParseParameters(**_only_keys(settings, ParseParameters))
+        p.bump = p.bump or "auto"
+        p.output = sys.stdout
+        changelog = build_changelog(p)
+        if not changelog.versions_list:
+            print("git-changelog: No version found in the repository.", file=sys.stderr)
+            return 1
+        print(changelog.versions_list[0].planned_tag)
+    else:
+        parser_params = ParseParameters(**_only_keys(settings, ParseParameters))
+        render_params = RenderParameters(**_only_keys(settings, RenderParameters))
+        try:
+            changelog = build_changelog(parser_params)
+            render(changelog, render_params)
+        except ValueError as error:
+            print(f"git-changelog: {error}", file=sys.stderr)
+            return 1
     return 0
