@@ -46,13 +46,19 @@ def test_trailers_emit_deprecation_warnings() -> None:
         subject="Summary",
         parse_trailers=True,
     )
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
         assert not commit.trailers.keys()  # type: ignore[attr-defined]
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
         assert not commit.trailers.values()  # type: ignore[attr-defined]
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
         assert not commit.trailers.items()  # type: ignore[attr-defined]
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
         assert not commit.trailers.get("key")  # type: ignore[attr-defined]
-    with pytest.warns(DeprecationWarning), pytest.raises(KeyError):
+    with (
+        pytest.warns(
+            DeprecationWarning,
+            match="Getting a trailer with a string key will stop being supported in version 3. Instead, use an integer index, or iterate.",
+        ),
+        pytest.raises(KeyError),
+    ):
         assert not commit.trailers["key"]  # type: ignore[call-overload]

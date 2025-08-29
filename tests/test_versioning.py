@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from git_changelog.versioning import (
+    ParsedVersion,
     PEP440Strategy,
     PEP440Version,
     SemVerStrategy,
@@ -366,3 +367,40 @@ def test_pep440_dent_error(part: PEP440Strategy, version: str) -> None:
     """
     with pytest.raises(ValueError, match="Cannot dent"):
         getattr(PEP440Version(version), f"dent_{part}")()
+
+
+def test_parsed_version_protocol_allow_unhashable() -> None:
+    """Test that unhashable versions are allowed."""
+
+    class NonHashableVersion(ParsedVersion):  # noqa: PLW1641
+        def __lt__(self, other: object) -> bool:
+            return False
+
+        def __le__(self, other: object) -> bool:
+            return False
+
+        def __eq__(self, other: object) -> bool:
+            return False
+
+        def __ge__(self, other: object) -> bool:
+            return False
+
+        def __gt__(self, other: object) -> bool:
+            return False
+
+        def __ne__(self, other: object) -> bool:
+            return False
+
+    version_a = NonHashableVersion()
+    version_b = NonHashableVersion()
+
+    with pytest.raises(TypeError, match="unhashable"):
+        _ = {version_a, version_b}
+
+    class VersionWithoutParsedProtocol:
+        pass
+
+    version_c = VersionWithoutParsedProtocol()
+    version_d = VersionWithoutParsedProtocol()
+
+    assert len({version_c, version_d}) == 2

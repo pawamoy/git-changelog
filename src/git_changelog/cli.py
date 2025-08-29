@@ -497,7 +497,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts})
+    sentinel_ns = argparse.Namespace(**dict.fromkeys(opts, sentinel))
     explicit_opts_dict = {
         key: opts.get(key, None)
         for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
