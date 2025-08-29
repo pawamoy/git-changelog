@@ -61,6 +61,7 @@ DEFAULT_CONFIG_FILES = [
 ]
 """Default configuration files read by git-changelog."""
 
+
 DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,
     "bump_latest": None,
@@ -574,7 +575,7 @@ class RendererParameters:
 def render(
     changelog: Changelog,
     p: RendererParameters,
-) -> tuple[Changelog, str]:
+) -> str:
     """Build a changelog and render it.
 
     This function returns the rendered contents,
@@ -832,7 +833,7 @@ def build_and_render(
         output=output or sys.stdout,
         version_regex=version_regex,
         marker_line=marker_line,
-        jinja_context=jinja_context,
+        jinja_context=jinja_context or {},
     )
     changelog = build_changelog(parser_params)
     rendered = render(changelog, renderer_params)
@@ -882,7 +883,7 @@ def get_release_notes(
 class ReleaseNotesParameters:
     """Parameters for getting release notes."""
 
-    input_file: str = "CHANGELOG.md"
+    input: str = "CHANGELOG.md"
     """
     The changelog to read from.
     """
@@ -894,7 +895,7 @@ class ReleaseNotesParameters:
     """
     The insertion marker line in the changelog.
     """
-    output_file: str | TextIO = sys.stdout
+    output: str | TextIO = sys.stdout
     """
     Where to print/write the release notes.
     """
@@ -930,25 +931,38 @@ def output_release_notes(p: ReleaseNotesParameters) -> None:
     """
 
 
-def output_release_notes(
-    input_file: str = "CHANGELOG.md",
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
-    output_file: str | TextIO | None = None,
-    p: ReleaseNotesParameters | None = None,
-) -> None:
-    p = p or ReleaseNotesParameters(
-        input_file=input_file,
-        version_regex=version_regex,
-        marker_line=marker_line,
-        output_file=output_file,
-    )
+def output_release_notes(*args, **kwargs) -> None:
+    if len(args) == 1 and isinstance(args[0], ReleaseNotesParameters):
+        p = args[0]
+    else:
+        # Extract parameters from args and kwargs
+        input_file = kwargs.get("input_file", "CHANGELOG.md")
+        version_regex = kwargs.get("version_regex", DEFAULT_VERSION_REGEX)
+        marker_line = kwargs.get("marker_line", DEFAULT_MARKER_LINE)
+        output_file = kwargs.get("output_file")
 
-    release_notes = get_release_notes(p.input_file, p.version_regex, p.marker_line)
+        # Override with positional arguments if provided
+        if len(args) >= 1:
+            input_file = args[0]
+        if len(args) >= 2:
+            version_regex = args[1]
+        if len(args) >= 3:
+            marker_line = args[2]
+        if len(args) >= 4:
+            output_file = args[3]
+
+        p = ReleaseNotesParameters(
+            input=input_file,
+            version_regex=version_regex,
+            marker_line=marker_line,
+            output=output_file or sys.stdout,
+        )
+
+    release_notes = get_release_notes(p.input, p.version_regex, p.marker_line)
     try:
-        p.output_file.write(release_notes)  # type: ignore[union-attr]
+        p.output.write(release_notes)  # type: ignore[union-attr]
     except AttributeError:
-        with open(p.output_file, "w") as file:  # type: ignore[arg-type]
+        with open(p.output, "w") as file:  # type: ignore[arg-type]
             file.write(release_notes)
 
 
@@ -966,13 +980,12 @@ def main(args: list[str] | None = None) -> int:
     settings = parse_settings(args)
 
     if settings.get("release_notes"):
-        p = ReleaseNotesParameters(**_only_keys(settings, ReleaseNotesParameters))
-        output_release_notes(p)
+        rn_params = ReleaseNotesParameters(**_only_keys(settings, ReleaseNotesParameters))
+        output_release_notes(rn_params)
     elif settings.get("bumped_version"):
-        p = ParserParameters(**_only_keys(settings, ParserParameters))
-        p.bump = p.bump or "auto"
-        p.output = sys.stdout
-        changelog = build_changelog(p)
+        parser_params = ParserParameters(**_only_keys(settings, ParserParameters))
+        parser_params.bump = parser_params.bump or "auto"
+        changelog = build_changelog(parser_params)
         if not changelog.versions_list:
             print("git-changelog: No version found in the repository.", file=sys.stderr)
             return 1

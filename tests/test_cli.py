@@ -294,3 +294,27 @@ def test_versioning(repo: GitRepo) -> None:
         assert cli.main(["-cconventional", "-nsemver", "-Bunknown"]) == 1
         assert cli.main(["-cconventional", "-npep440", "-Bunknown"]) == 1
         assert cli.main(["-cconventional", "-npep440", "-Balpha"]) == 1
+
+
+def test_cli_release_notes(tmp_path: Path) -> None:
+    """Check release notes option."""
+    changelog = tmp_path / "CHANGELOG.md"
+    changelog.write_text(
+        "# Changelog\n<!-- insertion marker -->\n## [1.0.0](https://example.com)\nRelease notes for 1.0.0\n",
+    )
+    output_file = str(tmp_path / "release_notes.md")
+    cli.main(
+        [
+            "--config-file",
+            str(tmp_path / "conf.toml"),
+            "--input",
+            str(changelog),
+            "--release-notes",
+            "--output",
+            output_file,
+        ],
+    )
+    with open(output_file, encoding="utf-8") as f:
+        output = f.read()
+    assert "## [1.0.0](https://example.com)" in output
+    assert "Release notes for 1.0.0" in output
