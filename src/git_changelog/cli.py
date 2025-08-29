@@ -201,6 +201,12 @@ def get_parser() -> argparse.ArgumentParser:
         "Default: unset (false).",
     )
     parser.add_argument(
+        "--bumped-version",
+        action="store_true",
+        dest="bumped_version",
+        help="Show bumped version and exit.",
+    )
+    parser.add_argument(
         "-B",
         "--bump",
         action="store",
@@ -546,6 +552,7 @@ def build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    bumped_version: bool = False,  # noqa: FBT001,FBT002
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -572,6 +579,7 @@ def build_and_render(
         filter_commits: The Git revision-range used to filter commits in git-log.
         jinja_context: Key/value pairs passed to the Jinja template.
         versioning: Versioning scheme to use when grouping commits and bumping versions.
+        bumped_version: Show bumped version and exit.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -605,6 +613,9 @@ def build_and_render(
         if bump is None:
             bump = "auto"
 
+    if bumped_version:
+        bump = bump or "auto"
+
     # build data
     changelog = Changelog(
         repository,
@@ -618,6 +629,14 @@ def build_and_render(
         filter_commits=filter_commits,
         versioning=versioning,
     )
+
+    if bumped_version:
+        if not changelog.versions_list:
+            print("git-changelog: No version found in the repository.", file=sys.stderr)
+        else:
+            print(changelog.versions_list[0].planned_tag)
+        return changelog, ""
+
 
     # remove empty versions from changelog data
     if omit_empty_versions:
