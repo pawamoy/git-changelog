@@ -188,7 +188,7 @@ def coverage(ctx: Context) -> None:
 
 
 @duty
-def test(ctx: Context, *cli_args: str, match: str = "") -> None:
+def test(ctx: Context, *cli_args: str, match: str = "") -> None:  # noqa: PT028
     """Run the test suite.
 
     Parameters:
@@ -217,16 +217,16 @@ def profile(ctx: Context, merge: int = 15) -> None:
     # Do not import those from the top level,
     # as it prevents the pytest-cov plugin for marking
     # lines executed at import time as covered.
-    from git_changelog import Changelog
-    from git_changelog.commit import AngularConvention
+    from git_changelog import Changelog  # noqa: PLC0415
+    from git_changelog.commit import AngularConvention  # noqa: PLC0415
 
     try:
-        from tests.helpers import GitRepo
+        from tests.helpers import GitRepo  # noqa: PLC0415
     except ModuleNotFoundError:
-        import sys
+        import sys  # noqa: PLC0415
 
         sys.path.insert(0, str(Path(__file__).parent))
-        from tests.helpers import GitRepo
+        from tests.helpers import GitRepo  # noqa: PLC0415
 
     def merge_branches(repo: GitRepo, branch: str = "feat", times: int = 15) -> None:
         for _ in range(times):

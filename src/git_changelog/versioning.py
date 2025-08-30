@@ -56,7 +56,7 @@ PEP440Strategy = Literal[
 _release_kind = {"a": "alpha", "b": "beta", "c": "candidate", "rc": "candidate", "p": "post"}
 
 
-class ParsedVersion(Protocol):
+class ParsedVersion(Protocol):  # noqa: PLW1641
     """Base class for versioning schemes."""
 
     def __lt__(self, other: object) -> bool: ...
