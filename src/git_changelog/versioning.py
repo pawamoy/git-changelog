@@ -57,11 +57,7 @@ _release_kind = {"a": "alpha", "b": "beta", "c": "candidate", "rc": "candidate",
 
 
 class ParsedVersion(Protocol):  # noqa: PLW1641
-    """Base class for versioning schemes.
-
-    IMPORTANT: For backward compatabillity it's not necesary to implement __hash__ method
-    but it's recommended to do so (see PLW1641: https://docs.astral.sh/ruff/rules/eq-without-hash/).
-    """
+    """Base class for versioning schemes."""
 
     def __lt__(self, other: object) -> bool: ...
     def __le__(self, other: object) -> bool: ...
@@ -69,8 +65,6 @@ class ParsedVersion(Protocol):  # noqa: PLW1641
     def __ge__(self, other: object) -> bool: ...
     def __gt__(self, other: object) -> bool: ...
     def __ne__(self, other: object) -> bool: ...
-
-    # TODO: in next major version it's better to add `def __hash__(self) -> int: ...`
 
 
 class SemVerVersion(semver.Version, ParsedVersion):  # type: ignore[misc]
