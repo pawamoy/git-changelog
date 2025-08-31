@@ -152,6 +152,7 @@ def test_config_reading(
         assert settings == ground_truth
 
 
+# YORE: Bump 3: Remove block.
 @pytest.mark.parametrize("value", [None, False, True])
 def test_settings_warning(
     tmp_path: Path,
