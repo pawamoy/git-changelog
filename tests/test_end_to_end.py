@@ -122,7 +122,7 @@ def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
         template="keepachangelog",
     )
 
-    # When bump_latest is True, there's only one insertion marker
+    # With automatic bumping, there's only one insertion marker
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     latest_tag = "1.2.0"
     assert latest_tag in rendered

@@ -199,6 +199,7 @@ class Changelog:
         parse_provider_refs: bool = False,
         parse_trailers: bool = False,
         sections: list[str] | None = None,
+        # YORE: Bump 3: Remove line.
         bump_latest: bool = False,
         bump: str | None = None,
         zerover: bool = True,
@@ -283,7 +284,7 @@ class Changelog:
         self.versions_list = v_list
         self.versions_dict = v_dict
 
-        # TODO: remove at some point
+        # YORE: Bump 3: Remove block.
         if bump_latest:
             warnings.warn(
                 "`bump_latest=True` is deprecated in favor of `bump='auto'`",
@@ -292,6 +293,7 @@ class Changelog:
             )
             if bump is None:
                 bump = "auto"
+
         if bump:
             self._bump(bump)
 

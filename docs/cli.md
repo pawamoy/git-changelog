@@ -27,6 +27,7 @@ parser = get_parser()
 
 option_to_docs = {
     "bump": "#understand-the-relationship-with-semver",
+    # YORE: Bump 3: Remove line.
     "bump_latest": "#understand-the-relationship-with-semver",
     "config_file": "#configuration-files",
     "convention": "#choose-the-commit-message-convention",

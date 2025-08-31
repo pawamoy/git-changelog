@@ -306,7 +306,7 @@ class CommitConvention(ABC):
             r"\n *",
             "\n",
             f"""
-            #### {cls.__name__[:-(len('Convention'))].strip()}
+            #### {cls.__name__[: -(len("Convention"))].strip()}
 
             *Default sections:*
 

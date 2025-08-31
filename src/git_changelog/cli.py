@@ -62,6 +62,7 @@ DEFAULT_CONFIG_FILES = [
 
 DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,
+    # YORE: Bump 3: Remove line.
     "bump_latest": None,
     "convention": "basic",
     "filter_commits": None,
@@ -189,6 +190,7 @@ def get_parser() -> argparse.ArgumentParser:
         help="Configuration file(s).",
     )
 
+    # YORE: Bump 3: Remove block.
     parser.add_argument(
         "-b",
         "--bump-latest",
@@ -200,6 +202,7 @@ def get_parser() -> argparse.ArgumentParser:
         "Else if there are new features, bump the minor number. Else just bump the patch number. "
         "Default: unset (false).",
     )
+
     parser.add_argument(
         "--bumped-version",
         action="store_true",
@@ -456,7 +459,7 @@ def read_config(
         # Settings can have hyphens like in the CLI
         new_settings = {key.replace("-", "_"): value for key, value in new_settings.items()}
 
-        # TODO: remove at some point
+        # YORE: Bump 3: Remove block.
         if "bump_latest" in new_settings:
             _opt_value = new_settings["bump_latest"]
             _suggestion = (
@@ -503,7 +506,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
 
     # Determine which arguments were explicitly set with the CLI
     sentinel = object()
-    sentinel_ns = argparse.Namespace(**{key: sentinel for key in opts})
+    sentinel_ns = argparse.Namespace(**dict.fromkeys(opts, sentinel))
     explicit_opts_dict = {
         key: opts.get(key, None)
         for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
@@ -526,7 +529,7 @@ def parse_settings(args: list[str] | None = None) -> dict:
     # Merge jinja context, CLI values override config file values.
     settings["jinja_context"].update(jinja_context)
 
-    # TODO: remove at some point
+    # YORE: Bump 3: Remove block.
     if "bump_latest" in explicit_opts_dict:
         warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
 
@@ -544,6 +547,7 @@ def build_and_render(
     output: str | TextIO | None = None,
     version_regex: str = DEFAULT_VERSION_REGEX,
     marker_line: str = DEFAULT_MARKER_LINE,
+    # YORE: Bump 3: Remove line.
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
     provider: str | None = None,
@@ -607,7 +611,7 @@ def build_and_render(
     # get provider
     provider_class = providers[provider] if provider else None
 
-    # TODO: remove at some point
+    # YORE: Bump 3: Remove block.
     if bump_latest:
         warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
         if bump is None:

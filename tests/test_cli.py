@@ -152,6 +152,7 @@ def test_config_reading(
         assert settings == ground_truth
 
 
+# YORE: Bump 3: Remove block.
 @pytest.mark.parametrize("value", [None, False, True])
 def test_settings_warning(
     tmp_path: Path,
@@ -174,19 +175,19 @@ def test_settings_warning(
         with pytest.warns(FutureWarning) as record:
             cli.parse_settings(args)
 
-            solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
-            if value is not None:  # Warning is issued when parsing the config file.
-                solution = "remove" if not value else "auto"
+        solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
+        if value is not None:  # Warning is issued when parsing the config file.
+            solution = "remove" if not value else "auto"
 
-            assert len(record) == 1
-            assert solution in str(record[0].message)
+        assert len(record) == 1
+        assert solution in str(record[0].message)
 
         # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
         if (tmp_path / ".git-changelog.toml").exists():
             with pytest.warns(FutureWarning) as record:
                 cli.parse_settings(["--bump-latest"])
 
-                assert len(record) == 2
+            assert len(record) == 2
 
 
 # IMPORTANT: See top module comment.

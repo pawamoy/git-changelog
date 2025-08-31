@@ -88,7 +88,7 @@ The following sections explain in more details all the features of *git-changelo
 
 Project-wise, permanent configuration of *git-changelog* is possible.
 By default, *git-changelog* will search for the existence a suitable configuration
-in the `pyproject.toml` file or otherwise, the following configuration files 
+in the `pyproject.toml` file or otherwise, the following configuration files
 in this particular order:
 
 - `.git-changelog.toml`
@@ -309,7 +309,7 @@ as a starting point.
 
 From there, simply modify the different Jinja macros:
 
-- `render_commit()`, which accepts a [Commit][git_changelog.build.Commit] object
+- `render_commit()`, which accepts a [Commit][git_changelog.commit.Commit] object
 - `render_section()`, which accepts a [Section][git_changelog.build.Section] object
 - `render_version()`, which accepts a [Version][git_changelog.build.Version] object
 
@@ -406,7 +406,7 @@ project has migrated to SemVer recently and you want to ignore old non-conventio
 This is possible through the option `-F`, `--filter-commits`, which takes a
 *revision-range* to select the commits that will be used in the changelog.
 This option will pass the [revision-range](https://git-scm.com/docs/git-log#
-Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow 
+Documentation/git-log.txt-ltrevision-rangegt) to `git log`, so it will follow
 the rules defined by Git.
 
 For example, to use commits from tag `0.5.0` up to latest:
