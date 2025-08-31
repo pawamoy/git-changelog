@@ -75,6 +75,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "parse_trailers": False,
     "provider": None,
     "release_notes": False,
+    "bumped_version": False,
     "repository": ".",
     "sections": None,
     "template": "keepachangelog",
@@ -536,6 +537,200 @@ def parse_settings(args: list[str] | None = None) -> dict:
     return settings
 
 
+def build(
+    repository: str,
+    convention: str | CommitConvention,
+    parse_refs: bool = False,  # noqa: FBT001,FBT002
+    parse_trailers: bool = False,  # noqa: FBT001,FBT002
+    sections: list[str] | None = None,
+    # YORE: Bump 3: Remove line.
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
+    omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
+    provider: str | None = None,
+    bump: str | None = None,
+    zerover: bool = True,  # noqa: FBT001,FBT002
+    filter_commits: str | None = None,
+    versioning: Literal["pep440", "semver"] = "semver",
+    **kwargs: Any,  # noqa: ARG001
+) -> Changelog:
+    """Build a changelog.
+
+    Parameters:
+        repository: Path to a local repository.
+        convention: Name of a commit message style/convention.
+        parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+        parse_trailers: Whether to parse Git trailers.
+        sections: Sections to render (features, bug fixes, etc.).
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
+        omit_empty_versions: Whether to omit empty versions from the output.
+        provider: Provider class used by this repository.
+        bump: Whether to try and bump to a given version.
+        zerover: Keep major version at zero, even for breaking changes.
+        filter_commits: The Git revision-range used to filter commits in git-log.
+        versioning: Versioning scheme to use when grouping commits and bumping versions.
+        **kwargs: Swallowing kwargs to allow passing all settings at once.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The built changelog.
+    """
+    # YORE: Bump 3: Remove block.
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
+    # Build data.
+    changelog = Changelog(
+        repository,
+        provider=providers[provider] if provider else None,
+        convention=convention,
+        parse_provider_refs=parse_refs,
+        parse_trailers=parse_trailers,
+        sections=sections,
+        bump=bump,
+        zerover=zerover,
+        filter_commits=filter_commits,
+        versioning=versioning,
+    )
+
+    # Remove empty versions from changelog data.
+    if omit_empty_versions:
+        section_set = set(changelog.sections)
+        empty_versions = [
+            version for version in changelog.versions_list if section_set.isdisjoint(version.sections_dict.keys())
+        ]
+        for version in empty_versions:
+            changelog.versions_list.remove(version)
+            changelog.versions_dict.pop(version.tag)
+
+    return changelog
+
+
+def render(
+    changelog: Changelog,
+    template: str,
+    in_place: bool = False,  # noqa: FBT001,FBT002
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    # YORE: Bump 3: Remove line.
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
+    bump: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+) -> str:
+    """Render a changelog.
+
+    This function updates the specified output file (side-effect) or writes to stdout.
+
+    Parameters:
+        changelog: The changelog to render.
+        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
+        in_place: Whether to update the changelog in-place.
+        output: Output/changelog file.
+        version_regex: Regular expression to match versions in an existing changelog file.
+        marker_line: Marker line used to insert contents in an existing changelog.
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
+        bump: Whether to try and bump to a given version.
+        jinja_context: Key/value pairs passed to the Jinja template.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The rendered changelog.
+    """
+    # Get template.
+    if template.startswith("path:"):
+        path = template.replace("path:", "", 1)
+        try:
+            jinja_template = templates.get_custom_template(path)
+        except TemplateNotFound as error:
+            raise ValueError(f"No such file: {path}") from error
+    else:
+        jinja_template = templates.get_template(template)
+
+    if output is None:
+        output = sys.stdout
+
+    # Handle misconfiguration early.
+    if in_place and output is sys.stdout:
+        raise ValueError("Cannot write in-place to stdout")
+
+    # YORE: Bump 3: Remove block.
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
+    # Render new entries in-place.
+    if in_place:
+        # Read current changelog lines.
+        with open(output) as changelog_file:  # type: ignore[arg-type]
+            lines = changelog_file.read().splitlines()
+
+        # Prepare version regex and marker line.
+        if template in {"angular", "keepachangelog"}:
+            version_regex = DEFAULT_VERSION_REGEX
+            marker_line = DEFAULT_MARKER_LINE
+
+        # Only keep new entries (missing from changelog).
+        last_released = _latest(lines, re.compile(version_regex))
+        if last_released:
+            # Check if the latest version is already in the changelog.
+            if last_released in [
+                changelog.versions_list[0].tag,
+                changelog.versions_list[0].planned_tag,
+            ]:
+                raise ValueError(f"Version {last_released} already in changelog")
+            changelog.versions_list = _unreleased(
+                changelog.versions_list,
+                last_released,
+            )
+
+        # Render new entries.
+        rendered = (
+            jinja_template.render(
+                changelog=changelog,
+                jinja_context=jinja_context,
+                in_place=True,
+            ).rstrip("\n")
+            + "\n"
+        )
+
+        # Find marker line(s) in current changelog.
+        marker = lines.index(marker_line)
+        try:
+            marker2 = lines[marker + 1 :].index(marker_line)
+        except ValueError:
+            # Apply new entries at marker line.
+            lines[marker] = rendered
+        else:
+            # Apply new entries between marker lines.
+            lines[marker : marker + marker2 + 2] = [rendered]
+
+        # Write back updated changelog lines.
+        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
+
+    # Overwrite output file.
+    else:
+        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
+
+        # Write result in specified output.
+        if output is sys.stdout:
+            sys.stdout.write(rendered)
+        else:
+            with open(output, "w") as stream:  # type: ignore[arg-type]
+                stream.write(rendered)
+
+    return rendered
+
+
 def build_and_render(
     repository: str,
     template: str,
@@ -556,7 +751,7 @@ def build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
-    bumped_version: bool = False,  # noqa: FBT001,FBT002
+    **kwargs: Any,  # noqa: ARG001
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
 
@@ -583,7 +778,7 @@ def build_and_render(
         filter_commits: The Git revision-range used to filter commits in git-log.
         jinja_context: Key/value pairs passed to the Jinja template.
         versioning: Versioning scheme to use when grouping commits and bumping versions.
-        bumped_version: Show bumped version and exit.
+        **kwargs: Swallowing kwargs to allow passing all settings at once.
 
     Raises:
         ValueError: When some arguments are incompatible or missing.
@@ -591,128 +786,31 @@ def build_and_render(
     Returns:
         The built changelog and the rendered contents.
     """
-    # get template
-    if template.startswith("path:"):
-        path = template.replace("path:", "", 1)
-        try:
-            jinja_template = templates.get_custom_template(path)
-        except TemplateNotFound as error:
-            raise ValueError(f"No such file: {path}") from error
-    else:
-        jinja_template = templates.get_template(template)
-
-    if output is None:
-        output = sys.stdout
-
-    # handle misconfiguration early
-    if in_place and output is sys.stdout:
-        raise ValueError("Cannot write in-place to stdout")
-
-    # get provider
-    provider_class = providers[provider] if provider else None
-
-    # YORE: Bump 3: Remove block.
-    if bump_latest:
-        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
-        if bump is None:
-            bump = "auto"
-
-    if bumped_version:
-        bump = bump or "auto"
-
-    # build data
-    changelog = Changelog(
-        repository,
-        provider=provider_class,
+    changelog = build(
+        repository=repository,
         convention=convention,
-        parse_provider_refs=parse_refs,
+        parse_refs=parse_refs,
         parse_trailers=parse_trailers,
         sections=sections,
+        bump_latest=bump_latest,
+        omit_empty_versions=omit_empty_versions,
+        provider=provider,
         bump=bump,
         zerover=zerover,
         filter_commits=filter_commits,
         versioning=versioning,
     )
-
-    if bumped_version:
-        if not changelog.versions_list:
-            print("git-changelog: No version found in the repository.", file=sys.stderr)
-        else:
-            print(changelog.versions_list[0].planned_tag)
-        return changelog, ""
-
-
-    # remove empty versions from changelog data
-    if omit_empty_versions:
-        section_set = set(changelog.sections)
-        empty_versions = [
-            version for version in changelog.versions_list if section_set.isdisjoint(version.sections_dict.keys())
-        ]
-        for version in empty_versions:
-            changelog.versions_list.remove(version)
-            changelog.versions_dict.pop(version.tag)
-
-    # render new entries in-place
-    if in_place:
-        # read current changelog lines
-        with open(output) as changelog_file:  # type: ignore[arg-type]
-            lines = changelog_file.read().splitlines()
-
-        # prepare version regex and marker line
-        if template in {"angular", "keepachangelog"}:
-            version_regex = DEFAULT_VERSION_REGEX
-            marker_line = DEFAULT_MARKER_LINE
-
-        # only keep new entries (missing from changelog)
-        last_released = _latest(lines, re.compile(version_regex))
-        if last_released:
-            # check if the latest version is already in the changelog
-            if last_released in [
-                changelog.versions_list[0].tag,
-                changelog.versions_list[0].planned_tag,
-            ]:
-                raise ValueError(f"Version {last_released} already in changelog")
-            changelog.versions_list = _unreleased(
-                changelog.versions_list,
-                last_released,
-            )
-
-        # render new entries
-        rendered = (
-            jinja_template.render(
-                changelog=changelog,
-                jinja_context=jinja_context,
-                in_place=True,
-            ).rstrip("\n")
-            + "\n"
-        )
-
-        # find marker line(s) in current changelog
-        marker = lines.index(marker_line)
-        try:
-            marker2 = lines[marker + 1 :].index(marker_line)
-        except ValueError:
-            # apply new entries at marker line
-            lines[marker] = rendered
-        else:
-            # apply new entries between marker lines
-            lines[marker : marker + marker2 + 2] = [rendered]
-
-        # write back updated changelog lines
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
-            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
-
-    # overwrite output file
-    else:
-        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
-
-        # write result in specified output
-        if output is sys.stdout:
-            sys.stdout.write(rendered)
-        else:
-            with open(output, "w") as stream:  # type: ignore[arg-type]
-                stream.write(rendered)
-
+    rendered = render(
+        changelog=changelog,
+        template=template,
+        in_place=in_place,
+        output=output,
+        version_regex=version_regex,
+        marker_line=marker_line,
+        bump_latest=bump_latest,
+        bump=bump,
+        jinja_context=jinja_context,
+    )
     return changelog, rendered
 
 
@@ -801,8 +899,15 @@ def main(args: list[str] | None = None) -> int:
         )
         return 0
 
-    # --input is not necessary anymore
-    settings.pop("input", None)
+    if settings.pop("bumped_version"):
+        settings["bump"] = settings.get("bump") or "auto"
+        changelog = build(**settings)
+        if not changelog.versions_list:
+            print("git-changelog: No version found in the repository.", file=sys.stderr)
+            return 1
+        print(changelog.versions_list[0].planned_tag)
+        return 0
+
     try:
         build_and_render(**settings)
     except ValueError as error:
