@@ -663,7 +663,7 @@ git-changelog --bump 2.0.0-alpha1
 
 ## Show bumped version
 
-To retrieve the bumped version (for example, to pass the same version to your package builder) use the `--bumped-version` flag. This flag forces output to stdout (overriding `--output`), uses the `bumped_version` template, and sets `--bumped` to `auto` if it isn’t already set.
+To retrieve the bumped version (for example, to pass the same version to your package builder) use the `--bumped-version` flag. This flag forces output to stdout (overriding `--output`) and sets `--bump` to `auto` if it isn’t already set.
 
 ```bash
 git-changelog --bumped-version
