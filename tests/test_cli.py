@@ -283,7 +283,7 @@ def test_versioning(repo: GitRepo) -> None:
 
 
 def test_bumped_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
-    """Test --bumped-version CLI option outputs the expected bumped version string."""
+    """The `--bumped-version` CLI option outputs the expected bumped version string."""
     cli.main(
         [
             "--config-file",
@@ -294,4 +294,4 @@ def test_bumped_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) ->
         ],
     )
     captured = capsys.readouterr()
-    assert "1.2.3" in captured.out
+    assert captured.out.strip() == "1.2.3"
