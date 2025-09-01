@@ -661,6 +661,18 @@ git-changelog --bump 1.1.0
 git-changelog --bump 2.0.0-alpha1
 ```
 
+## Show bumped version
+
+To retrieve the bumped version (for example, to pass the same version to your package builder) use the `--bumped-version` flag. This flag forces output to stdout (overriding `--output`) and sets `--bump` to `auto` if it isn’t already set.
+
+```bash
+git-changelog --bumped-version
+# prints the next auto-bumped version, e.g. 1.2.3
+
+git-changelog --bump major --bumped-version
+# prints the next major version, e.g. 2.0.0
+```
+
 ## Parse additional information in commit messages
 
 *git-changelog* is able to parse the body of commit messages
