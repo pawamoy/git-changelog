@@ -15,8 +15,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 import tomli_w
 
-from git_changelog import main
-from git_changelog._internal import debug
+from git_changelog._internal import cli, debug
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -32,7 +31,7 @@ else:
     from contextlib import contextmanager
 
     @contextmanager
-    def chdir(path: str) -> Iterator[None]:  # noqa: D103
+    def chdir(path: str) -> Iterator[None]:
         old_wd = os.getcwd()
         os.chdir(path)
         try:
@@ -59,7 +58,7 @@ def test_show_help(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        main(["-h"])
+        cli.main(["-h"])
     captured = capsys.readouterr()
     assert "git-changelog" in captured.out
 
@@ -199,7 +198,7 @@ def test_show_version(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        main(["-V"])
+        cli.main(["-V"])
     captured = capsys.readouterr()
     assert debug._get_version() in captured.out
 
@@ -212,7 +211,7 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        main(["--debug-info"])
+        cli.main(["--debug-info"])
     captured = capsys.readouterr().out.lower()
     assert "python" in captured
     assert "system" in captured

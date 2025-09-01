@@ -21,7 +21,7 @@ p:has(> a.doclink) {
 import argparse
 import sys
 
-from git_changelog.cli import get_parser
+from git_changelog import get_parser
 
 parser = get_parser()
 

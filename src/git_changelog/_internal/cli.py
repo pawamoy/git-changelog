@@ -1,5 +1,3 @@
-"""Module that contains the command line application."""
-
 # Why does this file exist, and why not put this in `__main__`?
 #
 # You might be tempted to import things from `__main__` later,
@@ -25,16 +23,16 @@ from typing import TYPE_CHECKING, Any, Literal, TextIO
 from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
 
-from git_changelog import debug, templates
-from git_changelog.build import Changelog, Version
-from git_changelog.commit import (
+from git_changelog._internal import debug, templates
+from git_changelog._internal.build import Changelog, Version
+from git_changelog._internal.commit import (
     AngularConvention,
     BasicConvention,
     CommitConvention,
     ConventionalCommitConvention,
 )
-from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
-from git_changelog.versioning import bump_pep440, bump_semver
+from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+from git_changelog._internal.versioning import bump_pep440, bump_semver
 
 # TODO: Remove once support for Python 3.10 is dropped.
 if sys.version_info >= (3, 11):
@@ -47,10 +45,15 @@ if TYPE_CHECKING:
 
 
 DEFAULT_VERSIONING = "semver"
+"""Default versioning strategy."""
 DEFAULT_VERSION_REGEX = r"^## \[(?P<version>v?[^\]]+)"
+"""Default version regex for finding versions."""
 DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
+"""Default marker line for finding insertion points."""
 DEFAULT_CHANGELOG_FILE = "CHANGELOG.md"
+"""Default changelog file name."""
 CONVENTIONS = ("angular", "conventional", "basic")
+"""Available commit message conventions."""
 DEFAULT_CONFIG_FILES = [
     "pyproject.toml",
     ".git-changelog.toml",
@@ -84,6 +87,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "versioning": DEFAULT_VERSIONING,
     "zerover": True,
 }
+"""Default settings for the CLI."""
 
 
 class Templates(tuple):  # (subclassing tuple)
@@ -132,6 +136,7 @@ providers: dict[str, type[ProviderRefParser]] = {
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
 }
+"""Available version control providers."""
 
 
 class _DebugInfo(argparse.Action):
@@ -139,7 +144,7 @@ class _DebugInfo(argparse.Action):
         super().__init__(nargs=nargs, **kwargs)
 
     def __call__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
-        debug.print_debug_info()
+        debug._print_debug_info()
         sys.exit(0)
 
 
@@ -399,7 +404,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-V",
         "--version",
         action="version",
-        version=f"%(prog)s {debug.get_version()}",
+        version=f"%(prog)s {debug._get_version()}",
         help="Show the current version of the program and exit.",
     )
     parser.add_argument("--debug-info", action=_DebugInfo, help="Print debug information.")
@@ -430,7 +435,7 @@ def read_config(
     Parameters:
         config_file: A path or list of paths to configuration file(s); or `None` to
             disable config file settings. Default: a list of paths given by
-            [`git_changelog.cli.DEFAULT_CONFIG_FILES`][].
+            [`git_changelog.DEFAULT_CONFIG_FILES`][].
 
     Returns:
         A settings dictionary. Default settings if no config file is found or `config_file` is `None`.

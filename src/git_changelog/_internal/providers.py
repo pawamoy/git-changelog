@@ -1,4 +1,4 @@
-"""Module containing the parsing utilities for git providers."""
+# Module containing the parsing utilities for git providers.
 
 from __future__ import annotations
 
@@ -12,14 +12,23 @@ class RefRe:
     """An enum helper to store parts of regular expressions for references."""
 
     BB = r"(?:^|[\s,])"  # blank before
+    """Blank before the reference."""
     BA = r"(?:[\s,]|$)"  # blank after
+    """Blank after the reference."""
     NP = r"(?:(?P<namespace>[-\w]+)/)?(?P<project>[-\w]+)"  # namespace and project
+    """Namespace and project."""
     ID = r"{symbol}(?P<ref>[1-9]\d*)"
+    """Issue or pull request ID."""
     ONE_WORD = r"{symbol}(?P<ref>\w*[-a-z_ ][-\w]*)"
+    """One word reference."""
     MULTI_WORD = r'{symbol}(?P<ref>"\w[- \w]*")'
+    """Multi word reference."""
     COMMIT = r"(?P<ref>[0-9a-f]{{{min},{max}}})"
+    """Commit hash."""
     COMMIT_RANGE = r"(?P<ref>[0-9a-f]{{{min},{max}}}\.\.\.[0-9a-f]{{{min},{max}}})"
+    """Commit range."""
     MENTION = r"@(?P<ref>\w[-\w]*)"
+    """Mention."""
 
 
 class Ref:
@@ -57,9 +66,13 @@ class ProviderRefParser(ABC):
     """A base class for specific providers reference parsers."""
 
     url: str
+    """The base URL for the provider."""
     namespace: str
+    """The namespace for the provider."""
     project: str
+    """The project for the provider."""
     REF: ClassVar[dict[str, RefDef]] = {}
+    """The reference definitions for the provider."""
 
     def __init__(self, namespace: str, project: str, url: str | None = None):
         """Initialization method.
@@ -81,7 +94,7 @@ class ProviderRefParser(ABC):
             text: The text in which to search references.
 
         Returns:
-            A list of references (instances of [Ref][git_changelog.providers.Ref]).
+            A list of references (instances of [Ref][git_changelog.Ref]).
         """
         return [
             Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
@@ -145,11 +158,16 @@ class GitHub(ProviderRefParser):
     """A parser for the GitHub references."""
 
     url: str = "https://github.com"
+    """The base URL for the provider."""
     project_url: str = "{base_url}/{namespace}/{project}"
+    """The project URL for the provider."""
     tag_url: str = "{base_url}/{namespace}/{project}/releases/tag/{ref}"
+    """The tag URL for the provider."""
 
     commit_min_length = 8
+    """The minimum length of a commit hash."""
     commit_max_length = 40
+    """The maximum length of a commit hash."""
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
@@ -181,8 +199,9 @@ class GitHub(ProviderRefParser):
         ),
         "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
+    """The reference definitions for the provider."""
 
-    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -190,10 +209,10 @@ class GitHub(ProviderRefParser):
             match_dict["project"] = self.project
         return super().build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102
+    def get_tag_url(self, tag: str = "") -> str:
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
-    def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
+    def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
 
 
@@ -201,11 +220,16 @@ class GitLab(ProviderRefParser):
     """A parser for the GitLab references."""
 
     url: str = "https://gitlab.com"
+    """The base URL for the provider."""
     project_url: str = "{base_url}/{namespace}/{project}"
+    """The project URL for the provider."""
     tag_url: str = "{base_url}/{namespace}/{project}/tags/{ref}"
+    """The tag URL for the provider."""
 
     commit_min_length = 8
+    """The minimum length of a commit hash."""
     commit_max_length = 40
+    """The maximum length of a commit hash."""
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
@@ -275,8 +299,9 @@ class GitLab(ProviderRefParser):
         ),
         "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
     }
+    """The reference definitions for the provider."""
 
-    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -286,10 +311,10 @@ class GitLab(ProviderRefParser):
             match_dict["ref"] = match_dict["ref"].replace('"', "").replace(" ", "+")
         return super().build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102
+    def get_tag_url(self, tag: str = "") -> str:
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
-    def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
+    def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
 
 
@@ -297,11 +322,16 @@ class Bitbucket(ProviderRefParser):
     """A parser for the Bitbucket references."""
 
     url: str = "https://bitbucket.org"
+    """The base URL for the provider."""
     project_url: str = "{base_url}/{namespace}/{project}"
+    """The project URL for the provider."""
     tag_url: str = "{base_url}/{namespace}/{project}/commits/tag/{ref}"
+    """The tag URL for the provider."""
 
     commit_min_length = 8
+    """The minimum length of a commit hash."""
     commit_max_length = 40
+    """The maximum length of a commit hash."""
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
@@ -340,8 +370,9 @@ class Bitbucket(ProviderRefParser):
             url_string="{base_url}/{ref}",
         ),
     }
+    """The reference definitions for the provider."""
 
-    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:  # noqa: D102 (use parent docstring)
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
         match_dict["base_url"] = self.url
         if not match_dict.get("namespace"):
             match_dict["namespace"] = self.namespace
@@ -349,8 +380,8 @@ class Bitbucket(ProviderRefParser):
             match_dict["project"] = self.project
         return super().build_ref_url(ref_type, match_dict)
 
-    def get_tag_url(self, tag: str = "") -> str:  # noqa: D102
+    def get_tag_url(self, tag: str = "") -> str:
         return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
 
-    def get_compare_url(self, base: str, target: str) -> str:  # noqa: D102 (use parent docstring)
+    def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": f"{target}..{base}"})

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from git_changelog.commit import AngularConvention, Commit
+from git_changelog._internal.commit import AngularConvention, Commit
 
 
 def test_angular_convention_breaking_change() -> None:

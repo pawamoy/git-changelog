@@ -228,7 +228,7 @@ def profile(ctx: Context, merge: int = 15) -> None:
     # as it prevents the pytest-cov plugin for marking
     # lines executed at import time as covered.
     from git_changelog import Changelog  # noqa: PLC0415
-    from git_changelog.commit import AngularConvention  # noqa: PLC0415
+    from git_changelog._internal.commit import AngularConvention  # noqa: PLC0415
 
     try:
         from tests.helpers import GitRepo  # noqa: PLC0415

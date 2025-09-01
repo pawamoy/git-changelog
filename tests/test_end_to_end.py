@@ -9,10 +9,10 @@ from urllib.parse import urlsplit, urlunsplit
 import pytest
 
 from git_changelog import Changelog
+from git_changelog._internal.commit import AngularConvention
+from git_changelog._internal.versioning import bump_semver
 from git_changelog.cli import build_and_render
-from git_changelog.commit import AngularConvention
 from git_changelog.templates import get_template
-from git_changelog.versioning import bump_semver
 
 if TYPE_CHECKING:
     from pathlib import Path

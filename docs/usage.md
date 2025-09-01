@@ -309,15 +309,15 @@ as a starting point.
 
 From there, simply modify the different Jinja macros:
 
-- `render_commit()`, which accepts a [Commit][git_changelog.commit.Commit] object
-- `render_section()`, which accepts a [Section][git_changelog.build.Section] object
-- `render_version()`, which accepts a [Version][git_changelog.build.Version] object
+- `render_commit()`, which accepts a [Commit][git_changelog.Commit] object
+- `render_section()`, which accepts a [Section][git_changelog.Section] object
+- `render_version()`, which accepts a [Version][git_changelog.Version] object
 
 Then, also update the template at the end, to change the changelog's header
 or add a changelog footer for example.
 
 The variables available in the template are `changelog`,
-which is a [Changelog][git_changelog.build.Changelog] instance,
+which is a [Changelog][git_changelog.Changelog] instance,
 and `in_place`, which is a boolean, and tells whether the changelog
 is being updated in-place.
 

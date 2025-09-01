@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from git_changelog.commit import AngularConvention
+from git_changelog._internal.commit import AngularConvention
 from tests.helpers import GitRepo
 
 if TYPE_CHECKING:

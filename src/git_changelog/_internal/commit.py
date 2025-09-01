@@ -1,4 +1,4 @@
-"""Module containing the commit logic."""
+# Module containing the commit logic.
 
 from __future__ import annotations
 
@@ -20,8 +20,8 @@ else:
 if TYPE_CHECKING:
     from collections.abc import ItemsView, Iterable, KeysView, ValuesView
 
-    from git_changelog.providers import ProviderRefParser, Ref
-    from git_changelog.versioning import ParsedVersion
+    from git_changelog._internal.providers import ProviderRefParser, Ref
+    from git_changelog._internal.versioning import ParsedVersion
 
 
 def _clean_body(lines: list[str]) -> list[str]:
@@ -343,7 +343,7 @@ class BasicConvention(CommitConvention):
         TYPES["remove"],
     ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
@@ -429,7 +429,7 @@ class AngularConvention(CommitConvention):
         TYPES["perf"],
     ]
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
@@ -493,7 +493,7 @@ class ConventionalCommitConvention(AngularConvention):
         rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$",
     )
 
-    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:  # noqa: D102
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message) or subject.get("breaking") == "!"

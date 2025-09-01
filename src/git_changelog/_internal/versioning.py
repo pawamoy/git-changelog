@@ -1,4 +1,4 @@
-"""Utilities to handle different versioning schemes such as SemVer and PEP 440."""
+# Utilities to handle different versioning schemes such as SemVer and PEP 440.
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ SemVerStrategy = Literal[
     "patch",
     "release",
 ]
+"""SemVer versioning strategies."""
 PEP440Strategy = Literal[
     "epoch",
     "release",
@@ -51,6 +52,7 @@ PEP440Strategy = Literal[
     "beta+dev",
     "candidate+dev",
 ]
+"""PEP 440 versioning strategies."""
 
 
 _release_kind = {"a": "alpha", "b": "beta", "c": "candidate", "rc": "candidate", "p": "post"}
@@ -70,13 +72,13 @@ class ParsedVersion(Protocol):  # noqa: PLW1641
 class SemVerVersion(semver.Version, ParsedVersion):  # type: ignore[misc]
     """SemVer version."""
 
-    def bump_major(self) -> SemVerVersion:  # noqa: D102
+    def bump_major(self) -> SemVerVersion:
         return SemVerVersion(*super().bump_major())  # type: ignore[misc]
 
-    def bump_minor(self) -> SemVerVersion:  # noqa: D102
+    def bump_minor(self) -> SemVerVersion:
         return SemVerVersion(*super().bump_minor())  # type: ignore[misc]
 
-    def bump_patch(self) -> SemVerVersion:  # noqa: D102
+    def bump_patch(self) -> SemVerVersion:
         return SemVerVersion(*super().bump_patch())  # type: ignore[misc]
 
     def bump_release(self) -> SemVerVersion:

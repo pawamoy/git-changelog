@@ -1,4 +1,4 @@
-"""The module responsible for building the data."""
+# The module responsible for building the data.
 
 from __future__ import annotations
 
@@ -10,27 +10,27 @@ from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal, Union
 from urllib.parse import urlsplit, urlunsplit
 
-from git_changelog.commit import (
+from git_changelog._internal.commit import (
     AngularConvention,
     BasicConvention,
     Commit,
     CommitConvention,
     ConventionalCommitConvention,
 )
-from git_changelog.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
-from git_changelog.versioning import ParsedVersion, bump_pep440, bump_semver, parse_pep440, parse_semver
+from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+from git_changelog._internal.versioning import ParsedVersion, bump_pep440, bump_semver, parse_pep440, parse_semver
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from git_changelog.versioning import SemVerVersion
+    from git_changelog._internal.versioning import SemVerVersion
 
 ConventionType = Union[str, CommitConvention, type[CommitConvention]]
 
 
 # TODO: Remove at some point.
 def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
-    """Bump a version. Deprecated, use [`bump_semver`][git_changelog.versioning.bump_semver] instead.
+    """Bump a version. Deprecated, use [`bump_semver`][git_changelog.bump_semver] instead.
 
     Arguments:
         version: The version to bump.
@@ -50,7 +50,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
 
 # TODO: Remove at some point.
 def parse_version(version: str) -> tuple[SemVerVersion, str]:
-    """Parse a version. Deprecated, use [`bump_semver`][git_changelog.versioning.parse_semver] instead.
+    """Parse a version. Deprecated, use [`bump_semver`][git_changelog.parse_semver] instead.
 
     Arguments:
         version: The version to parse.

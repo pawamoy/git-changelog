@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Literal
 import pytest
 
 from git_changelog import Changelog
-from git_changelog.commit import AngularConvention
+from git_changelog._internal.commit import AngularConvention
 
 if TYPE_CHECKING:
-    from git_changelog.build import Version
+    from git_changelog._internal.build import Version
     from tests.helpers import GitRepo
 
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from git_changelog.versioning import (
+from git_changelog._internal.versioning import (
     PEP440Strategy,
     PEP440Version,
     SemVerStrategy,
