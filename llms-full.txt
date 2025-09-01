@@ -1,0 +1,6856 @@
+# git-changelog
+
+> Automatic Changelog generator using Jinja2 templates.
+
+# Usage
+
+# git-changelog
+
+Automatic Changelog generator using Jinja2 templates. From git logs to change logs.
+
+## Features
+
+- [Jinja2](http://jinja.pocoo.org/) templates! You get full control over the rendering. Built-in [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and [Angular](https://github.com/angular/angular/blob/master/CHANGELOG.md) templates (also see [Conventional Changelog](https://github.com/conventional-changelog/conventional-changelog)).
+
+- Commit styles/conventions parsing. Built-in [Angular](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit), [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) and basic conventions.
+
+- Git service/provider agnostic, plus references parsing (issues, commits, etc.). Built-in [GitHub](https://help.github.com/articles/autolinked-references-and-urls/), [Gitlab](https://docs.gitlab.com/ce/user/markdown.html#special-gitlab-references) and [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/markup-comments) support.
+
+- Understands [SemVer](http://semver.org/spec/v2.0.0.html) and [PEP 440](https://peps.python.org/pep-0440/) versioning schemes. Guesses next version based on last commits.
+
+- Parses [Git trailers](https://git-scm.com/docs/git-interpret-trailers), allowing to reference issues, PRs, etc., in your commit messages in a clean, provider-agnostic way.
+
+- Template context injection, to furthermore customize how your changelog will be rendered.
+
+- Todo:
+
+  - [Plugin architecture](https://github.com/pawamoy/git-changelog/issues/19), to support more commit conventions and git services.
+  - [Easy access to "Breaking Changes"](https://github.com/pawamoy/git-changelog/issues/14) in the templates.
+
+## Installation
+
+```
+pip install git-changelog
+```
+
+With [`uv`](https://docs.astral.sh/uv/):
+
+```
+uv tool install git-changelog
+```
+
+## Usage
+
+Simply run `git-changelog` in your repository to output a changelog on standard output. To show the different options and their descriptions, use `git-changelog -h`.
+
+- See [Quick usage](http://pawamoy.github.io/git-changelog/usage/#quick-usage) for some command line examples.
+- See [Configuration](https://pawamoy.github.io/git-changelog/usage/#configuration-files) to learn how to configure *git-changelog* for your project.
+- See the [CLI reference](https://pawamoy.github.io/git-changelog/cli) and the [API reference](https://pawamoy.github.io/git-changelog/reference) for more information.
+
+## Alternatives
+
+- [git-cliff](https://github.com/orhun/git-cliff): A highly customizable Changelog Generator that follows Conventional Commit specifications.
+# API
+
+# git_changelog
+
+git-changelog package.
+
+Automatic Changelog generator using Jinja2 templates.
+
+Modules:
+
+- **`build`** – Deprecated. Import from git_changelog directly.
+- **`cli`** – Deprecated. Import from git_changelog directly.
+- **`commit`** – Deprecated. Import from git_changelog directly.
+- **`providers`** – Deprecated. Import from git_changelog directly.
+- **`templates`** – Deprecated. Import from git_changelog directly.
+- **`versioning`** – Deprecated. Import from git_changelog directly.
+
+Classes:
+
+- **`AngularConvention`** – Angular commit message convention.
+- **`BasicConvention`** – Basic commit message convention.
+- **`Bitbucket`** – A parser for the Bitbucket references.
+- **`Changelog`** – The main changelog class.
+- **`Commit`** – A class to represent a commit.
+- **`CommitConvention`** – A base class for a convention of commit messages.
+- **`ConventionalCommitConvention`** – Conventional commit message convention.
+- **`GitHub`** – A parser for the GitHub references.
+- **`GitLab`** – A parser for the GitLab references.
+- **`PEP440Bumper`** – PEP 440 version bumper.
+- **`PEP440Version`** – PEP 440 version.
+- **`ParsedVersion`** – Base class for versioning schemes.
+- **`ProviderRefParser`** – A base class for specific providers reference parsers.
+- **`Ref`** – A class to represent a reference and its URL.
+- **`RefDef`** – A class to store a reference regular expression and URL building string.
+- **`RefRe`** – An enum helper to store parts of regular expressions for references.
+- **`Section`** – A list of commits grouped by section_type.
+- **`SemVerBumper`** – SemVer version bumper.
+- **`SemVerVersion`** – SemVer version.
+- **`Templates`** – Helper to pick a template on the command line.
+- **`Version`** – A class to represent a changelog version.
+- **`VersionBumper`** – Base class for version bumpers.
+
+Functions:
+
+- **`build_and_render`** – Build a changelog and render it.
+- **`bump`** – Bump a version. Deprecated, use bump_semver instead.
+- **`configure_env`** – Configure the Jinja environment.
+- **`get_custom_template`** – Get a custom template instance.
+- **`get_parser`** – Return the CLI argument parser.
+- **`get_release_notes`** – Get release notes from existing changelog.
+- **`get_template`** – Get a builtin template instance.
+- **`get_version`** – Return the current git-changelog version.
+- **`main`** – Run the main program.
+- **`output_release_notes`** – Print release notes from existing changelog.
+- **`parse_pep440`** – Parse a PEP version.
+- **`parse_semver`** – Parse a SemVer version.
+- **`parse_settings`** – Parse arguments and config files to build the final settings set.
+- **`parse_version`** – Parse a version. Deprecated, use bump_semver instead.
+- **`read_config`** – Find config files and initialize settings with the one of highest priority.
+- **`render`** – Render a changelog.
+- **`version_prefix`** – Return a version and its optional v prefix.
+
+Attributes:
+
+- **`CONVENTIONS`** – Available commit message conventions.
+- **`ConventionType`** – The type of convention used for commits.
+- **`DEFAULT_CHANGELOG_FILE`** – Default changelog file name.
+- **`DEFAULT_CONFIG_FILES`** – Default configuration files read by git-changelog.
+- **`DEFAULT_MARKER_LINE`** – Default marker line for finding insertion points.
+- **`DEFAULT_SETTINGS`** (`dict[str, Any]`) – Default settings for the CLI.
+- **`DEFAULT_VERSIONING`** – Default versioning strategy.
+- **`DEFAULT_VERSION_REGEX`** – Default version regex for finding versions.
+- **`JINJA_ENV`** – The Jinja environment.
+- **`PEP440Strategy`** – PEP 440 versioning strategies.
+- **`SemVerStrategy`** – SemVer versioning strategies.
+- **`TEMPLATES_PATH`** – The path to the templates directory.
+- **`bump_pep440`** – Bump a PEP 440 version.
+- **`bump_semver`** – Bump a SemVer version.
+
+## CONVENTIONS
+
+```
+CONVENTIONS = ('angular', 'conventional', 'basic')
+```
+
+Available commit message conventions.
+
+## ConventionType
+
+```
+ConventionType = Union[
+    str, CommitConvention, type[CommitConvention]
+]
+```
+
+The type of convention used for commits.
+
+## DEFAULT_CHANGELOG_FILE
+
+```
+DEFAULT_CHANGELOG_FILE = 'CHANGELOG.md'
+```
+
+Default changelog file name.
+
+## DEFAULT_CONFIG_FILES
+
+```
+DEFAULT_CONFIG_FILES = [
+    "pyproject.toml",
+    ".git-changelog.toml",
+    "config/git-changelog.toml",
+    ".config/git-changelog.toml",
+    str(Path(user_config_dir()) / "git-changelog.toml"),
+]
+```
+
+Default configuration files read by git-changelog.
+
+## DEFAULT_MARKER_LINE
+
+```
+DEFAULT_MARKER_LINE = '<!-- insertion marker -->'
+```
+
+Default marker line for finding insertion points.
+
+## DEFAULT_SETTINGS
+
+```
+DEFAULT_SETTINGS: dict[str, Any] = {
+    "bump": None,
+    "bump_latest": None,
+    "convention": "basic",
+    "filter_commits": None,
+    "in_place": False,
+    "input": DEFAULT_CHANGELOG_FILE,
+    "marker_line": DEFAULT_MARKER_LINE,
+    "omit_empty_versions": False,
+    "output": stdout,
+    "parse_refs": False,
+    "parse_trailers": False,
+    "provider": None,
+    "release_notes": False,
+    "bumped_version": False,
+    "repository": ".",
+    "sections": None,
+    "template": "keepachangelog",
+    "jinja_context": {},
+    "version_regex": DEFAULT_VERSION_REGEX,
+    "versioning": DEFAULT_VERSIONING,
+    "zerover": True,
+}
+```
+
+Default settings for the CLI.
+
+## DEFAULT_VERSIONING
+
+```
+DEFAULT_VERSIONING = 'semver'
+```
+
+Default versioning strategy.
+
+## DEFAULT_VERSION_REGEX
+
+```
+DEFAULT_VERSION_REGEX = '^## \\[(?P<version>v?[^\\]]+)'
+```
+
+Default version regex for finding versions.
+
+## JINJA_ENV
+
+```
+JINJA_ENV = Environment()
+```
+
+The Jinja environment.
+
+## PEP440Strategy
+
+```
+PEP440Strategy = Literal[
+    "epoch",
+    "release",
+    "major",
+    "minor",
+    "micro",
+    "patch",
+    "pre",
+    "alpha",
+    "beta",
+    "candidate",
+    "post",
+    "dev",
+    "major+alpha",
+    "major+beta",
+    "major+candidate",
+    "major+dev",
+    "major+alpha+dev",
+    "major+beta+dev",
+    "major+candidate+dev",
+    "minor+alpha",
+    "minor+beta",
+    "minor+candidate",
+    "minor+dev",
+    "minor+alpha+dev",
+    "minor+beta+dev",
+    "minor+candidate+dev",
+    "micro+alpha",
+    "micro+beta",
+    "micro+candidate",
+    "micro+dev",
+    "micro+alpha+dev",
+    "micro+beta+dev",
+    "micro+candidate+dev",
+    "alpha+dev",
+    "beta+dev",
+    "candidate+dev",
+]
+```
+
+PEP 440 versioning strategies.
+
+## SemVerStrategy
+
+```
+SemVerStrategy = Literal[
+    "major", "minor", "patch", "release"
+]
+```
+
+SemVer versioning strategies.
+
+## TEMPLATES_PATH
+
+```
+TEMPLATES_PATH = parent
+```
+
+The path to the templates directory.
+
+## bump_pep440
+
+```
+bump_pep440 = PEP440Bumper(__args__)
+```
+
+Bump a PEP 440 version.
+
+## bump_semver
+
+```
+bump_semver = SemVerBumper(__args__)
+```
+
+Bump a SemVer version.
+
+## AngularConvention
+
+Bases: `CommitConvention`
+
+Angular commit message convention.
+
+Methods:
+
+- **`is_major`** – Tell if this commit is worth a major bump.
+- **`is_minor`** – Tell if this commit is worth a minor bump.
+- **`parse_commit`** – Parse the commit to extract information.
+- **`parse_subject`** – Parse the subject of the commit (<type>\[(scope)\]: Subject).
+
+Attributes:
+
+- **`BREAK_REGEX`** (`Pattern`) – The commit message breaking change regex.
+- **`DEFAULT_RENDER`** (`list[str]`) – The default sections to render.
+- **`SUBJECT_REGEX`** (`Pattern`) – The commit message subject regex.
+- **`TYPES`** (`dict[str, str]`) – The commit message types.
+- **`TYPE_REGEX`** (`Pattern`) – The commit message type regex.
+
+### BREAK_REGEX
+
+```
+BREAK_REGEX: Pattern = compile(
+    "^break(s|ing changes?)?[ :].+$", I | MULTILINE
+)
+```
+
+The commit message breaking change regex.
+
+### DEFAULT_RENDER
+
+```
+DEFAULT_RENDER: list[str] = [
+    TYPES["feat"],
+    TYPES["fix"],
+    TYPES["revert"],
+    TYPES["refactor"],
+    TYPES["perf"],
+]
+```
+
+The default sections to render.
+
+### SUBJECT_REGEX
+
+```
+SUBJECT_REGEX: Pattern = compile(
+    f"^(?P<type>({join(keys())}))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$"
+)
+```
+
+The commit message subject regex.
+
+### TYPES
+
+```
+TYPES: dict[str, str] = {
+    "build": "Build",
+    "chore": "Chore",
+    "ci": "Continuous Integration",
+    "deps": "Dependencies",
+    "doc": "Docs",
+    "docs": "Docs",
+    "feat": "Features",
+    "fix": "Bug Fixes",
+    "perf": "Performance Improvements",
+    "ref": "Code Refactoring",
+    "refactor": "Code Refactoring",
+    "revert": "Reverts",
+    "style": "Style",
+    "test": "Tests",
+    "tests": "Tests",
+}
+```
+
+The commit message types.
+
+### TYPE_REGEX
+
+```
+TYPE_REGEX: Pattern
+```
+
+The commit message type regex.
+
+### is_major
+
+```
+is_major(commit_message: str) -> bool
+```
+
+Tell if this commit is worth a major bump.
+
+Parameters:
+
+- **`commit_message`** (`str`) – The commit message.
+
+Returns:
+
+- `bool` – Whether it's a major commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_major(self, commit_message: str) -> bool:
+    """Tell if this commit is worth a major bump.
+
+    Parameters:
+        commit_message: The commit message.
+
+    Returns:
+        Whether it's a major commit.
+    """
+    return bool(self.BREAK_REGEX.search(commit_message))
+```
+
+### is_minor
+
+```
+is_minor(commit_type: str) -> bool
+```
+
+Tell if this commit is worth a minor bump.
+
+Parameters:
+
+- **`commit_type`** (`str`) – The commit type.
+
+Returns:
+
+- `bool` – Whether it's a minor commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_minor(self, commit_type: str) -> bool:
+    """Tell if this commit is worth a minor bump.
+
+    Parameters:
+        commit_type: The commit type.
+
+    Returns:
+        Whether it's a minor commit.
+    """
+    return commit_type == self.TYPES["feat"]
+```
+
+### parse_commit
+
+```
+parse_commit(commit: Commit) -> dict[str, str | bool]
+```
+
+Parse the commit to extract information.
+
+Parameters:
+
+- **`commit`** (`Commit`) – The commit to parse.
+
+Returns:
+
+- `dict[str, str | bool]` – A dictionary containing the parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+    """Parse the commit to extract information.
+
+    Parameters:
+        commit: The commit to parse.
+
+    Returns:
+        A dictionary containing the parsed data.
+    """
+    subject = self.parse_subject(commit.subject)
+    message = "\n".join([commit.subject, *commit.body])
+    is_major = self.is_major(message)
+    is_minor = not is_major and self.is_minor(subject["type"])
+    is_patch = not any((is_major, is_minor))
+
+    return {
+        "type": subject["type"],
+        "scope": subject["scope"],
+        "subject": subject["subject"],
+        "is_major": is_major,
+        "is_minor": is_minor,
+        "is_patch": is_patch,
+    }
+```
+
+### parse_subject
+
+```
+parse_subject(commit_subject: str) -> dict[str, str]
+```
+
+Parse the subject of the commit (`<type>[(scope)]: Subject`).
+
+Parameters:
+
+- **`commit_subject`** (`str`) – The commit message subject.
+
+Returns:
+
+- `dict[str, str]` – The parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_subject(self, commit_subject: str) -> dict[str, str]:
+    """Parse the subject of the commit (`<type>[(scope)]: Subject`).
+
+    Parameters:
+        commit_subject: The commit message subject.
+
+    Returns:
+        The parsed data.
+    """
+    subject_match = self.SUBJECT_REGEX.match(commit_subject)
+    if subject_match:
+        dct = subject_match.groupdict()
+        dct["type"] = self.TYPES[dct["type"]]
+        return dct
+    return {"type": "", "scope": "", "subject": commit_subject}
+```
+
+## BasicConvention
+
+Bases: `CommitConvention`
+
+Basic commit message convention.
+
+Methods:
+
+- **`is_major`** – Tell if this commit is worth a major bump.
+- **`is_minor`** – Tell if this commit is worth a minor bump.
+- **`parse_commit`** – Parse the commit to extract information.
+- **`parse_type`** – Parse the type of the commit given its subject.
+
+Attributes:
+
+- **`BREAK_REGEX`** (`Pattern`) – The commit message breaking change regex.
+- **`DEFAULT_RENDER`** (`list[str]`) – The default sections to render.
+- **`TYPES`** (`dict[str, str]`) – The commit message types.
+- **`TYPE_REGEX`** (`Pattern`) – The commit message type regex.
+
+### BREAK_REGEX
+
+```
+BREAK_REGEX: Pattern = compile(
+    "^break(s|ing changes?)?[ :].+$", I | MULTILINE
+)
+```
+
+The commit message breaking change regex.
+
+### DEFAULT_RENDER
+
+```
+DEFAULT_RENDER: list[str] = [
+    TYPES["add"],
+    TYPES["fix"],
+    TYPES["change"],
+    TYPES["remove"],
+]
+```
+
+The default sections to render.
+
+### TYPES
+
+```
+TYPES: dict[str, str] = {
+    "add": "Added",
+    "fix": "Fixed",
+    "change": "Changed",
+    "remove": "Removed",
+    "merge": "Merged",
+    "doc": "Documented",
+}
+```
+
+The commit message types.
+
+### TYPE_REGEX
+
+```
+TYPE_REGEX: Pattern = compile(
+    f"^(?P<type>({join(keys())}))", I
+)
+```
+
+The commit message type regex.
+
+### is_major
+
+```
+is_major(commit_message: str) -> bool
+```
+
+Tell if this commit is worth a major bump.
+
+Parameters:
+
+- **`commit_message`** (`str`) – The commit message.
+
+Returns:
+
+- `bool` – Whether it's a major commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_major(self, commit_message: str) -> bool:
+    """Tell if this commit is worth a major bump.
+
+    Parameters:
+        commit_message: The commit message.
+
+    Returns:
+        Whether it's a major commit.
+    """
+    return bool(self.BREAK_REGEX.search(commit_message))
+```
+
+### is_minor
+
+```
+is_minor(commit_type: str) -> bool
+```
+
+Tell if this commit is worth a minor bump.
+
+Parameters:
+
+- **`commit_type`** (`str`) – The commit type.
+
+Returns:
+
+- `bool` – Whether it's a minor commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_minor(self, commit_type: str) -> bool:
+    """Tell if this commit is worth a minor bump.
+
+    Parameters:
+        commit_type: The commit type.
+
+    Returns:
+        Whether it's a minor commit.
+    """
+    return commit_type == self.TYPES["add"]
+```
+
+### parse_commit
+
+```
+parse_commit(commit: Commit) -> dict[str, str | bool]
+```
+
+Parse the commit to extract information.
+
+Parameters:
+
+- **`commit`** (`Commit`) – The commit to parse.
+
+Returns:
+
+- `dict[str, str | bool]` – A dictionary containing the parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+    """Parse the commit to extract information.
+
+    Parameters:
+        commit: The commit to parse.
+
+    Returns:
+        A dictionary containing the parsed data.
+    """
+    commit_type = self.parse_type(commit.subject)
+    message = "\n".join([commit.subject, *commit.body])
+    is_major = self.is_major(message)
+    is_minor = not is_major and self.is_minor(commit_type)
+    is_patch = not any((is_major, is_minor))
+
+    return {
+        "type": commit_type,
+        "is_major": is_major,
+        "is_minor": is_minor,
+        "is_patch": is_patch,
+    }
+```
+
+### parse_type
+
+```
+parse_type(commit_subject: str) -> str
+```
+
+Parse the type of the commit given its subject.
+
+Parameters:
+
+- **`commit_subject`** (`str`) – The commit message subject.
+
+Returns:
+
+- `str` – The commit type.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_type(self, commit_subject: str) -> str:
+    """Parse the type of the commit given its subject.
+
+    Parameters:
+        commit_subject: The commit message subject.
+
+    Returns:
+        The commit type.
+    """
+    type_match = self.TYPE_REGEX.match(commit_subject)
+    if type_match:
+        return self.TYPES.get(type_match.groupdict()["type"].lower(), "")
+    return ""
+```
+
+## Bitbucket
+
+```
+Bitbucket(
+    namespace: str, project: str, url: str | None = None
+)
+```
+
+Bases: `ProviderRefParser`
+
+A parser for the Bitbucket references.
+
+Parameters:
+
+- **`namespace`** (`str`) – The Bitbucket namespace.
+- **`project`** (`str`) – The Bitbucket project.
+- **`url`** (`str | None`, default: `None` ) – The Bitbucket URL.
+
+Methods:
+
+- **`build_ref_url`** – Build the URL for a reference type and a dictionary of matched groups.
+- **`get_compare_url`** – Get the URL for a tag comparison.
+- **`get_refs`** – Find all references in the given text.
+- **`get_tag_url`** – Get the URL for a git tag.
+- **`parse_refs`** – Parse references in the given text.
+
+Attributes:
+
+- **`REF`** (`dict[str, RefDef]`) – The reference definitions for the provider.
+- **`commit_max_length`** – The maximum length of a commit hash.
+- **`commit_min_length`** – The minimum length of a commit hash.
+- **`namespace`** (`str`) – The namespace for the provider.
+- **`project`** (`str`) – The project for the provider.
+- **`project_url`** (`str`) – The project URL for the provider.
+- **`tag_url`** (`str`) – The tag URL for the provider.
+- **`url`** (`str`) – The base URL for the provider.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, namespace: str, project: str, url: str | None = None):
+    """Initialization method.
+
+    Parameters:
+        namespace: The Bitbucket namespace.
+        project: The Bitbucket project.
+        url: The Bitbucket URL.
+    """
+    self.namespace: str = namespace
+    """The namespace for the provider."""
+    self.project: str = project
+    """The project for the provider."""
+    self.url: str = url or self.url
+    """The URL for the provider."""
+```
+
+### REF
+
+```
+REF: dict[str, RefDef] = {
+    "issues": RefDef(
+        regex=compile(
+            BB + NP + "?issue\\s*" + format(symbol="#"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+    ),
+    "merge_requests": RefDef(
+        regex=compile(
+            BB
+            + NP
+            + "?pull request\\s*"
+            + format(symbol="#"),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/pull-request/{ref}",
+    ),
+    "commits": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+                ba=BA,
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/commits/{ref}",
+    ),
+    "commits_ranges": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit_range=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/branches/compare/{ref}#diff",
+    ),
+    "mentions": RefDef(
+        regex=compile(BB + MENTION, I),
+        url_string="{base_url}/{ref}",
+    ),
+}
+```
+
+The reference definitions for the provider.
+
+### commit_max_length
+
+```
+commit_max_length = 40
+```
+
+The maximum length of a commit hash.
+
+### commit_min_length
+
+```
+commit_min_length = 8
+```
+
+The minimum length of a commit hash.
+
+### namespace
+
+```
+namespace: str = namespace
+```
+
+The namespace for the provider.
+
+### project
+
+```
+project: str = project
+```
+
+The project for the provider.
+
+### project_url
+
+```
+project_url: str = '{base_url}/{namespace}/{project}'
+```
+
+The project URL for the provider.
+
+### tag_url
+
+```
+tag_url: str = (
+    "{base_url}/{namespace}/{project}/commits/tag/{ref}"
+)
+```
+
+The tag URL for the provider.
+
+### url
+
+```
+url: str = 'https://bitbucket.org'
+```
+
+The base URL for the provider.
+
+### build_ref_url
+
+```
+build_ref_url(
+    ref_type: str, match_dict: dict[str, str]
+) -> str
+```
+
+Build the URL for a reference type and a dictionary of matched groups.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`match_dict`** (`dict[str, str]`) – The matched groups.
+
+Returns:
+
+- `str` – The built URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
+    match_dict["base_url"] = self.url
+    if not match_dict.get("namespace"):
+        match_dict["namespace"] = self.namespace
+    if not match_dict.get("project"):
+        match_dict["project"] = self.project
+    return super().build_ref_url(ref_type, match_dict)
+```
+
+### get_compare_url
+
+```
+get_compare_url(base: str, target: str) -> str
+```
+
+Get the URL for a tag comparison.
+
+Parameters:
+
+- **`base`** (`str`) – The base tag.
+- **`target`** (`str`) – The target tag.
+
+Returns:
+
+- `str` – The comparison URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_compare_url(self, base: str, target: str) -> str:
+    return self.build_ref_url("commits_ranges", {"ref": f"{target}..{base}"})
+```
+
+### get_refs
+
+```
+get_refs(ref_type: str, text: str) -> list[Ref]
+```
+
+Find all references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text in which to search references.
+
+Returns:
+
+- `list[Ref]` – A list of references (instances of Ref).
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_refs(self, ref_type: str, text: str) -> list[Ref]:
+    """Find all references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text in which to search references.
+
+    Returns:
+        A list of references (instances of [Ref][git_changelog.Ref]).
+    """
+    return [
+        Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
+        for match in self.parse_refs(ref_type, text)
+    ]
+```
+
+### get_tag_url
+
+```
+get_tag_url(tag: str = '') -> str
+```
+
+Get the URL for a git tag.
+
+Parameters:
+
+- **`tag`** (`str`) – The git tag.
+
+Returns:
+
+- `str` – The tag URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_tag_url(self, tag: str = "") -> str:
+    return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+```
+
+### parse_refs
+
+```
+parse_refs(ref_type: str, text: str) -> list[Match]
+```
+
+Parse references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text to parse.
+
+Returns:
+
+- `list[Match]` – A list of regular expressions matches.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def parse_refs(self, ref_type: str, text: str) -> list[Match]:
+    """Parse references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text to parse.
+
+    Returns:
+        A list of regular expressions matches.
+    """
+    if ref_type not in self.REF:
+        refs = [key for key in self.REF if key.startswith(ref_type)]
+        return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
+    return list(self.REF[ref_type].regex.finditer(text))
+```
+
+## Changelog
+
+```
+Changelog(
+    repository: str | Path,
+    *,
+    provider: ProviderRefParser
+    | type[ProviderRefParser]
+    | None = None,
+    convention: ConventionType | None = None,
+    parse_provider_refs: bool = False,
+    parse_trailers: bool = False,
+    sections: list[str] | None = None,
+    bump_latest: bool = False,
+    bump: str | None = None,
+    zerover: bool = True,
+    filter_commits: str | None = None,
+    versioning: Literal["semver", "pep440"] = "semver",
+)
+```
+
+The main changelog class.
+
+Parameters:
+
+- **`repository`** (`str | Path`) – The repository (directory) for which to build the changelog.
+- **`provider`** (`ProviderRefParser | type[ProviderRefParser] | None`, default: `None` ) – The provider to use (github.com, gitlab.com, etc.).
+- **`convention`** (`ConventionType | None`, default: `None` ) – The commit convention to use (angular, etc.).
+- **`parse_provider_refs`** (`bool`, default: `False` ) – Whether to parse provider-specific references in the commit messages.
+- **`parse_trailers`** (`bool`, default: `False` ) – Whether to parse Git trailers in the commit messages.
+- **`sections`** (`list[str] | None`, default: `None` ) – The sections to render (features, bug fixes, etc.).
+- **`bump_latest`** (`bool`, default: `False` ) – Deprecated, use bump="auto" instead. Whether to try and bump latest version to guess new one.
+- **`bump`** (`str | None`, default: `None` ) – Whether to try and bump to a given version.
+- **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
+- **`filter_commits`** (`str | None`, default: `None` ) – The Git revision-range used to filter commits in git-log (e.g: v1.0.1..).
+
+Methods:
+
+- **`get_log`** – Get the git log output.
+- **`get_remote_url`** – Get the git remote URL for the repository.
+- **`parse_commits`** – Parse the output of 'git log' into a list of commits.
+- **`run_git`** – Run a git command in the chosen repository.
+
+Attributes:
+
+- **`CONVENTION`** (`dict[str, type[CommitConvention]]`) – Available commit message conventions.
+- **`FORMAT`** (`str`) – Format string for the changelog.
+- **`MARKER`** (`str`) – Marker for the changelog.
+- **`commits`** (`list[Commit]`) – The list of parsed commits.
+- **`convention`** (`CommitConvention`) – The commit convention to use.
+- **`filter_commits`** (`str | None`) – The Git revision-range used to filter commits in git-log (e.g: v1.0.1..).
+- **`parse_provider_refs`** (`bool`) – Whether to parse provider-specific references in the commit messages.
+- **`parse_trailers`** (`bool`) – Whether to parse Git trailers in the commit messages.
+- **`provider`** – The provider to use (github.com, gitlab.com, etc.).
+- **`raw_log`** (`str`) – The raw Git log output.
+- **`remote_url`** (`str`) – The remote URL of the repository.
+- **`repository`** (`str | Path`) – The repository (directory) for which to build the changelog.
+- **`sections`** – The sections to include in the changelog.
+- **`tag_commits`** (`list[Commit]`) – The list of tagged commits.
+- **`version_bumper`** – The version bumper function.
+- **`version_parser`** – The version parser function.
+- **`versions_dict`** – The dictionary of versions.
+- **`versions_list`** – The list of versions.
+- **`zerover`** (`bool`) – Whether to keep major version at zero, even for breaking changes.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def __init__(
+    self,
+    repository: str | Path,
+    *,
+    provider: ProviderRefParser | type[ProviderRefParser] | None = None,
+    convention: ConventionType | None = None,
+    parse_provider_refs: bool = False,
+    parse_trailers: bool = False,
+    sections: list[str] | None = None,
+    # YORE: Bump 3: Remove line.
+    bump_latest: bool = False,
+    bump: str | None = None,
+    zerover: bool = True,
+    filter_commits: str | None = None,
+    versioning: Literal["semver", "pep440"] = "semver",
+):
+    """Initialization method.
+
+    Parameters:
+        repository: The repository (directory) for which to build the changelog.
+        provider: The provider to use (github.com, gitlab.com, etc.).
+        convention: The commit convention to use (angular, etc.).
+        parse_provider_refs: Whether to parse provider-specific references in the commit messages.
+        parse_trailers: Whether to parse Git trailers in the commit messages.
+        sections: The sections to render (features, bug fixes, etc.).
+        bump_latest: Deprecated, use `bump="auto"` instead. Whether to try and bump latest version to guess new one.
+        bump: Whether to try and bump to a given version.
+        zerover: Keep major version at zero, even for breaking changes.
+        filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
+    """
+    self.repository: str | Path = repository
+    """The repository (directory) for which to build the changelog."""
+    self.parse_provider_refs: bool = parse_provider_refs
+    """Whether to parse provider-specific references in the commit messages."""
+    self.parse_trailers: bool = parse_trailers
+    """Whether to parse Git trailers in the commit messages."""
+    self.zerover: bool = zerover
+    """Whether to keep major version at zero, even for breaking changes."""
+    self.filter_commits: str | None = filter_commits
+    """The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`)."""
+
+    # Set provider.
+    if not isinstance(provider, ProviderRefParser):
+        remote_url = self.get_remote_url()
+        split = remote_url.split("/")
+        provider_url = "/".join(split[:3])
+        namespace, project = "/".join(split[3:-1]), split[-1]
+        if callable(provider):
+            provider = provider(namespace, project, url=provider_url)
+        elif "github" in provider_url:
+            provider = GitHub(namespace, project, url=provider_url)
+        elif "gitlab" in provider_url:
+            provider = GitLab(namespace, project, url=provider_url)
+        elif "bitbucket" in provider_url:
+            provider = Bitbucket(namespace, project, url=provider_url)
+        else:
+            provider = None
+        self.remote_url: str = remote_url
+        """The remote URL of the repository."""
+    self.provider = provider
+    """The provider to use (github.com, gitlab.com, etc.)."""
+
+    # Set convention.
+    if isinstance(convention, str):
+        try:
+            convention = self.CONVENTION[convention]()
+        except KeyError:
+            print(  # noqa: T201
+                f"git-changelog: no such convention available: {convention}, using default convention",
+                file=sys.stderr,
+            )
+            convention = BasicConvention()
+    elif convention is None:
+        convention = BasicConvention()
+    elif not isinstance(convention, CommitConvention) and issubclass(convention, CommitConvention):
+        convention = convention()
+    self.convention: CommitConvention = convention
+    """The commit convention to use."""
+
+    # Set sections.
+    sections = (
+        [self.convention.TYPES[section] for section in sections] if sections else self.convention.DEFAULT_RENDER
+    )
+    self.sections = sections
+    """The sections to include in the changelog."""
+
+    # Get version parser based on selected versioning scheme.
+    version_parser, version_bumper = {
+        "semver": (parse_semver, bump_semver),
+        "pep440": (parse_pep440, bump_pep440),
+    }[versioning]
+    self.version_parser = version_parser
+    """The version parser function."""
+    self.version_bumper = version_bumper
+    """The version bumper function."""
+
+    # Get git log and parse it into list of commits.
+    self.raw_log: str = self.get_log()
+    """The raw Git log output."""
+    self.commits: list[Commit] = self.parse_commits()
+    """The list of parsed commits."""
+    self.tag_commits: list[Commit] = [commit for commit in self.commits[1:] if commit.tag]
+    """The list of tagged commits."""
+    self.tag_commits.insert(0, self.commits[0])
+
+    # Apply dates to commits and group them by version.
+    v_list, v_dict = self._group_commits_by_version()
+    self.versions_list = v_list
+    """The list of versions."""
+    self.versions_dict = v_dict
+    """The dictionary of versions."""
+
+    # YORE: Bump 3: Remove block.
+    if bump_latest:
+        warnings.warn(
+            "`bump_latest=True` is deprecated in favor of `bump='auto'`",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        if bump is None:
+            bump = "auto"
+
+    if bump:
+        self._bump(bump)
+```
+
+### CONVENTION
+
+```
+CONVENTION: dict[str, type[CommitConvention]] = {
+    "basic": BasicConvention,
+    "angular": AngularConvention,
+    "conventional": ConventionalCommitConvention,
+}
+```
+
+Available commit message conventions.
+
+### FORMAT
+
+```
+FORMAT: str = (
+    "%H%n%an%n%ae%n%ad%n%cn%n%ce%n%cd%n%D%n%P%n%s%n%b%n"
+    + MARKER
+)
+```
+
+Format string for the changelog.
+
+### MARKER
+
+```
+MARKER: str = '--GIT-CHANGELOG MARKER--'
+```
+
+Marker for the changelog.
+
+### commits
+
+```
+commits: list[Commit] = parse_commits()
+```
+
+The list of parsed commits.
+
+### convention
+
+```
+convention: CommitConvention = convention
+```
+
+The commit convention to use.
+
+### filter_commits
+
+```
+filter_commits: str | None = filter_commits
+```
+
+The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
+
+### parse_provider_refs
+
+```
+parse_provider_refs: bool = parse_provider_refs
+```
+
+Whether to parse provider-specific references in the commit messages.
+
+### parse_trailers
+
+```
+parse_trailers: bool = parse_trailers
+```
+
+Whether to parse Git trailers in the commit messages.
+
+### provider
+
+```
+provider = provider
+```
+
+The provider to use (github.com, gitlab.com, etc.).
+
+### raw_log
+
+```
+raw_log: str = get_log()
+```
+
+The raw Git log output.
+
+### remote_url
+
+```
+remote_url: str = remote_url
+```
+
+The remote URL of the repository.
+
+### repository
+
+```
+repository: str | Path = repository
+```
+
+The repository (directory) for which to build the changelog.
+
+### sections
+
+```
+sections = sections
+```
+
+The sections to include in the changelog.
+
+### tag_commits
+
+```
+tag_commits: list[Commit] = [
+    commit for commit in (commits[1:]) if tag
+]
+```
+
+The list of tagged commits.
+
+### version_bumper
+
+```
+version_bumper = version_bumper
+```
+
+The version bumper function.
+
+### version_parser
+
+```
+version_parser = version_parser
+```
+
+The version parser function.
+
+### versions_dict
+
+```
+versions_dict = v_dict
+```
+
+The dictionary of versions.
+
+### versions_list
+
+```
+versions_list = v_list
+```
+
+The list of versions.
+
+### zerover
+
+```
+zerover: bool = zerover
+```
+
+Whether to keep major version at zero, even for breaking changes.
+
+### get_log
+
+```
+get_log() -> str
+```
+
+Get the `git log` output.
+
+Returns:
+
+- `str` – The output of the git log command, with a particular format.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def get_log(self) -> str:
+    """Get the `git log` output.
+
+    Returns:
+        The output of the `git log` command, with a particular format.
+    """
+    if self.filter_commits:
+        try:
+            return self.run_git("log", "--date=unix", "--format=" + self.FORMAT, self.filter_commits)
+        except CalledProcessError as e:
+            raise ValueError(
+                f"An error ocurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
+            ) from e
+
+    # No revision-range provided. Call normally
+    return self.run_git("log", "--date=unix", "--format=" + self.FORMAT)
+```
+
+### get_remote_url
+
+```
+get_remote_url() -> str
+```
+
+Get the git remote URL for the repository.
+
+Returns:
+
+- `str` – The origin remote URL.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def get_remote_url(self) -> str:
+    """Get the git remote URL for the repository.
+
+    Returns:
+        The origin remote URL.
+    """
+    remote = "remote." + os.environ.get("GIT_CHANGELOG_REMOTE", "origin") + ".url"
+    git_url = self.run_git("config", "--default", "", "--get", remote).rstrip("\n")
+    if git_url.startswith("git@"):
+        git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
+    if git_url.endswith(".git"):
+        git_url = git_url[:-4]
+
+    # Remove credentials from the URL.
+    if git_url.startswith(("http://", "https://")):
+        # (addressing scheme, network location, path, query, fragment identifier)
+        urlparts = list(urlsplit(git_url))
+        urlparts[1] = urlparts[1].split("@", 1)[-1]
+        git_url = urlunsplit(urlparts)
+
+    return git_url
+```
+
+### parse_commits
+
+```
+parse_commits() -> list[Commit]
+```
+
+Parse the output of 'git log' into a list of commits.
+
+The commits build a Git commit graph by referencing their parent commits. Commits are ordered from newest to oldest.
+
+Returns:
+
+- `list[Commit]` – The list of commits.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def parse_commits(self) -> list[Commit]:
+    """Parse the output of 'git log' into a list of commits.
+
+    The commits build a Git commit graph by referencing their parent commits.
+    Commits are ordered from newest to oldest.
+
+    Returns:
+        The list of commits.
+    """
+    lines = self.raw_log.split("\n")
+    size = len(lines) - 1  # Don't count last blank line.
+    pos = 0
+
+    commits_map: dict[str, Commit] = {}
+
+    while pos < size:
+        # Build message body.
+        nbl_index = 10
+        body = []
+        while lines[pos + nbl_index] != self.MARKER:
+            body.append(lines[pos + nbl_index].strip("\r"))
+            nbl_index += 1
+
+        # Build commit object.
+        commit = Commit(
+            commit_hash=lines[pos],
+            author_name=lines[pos + 1],
+            author_email=lines[pos + 2],
+            author_date=lines[pos + 3],
+            committer_name=lines[pos + 4],
+            committer_email=lines[pos + 5],
+            committer_date=lines[pos + 6],
+            refs=lines[pos + 7],
+            parent_hashes=lines[pos + 8],
+            commits_map=commits_map,
+            subject=lines[pos + 9],
+            body=body,
+            parse_trailers=self.parse_trailers,
+            version_parser=self.version_parser,
+        )
+
+        pos += nbl_index + 1
+
+        # Expand commit object with provider parsing.
+        if self.provider:
+            commit.update_with_provider(self.provider, parse_refs=self.parse_provider_refs)
+
+        # Set the commit url based on remote_url (could be wrong).
+        elif self.remote_url:
+            commit.url = self.remote_url + "/commit/" + commit.hash
+
+        # Expand commit object with convention parsing.
+        if self.convention:
+            commit.update_with_convention(self.convention)
+
+        commits_map[commit.hash] = commit
+
+    return list(commits_map.values())
+```
+
+### run_git
+
+```
+run_git(*args: str) -> str
+```
+
+Run a git command in the chosen repository.
+
+Parameters:
+
+- **`*args`** (`str`, default: `()` ) – Arguments passed to the git command.
+
+Returns:
+
+- `str` – The git command output.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def run_git(self, *args: str) -> str:
+    """Run a git command in the chosen repository.
+
+    Parameters:
+        *args: Arguments passed to the git command.
+
+    Returns:
+        The git command output.
+    """
+    return check_output(["git", *args], cwd=self.repository).decode("utf8")  # noqa: S603,S607
+```
+
+## Commit
+
+```
+Commit(
+    commit_hash: str,
+    author_name: str = "",
+    author_email: str = "",
+    author_date: str | datetime = "",
+    committer_name: str = "",
+    committer_email: str = "",
+    committer_date: str | datetime = "",
+    refs: str = "",
+    subject: str = "",
+    body: list[str] | None = None,
+    url: str = "",
+    *,
+    parse_trailers: bool = False,
+    parent_hashes: str | list[str] = "",
+    commits_map: dict[str, Commit] | None = None,
+    version_parser: Callable[
+        [str], tuple[ParsedVersion, str]
+    ]
+    | None = None,
+)
+```
+
+A class to represent a commit.
+
+Parameters:
+
+- **`commit_hash`** (`str`) – The commit hash.
+- **`author_name`** (`str`, default: `''` ) – The author name.
+- **`author_email`** (`str`, default: `''` ) – The author email.
+- **`author_date`** (`str | datetime`, default: `''` ) – The authoring date (datetime or UTC timestamp).
+- **`committer_name`** (`str`, default: `''` ) – The committer name.
+- **`committer_email`** (`str`, default: `''` ) – The committer email.
+- **`committer_date`** (`str | datetime`, default: `''` ) – The committing date (datetime or UTC timestamp).
+- **`refs`** (`str`, default: `''` ) – The commit refs.
+- **`subject`** (`str`, default: `''` ) – The commit message subject.
+- **`body`** (`list[str] | None`, default: `None` ) – The commit message body.
+- **`url`** (`str`, default: `''` ) – The commit URL.
+- **`parse_trailers`** (`bool`, default: `False` ) – Whether to parse Git trailers.
+
+Methods:
+
+- **`update_with_convention`** – Apply the convention-parsed data to this commit.
+- **`update_with_provider`** – Apply the provider-parsed data to this commit.
+
+Attributes:
+
+- **`author_date`** (`datetime`) – The author date.
+- **`author_email`** (`str`) – The author email.
+- **`author_name`** (`str`) – The author name.
+- **`body`** (`list[str]`) – The commit body.
+- **`body_without_trailers`** – The commit body without trailers.
+- **`committer_date`** (`datetime`) – The committer date.
+- **`committer_email`** (`str`) – The committer email.
+- **`committer_name`** (`str`) – The committer name.
+- **`convention`** (`dict[str, Any]`) – The commit message convention.
+- **`hash`** (`str`) – The commit hash.
+- **`parent_commits`** (`list[Commit]`) – Parent commits of this commit.
+- **`parent_hashes`** – The parent commit hashes.
+- **`subject`** (`str`) – The commit subject.
+- **`tag`** (`str`) – The commit tag.
+- **`text_refs`** (`dict[str, list[Ref]]`) – The commit text references.
+- **`trailers`** (`list[tuple[str, str]]`) – The commit trailers.
+- **`url`** (`str`) – The commit URL.
+- **`version`** (`str`) – The commit version.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def __init__(
+    self,
+    commit_hash: str,
+    author_name: str = "",
+    author_email: str = "",
+    author_date: str | datetime = "",
+    committer_name: str = "",
+    committer_email: str = "",
+    committer_date: str | datetime = "",
+    refs: str = "",
+    subject: str = "",
+    body: list[str] | None = None,
+    url: str = "",
+    *,
+    parse_trailers: bool = False,
+    parent_hashes: str | list[str] = "",
+    commits_map: dict[str, Commit] | None = None,
+    version_parser: Callable[[str], tuple[ParsedVersion, str]] | None = None,
+):
+    """Initialization method.
+
+    Parameters:
+        commit_hash: The commit hash.
+        author_name: The author name.
+        author_email: The author email.
+        author_date: The authoring date (datetime or UTC timestamp).
+        committer_name: The committer name.
+        committer_email: The committer email.
+        committer_date: The committing date (datetime or UTC timestamp).
+        refs: The commit refs.
+        subject: The commit message subject.
+        body: The commit message body.
+        url: The commit URL.
+        parse_trailers: Whether to parse Git trailers.
+    """
+    if not author_date:
+        author_date = datetime.now()  # noqa: DTZ005
+    elif isinstance(author_date, str):
+        author_date = datetime.fromtimestamp(float(author_date), tz=timezone.utc)
+    if not committer_date:
+        committer_date = datetime.now()  # noqa: DTZ005
+    elif isinstance(committer_date, str):
+        committer_date = datetime.fromtimestamp(float(committer_date), tz=timezone.utc)
+
+    self.hash: str = commit_hash
+    """The commit hash."""
+    self.author_name: str = author_name
+    """The author name."""
+    self.author_email: str = author_email
+    """The author email."""
+    self.author_date: datetime = author_date
+    """The author date."""
+    self.committer_name: str = committer_name
+    """The committer name."""
+    self.committer_email: str = committer_email
+    """The committer email."""
+    self.committer_date: datetime = committer_date
+    """The committer date."""
+    self.subject: str = subject
+    """The commit subject."""
+    self.body: list[str] = _clean_body(body) if body else []
+    """The commit body."""
+    self.url: str = url
+    """The commit URL."""
+
+    tag = ""
+    for ref in refs.split(","):
+        ref = ref.strip()  # noqa: PLW2901
+        if ref.startswith("tag: "):
+            ref = ref.replace("tag: ", "")  # noqa: PLW2901
+            if version_parser is None or _is_valid_version(ref, version_parser):
+                tag = ref
+                break
+    self.tag: str = tag
+    """The commit tag."""
+    self.version: str = tag
+    """The commit version."""
+
+    if isinstance(parent_hashes, str):
+        parent_hashes = parent_hashes.split()
+    self.parent_hashes = parent_hashes
+    """The parent commit hashes."""
+    self._commits_map = commits_map
+
+    self.text_refs: dict[str, list[Ref]] = {}
+    """The commit text references."""
+    self.convention: dict[str, Any] = {}
+    """The commit message convention."""
+
+    # YORE: Bump 3: Replace `_Trailers()` with `[]` within line.
+    self.trailers: list[tuple[str, str]] = _Trailers()
+    """The commit trailers."""
+    self.body_without_trailers = self.body
+    """The commit body without trailers."""
+
+    if parse_trailers:
+        self._parse_trailers()
+```
+
+### author_date
+
+```
+author_date: datetime = author_date
+```
+
+The author date.
+
+### author_email
+
+```
+author_email: str = author_email
+```
+
+The author email.
+
+### author_name
+
+```
+author_name: str = author_name
+```
+
+The author name.
+
+### body
+
+```
+body: list[str] = _clean_body(body) if body else []
+```
+
+The commit body.
+
+### body_without_trailers
+
+```
+body_without_trailers = body
+```
+
+The commit body without trailers.
+
+### committer_date
+
+```
+committer_date: datetime = committer_date
+```
+
+The committer date.
+
+### committer_email
+
+```
+committer_email: str = committer_email
+```
+
+The committer email.
+
+### committer_name
+
+```
+committer_name: str = committer_name
+```
+
+The committer name.
+
+### convention
+
+```
+convention: dict[str, Any] = {}
+```
+
+The commit message convention.
+
+### hash
+
+```
+hash: str = commit_hash
+```
+
+The commit hash.
+
+### parent_commits
+
+```
+parent_commits: list[Commit]
+```
+
+Parent commits of this commit.
+
+### parent_hashes
+
+```
+parent_hashes = parent_hashes
+```
+
+The parent commit hashes.
+
+### subject
+
+```
+subject: str = subject
+```
+
+The commit subject.
+
+### tag
+
+```
+tag: str = tag
+```
+
+The commit tag.
+
+### text_refs
+
+```
+text_refs: dict[str, list[Ref]] = {}
+```
+
+The commit text references.
+
+### trailers
+
+```
+trailers: list[tuple[str, str]] = _Trailers()
+```
+
+The commit trailers.
+
+### url
+
+```
+url: str = url
+```
+
+The commit URL.
+
+### version
+
+```
+version: str = tag
+```
+
+The commit version.
+
+### update_with_convention
+
+```
+update_with_convention(
+    convention: CommitConvention,
+) -> None
+```
+
+Apply the convention-parsed data to this commit.
+
+Parameters:
+
+- **`convention`** (`CommitConvention`) – The convention to use.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def update_with_convention(self, convention: CommitConvention) -> None:
+    """Apply the convention-parsed data to this commit.
+
+    Parameters:
+        convention: The convention to use.
+    """
+    self.convention.update(convention.parse_commit(self))
+```
+
+### update_with_provider
+
+```
+update_with_provider(
+    provider: ProviderRefParser, parse_refs: bool = True
+) -> None
+```
+
+Apply the provider-parsed data to this commit.
+
+Parameters:
+
+- **`provider`** (`ProviderRefParser`) – The provider to use.
+- **`parse_refs`** (`bool`, default: `True` ) – Whether to parse references for this provider.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def update_with_provider(
+    self,
+    provider: ProviderRefParser,
+    parse_refs: bool = True,  # noqa: FBT001,FBT002
+) -> None:
+    """Apply the provider-parsed data to this commit.
+
+    Parameters:
+        provider: The provider to use.
+        parse_refs: Whether to parse references for this provider.
+    """
+    # Set the commit URL based on the provider.
+    # FIXME: hardcoded 'commits'
+    if "commits" in provider.REF:
+        self.url = provider.build_ref_url("commits", {"ref": self.hash})
+    else:
+        # Use default "commit" URL (could be wrong).
+        self.url = f"{provider.url}/{provider.namespace}/{provider.project}/commit/{self.hash}"
+
+    # Build commit text references from its subject and body.
+    if parse_refs:
+        for ref_type in provider.REF:
+            self.text_refs[ref_type] = provider.get_refs(
+                ref_type,
+                "\n".join([self.subject, *self.body]),
+            )
+
+        if "issues" in self.text_refs:
+            self.text_refs["issues_not_in_subject"] = []
+            for issue in self.text_refs["issues"]:
+                if issue.ref not in self.subject:
+                    self.text_refs["issues_not_in_subject"].append(issue)
+```
+
+## CommitConvention
+
+Bases: `ABC`
+
+A base class for a convention of commit messages.
+
+Methods:
+
+- **`parse_commit`** – Parse the commit to extract information.
+
+Attributes:
+
+- **`BREAK_REGEX`** (`Pattern`) – The commit message breaking change regex.
+- **`DEFAULT_RENDER`** (`list[str]`) – The sections rendered by default.
+- **`TYPES`** (`dict[str, str]`) – The commit message types.
+- **`TYPE_REGEX`** (`Pattern`) – The commit message type regex.
+
+### BREAK_REGEX
+
+```
+BREAK_REGEX: Pattern
+```
+
+The commit message breaking change regex.
+
+### DEFAULT_RENDER
+
+```
+DEFAULT_RENDER: list[str]
+```
+
+The sections rendered by default.
+
+### TYPES
+
+```
+TYPES: dict[str, str]
+```
+
+The commit message types.
+
+### TYPE_REGEX
+
+```
+TYPE_REGEX: Pattern
+```
+
+The commit message type regex.
+
+### parse_commit
+
+```
+parse_commit(commit: Commit) -> dict[str, str | bool]
+```
+
+Parse the commit to extract information.
+
+Parameters:
+
+- **`commit`** (`Commit`) – The commit to parse.
+
+Returns:
+
+- `dict[str, str | bool]` – A dictionary containing the parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+@abstractmethod
+def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+    """Parse the commit to extract information.
+
+    Parameters:
+        commit: The commit to parse.
+
+    Returns:
+        A dictionary containing the parsed data.
+    """
+    raise NotImplementedError
+```
+
+## ConventionalCommitConvention
+
+Bases: `AngularConvention`
+
+Conventional commit message convention.
+
+Methods:
+
+- **`is_major`** – Tell if this commit is worth a major bump.
+- **`is_minor`** – Tell if this commit is worth a minor bump.
+- **`parse_commit`** – Parse the commit to extract information.
+- **`parse_subject`** – Parse the subject of the commit (<type>\[(scope)\]: Subject).
+
+Attributes:
+
+- **`BREAK_REGEX`** (`Pattern`) – The commit message breaking change regex.
+- **`DEFAULT_RENDER`** (`list[str]`) – The default sections to render.
+- **`SUBJECT_REGEX`** (`Pattern`) – The commit message subject regex.
+- **`TYPES`** (`dict[str, str]`) – The commit message types.
+- **`TYPE_REGEX`** (`Pattern`) – The commit message type regex.
+
+### BREAK_REGEX
+
+```
+BREAK_REGEX: Pattern = compile(
+    "^break(s|ing changes?)?[ :].+$", I | MULTILINE
+)
+```
+
+The commit message breaking change regex.
+
+### DEFAULT_RENDER
+
+```
+DEFAULT_RENDER: list[str] = DEFAULT_RENDER
+```
+
+The default sections to render.
+
+### SUBJECT_REGEX
+
+```
+SUBJECT_REGEX: Pattern = compile(
+    f"^(?P<type>({join(keys())}))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$"
+)
+```
+
+The commit message subject regex.
+
+### TYPES
+
+```
+TYPES: dict[str, str] = TYPES
+```
+
+The commit message types.
+
+### TYPE_REGEX
+
+```
+TYPE_REGEX: Pattern
+```
+
+The commit message type regex.
+
+### is_major
+
+```
+is_major(commit_message: str) -> bool
+```
+
+Tell if this commit is worth a major bump.
+
+Parameters:
+
+- **`commit_message`** (`str`) – The commit message.
+
+Returns:
+
+- `bool` – Whether it's a major commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_major(self, commit_message: str) -> bool:
+    """Tell if this commit is worth a major bump.
+
+    Parameters:
+        commit_message: The commit message.
+
+    Returns:
+        Whether it's a major commit.
+    """
+    return bool(self.BREAK_REGEX.search(commit_message))
+```
+
+### is_minor
+
+```
+is_minor(commit_type: str) -> bool
+```
+
+Tell if this commit is worth a minor bump.
+
+Parameters:
+
+- **`commit_type`** (`str`) – The commit type.
+
+Returns:
+
+- `bool` – Whether it's a minor commit.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def is_minor(self, commit_type: str) -> bool:
+    """Tell if this commit is worth a minor bump.
+
+    Parameters:
+        commit_type: The commit type.
+
+    Returns:
+        Whether it's a minor commit.
+    """
+    return commit_type == self.TYPES["feat"]
+```
+
+### parse_commit
+
+```
+parse_commit(commit: Commit) -> dict[str, str | bool]
+```
+
+Parse the commit to extract information.
+
+Parameters:
+
+- **`commit`** (`Commit`) – The commit to parse.
+
+Returns:
+
+- `dict[str, str | bool]` – A dictionary containing the parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+    """Parse the commit to extract information.
+
+    Parameters:
+        commit: The commit to parse.
+
+    Returns:
+        A dictionary containing the parsed data.
+    """
+    subject = self.parse_subject(commit.subject)
+    message = "\n".join([commit.subject, *commit.body])
+    is_major = self.is_major(message) or subject.get("breaking") == "!"
+    is_minor = not is_major and self.is_minor(subject["type"])
+    is_patch = not any((is_major, is_minor))
+
+    return {
+        "type": subject["type"],
+        "scope": subject["scope"],
+        "subject": subject["subject"],
+        "is_major": is_major,
+        "is_minor": is_minor,
+        "is_patch": is_patch,
+    }
+```
+
+### parse_subject
+
+```
+parse_subject(commit_subject: str) -> dict[str, str]
+```
+
+Parse the subject of the commit (`<type>[(scope)]: Subject`).
+
+Parameters:
+
+- **`commit_subject`** (`str`) – The commit message subject.
+
+Returns:
+
+- `dict[str, str]` – The parsed data.
+
+Source code in `src/git_changelog/_internal/commit.py`
+
+```
+def parse_subject(self, commit_subject: str) -> dict[str, str]:
+    """Parse the subject of the commit (`<type>[(scope)]: Subject`).
+
+    Parameters:
+        commit_subject: The commit message subject.
+
+    Returns:
+        The parsed data.
+    """
+    subject_match = self.SUBJECT_REGEX.match(commit_subject)
+    if subject_match:
+        dct = subject_match.groupdict()
+        dct["type"] = self.TYPES[dct["type"]]
+        return dct
+    return {"type": "", "scope": "", "subject": commit_subject}
+```
+
+## GitHub
+
+```
+GitHub(
+    namespace: str, project: str, url: str | None = None
+)
+```
+
+Bases: `ProviderRefParser`
+
+A parser for the GitHub references.
+
+Parameters:
+
+- **`namespace`** (`str`) – The Bitbucket namespace.
+- **`project`** (`str`) – The Bitbucket project.
+- **`url`** (`str | None`, default: `None` ) – The Bitbucket URL.
+
+Methods:
+
+- **`build_ref_url`** – Build the URL for a reference type and a dictionary of matched groups.
+- **`get_compare_url`** – Get the URL for a tag comparison.
+- **`get_refs`** – Find all references in the given text.
+- **`get_tag_url`** – Get the URL for a git tag.
+- **`parse_refs`** – Parse references in the given text.
+
+Attributes:
+
+- **`REF`** (`dict[str, RefDef]`) – The reference definitions for the provider.
+- **`commit_max_length`** – The maximum length of a commit hash.
+- **`commit_min_length`** – The minimum length of a commit hash.
+- **`namespace`** (`str`) – The namespace for the provider.
+- **`project`** (`str`) – The project for the provider.
+- **`project_url`** (`str`) – The project URL for the provider.
+- **`tag_url`** (`str`) – The tag URL for the provider.
+- **`url`** (`str`) – The base URL for the provider.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, namespace: str, project: str, url: str | None = None):
+    """Initialization method.
+
+    Parameters:
+        namespace: The Bitbucket namespace.
+        project: The Bitbucket project.
+        url: The Bitbucket URL.
+    """
+    self.namespace: str = namespace
+    """The namespace for the provider."""
+    self.project: str = project
+    """The project for the provider."""
+    self.url: str = url or self.url
+    """The URL for the provider."""
+```
+
+### REF
+
+```
+REF: dict[str, RefDef] = {
+    "issues": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="#"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+    ),
+    "commits": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+                ba=BA,
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/commit/{ref}",
+    ),
+    "commits_ranges": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit_range=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/compare/{ref}",
+    ),
+    "mentions": RefDef(
+        regex=compile(BB + MENTION, I),
+        url_string="{base_url}/{ref}",
+    ),
+}
+```
+
+The reference definitions for the provider.
+
+### commit_max_length
+
+```
+commit_max_length = 40
+```
+
+The maximum length of a commit hash.
+
+### commit_min_length
+
+```
+commit_min_length = 8
+```
+
+The minimum length of a commit hash.
+
+### namespace
+
+```
+namespace: str = namespace
+```
+
+The namespace for the provider.
+
+### project
+
+```
+project: str = project
+```
+
+The project for the provider.
+
+### project_url
+
+```
+project_url: str = '{base_url}/{namespace}/{project}'
+```
+
+The project URL for the provider.
+
+### tag_url
+
+```
+tag_url: str = (
+    "{base_url}/{namespace}/{project}/releases/tag/{ref}"
+)
+```
+
+The tag URL for the provider.
+
+### url
+
+```
+url: str = 'https://github.com'
+```
+
+The base URL for the provider.
+
+### build_ref_url
+
+```
+build_ref_url(
+    ref_type: str, match_dict: dict[str, str]
+) -> str
+```
+
+Build the URL for a reference type and a dictionary of matched groups.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`match_dict`** (`dict[str, str]`) – The matched groups.
+
+Returns:
+
+- `str` – The built URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
+    match_dict["base_url"] = self.url
+    if not match_dict.get("namespace"):
+        match_dict["namespace"] = self.namespace
+    if not match_dict.get("project"):
+        match_dict["project"] = self.project
+    return super().build_ref_url(ref_type, match_dict)
+```
+
+### get_compare_url
+
+```
+get_compare_url(base: str, target: str) -> str
+```
+
+Get the URL for a tag comparison.
+
+Parameters:
+
+- **`base`** (`str`) – The base tag.
+- **`target`** (`str`) – The target tag.
+
+Returns:
+
+- `str` – The comparison URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_compare_url(self, base: str, target: str) -> str:
+    return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
+```
+
+### get_refs
+
+```
+get_refs(ref_type: str, text: str) -> list[Ref]
+```
+
+Find all references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text in which to search references.
+
+Returns:
+
+- `list[Ref]` – A list of references (instances of Ref).
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_refs(self, ref_type: str, text: str) -> list[Ref]:
+    """Find all references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text in which to search references.
+
+    Returns:
+        A list of references (instances of [Ref][git_changelog.Ref]).
+    """
+    return [
+        Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
+        for match in self.parse_refs(ref_type, text)
+    ]
+```
+
+### get_tag_url
+
+```
+get_tag_url(tag: str = '') -> str
+```
+
+Get the URL for a git tag.
+
+Parameters:
+
+- **`tag`** (`str`) – The git tag.
+
+Returns:
+
+- `str` – The tag URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_tag_url(self, tag: str = "") -> str:
+    return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+```
+
+### parse_refs
+
+```
+parse_refs(ref_type: str, text: str) -> list[Match]
+```
+
+Parse references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text to parse.
+
+Returns:
+
+- `list[Match]` – A list of regular expressions matches.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def parse_refs(self, ref_type: str, text: str) -> list[Match]:
+    """Parse references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text to parse.
+
+    Returns:
+        A list of regular expressions matches.
+    """
+    if ref_type not in self.REF:
+        refs = [key for key in self.REF if key.startswith(ref_type)]
+        return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
+    return list(self.REF[ref_type].regex.finditer(text))
+```
+
+## GitLab
+
+```
+GitLab(
+    namespace: str, project: str, url: str | None = None
+)
+```
+
+Bases: `ProviderRefParser`
+
+A parser for the GitLab references.
+
+Parameters:
+
+- **`namespace`** (`str`) – The Bitbucket namespace.
+- **`project`** (`str`) – The Bitbucket project.
+- **`url`** (`str | None`, default: `None` ) – The Bitbucket URL.
+
+Methods:
+
+- **`build_ref_url`** – Build the URL for a reference type and a dictionary of matched groups.
+- **`get_compare_url`** – Get the URL for a tag comparison.
+- **`get_refs`** – Find all references in the given text.
+- **`get_tag_url`** – Get the URL for a git tag.
+- **`parse_refs`** – Parse references in the given text.
+
+Attributes:
+
+- **`REF`** (`dict[str, RefDef]`) – The reference definitions for the provider.
+- **`commit_max_length`** – The maximum length of a commit hash.
+- **`commit_min_length`** – The minimum length of a commit hash.
+- **`namespace`** (`str`) – The namespace for the provider.
+- **`project`** (`str`) – The project for the provider.
+- **`project_url`** (`str`) – The project URL for the provider.
+- **`tag_url`** (`str`) – The tag URL for the provider.
+- **`url`** (`str`) – The base URL for the provider.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, namespace: str, project: str, url: str | None = None):
+    """Initialization method.
+
+    Parameters:
+        namespace: The Bitbucket namespace.
+        project: The Bitbucket project.
+        url: The Bitbucket URL.
+    """
+    self.namespace: str = namespace
+    """The namespace for the provider."""
+    self.project: str = project
+    """The project for the provider."""
+    self.url: str = url or self.url
+    """The URL for the provider."""
+```
+
+### REF
+
+```
+REF: dict[str, RefDef] = {
+    "issues": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="#"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+    ),
+    "merge_requests": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="!"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/merge_requests/{ref}",
+    ),
+    "snippets": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="\\$"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/snippets/{ref}",
+    ),
+    "labels_ids": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="~"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
+    ),
+    "labels_one_word": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="~"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
+    ),
+    "labels_multi_word": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="~"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
+    ),
+    "milestones_ids": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="%"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/milestones/{ref}",
+    ),
+    "milestones_one_word": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="%"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/milestones",
+    ),
+    "milestones_multi_word": RefDef(
+        regex=compile(
+            BB + NP + "?" + format(symbol="%"), I
+        ),
+        url_string="{base_url}/{namespace}/{project}/milestones",
+    ),
+    "commits": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+                ba=BA,
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/commit/{ref}",
+    ),
+    "commits_ranges": RefDef(
+        regex=compile(
+            BB
+            + format(
+                np=NP,
+                commit_range=format(
+                    min=commit_min_length,
+                    max=commit_max_length,
+                ),
+            ),
+            I,
+        ),
+        url_string="{base_url}/{namespace}/{project}/compare/{ref}",
+    ),
+    "mentions": RefDef(
+        regex=compile(BB + MENTION, I),
+        url_string="{base_url}/{ref}",
+    ),
+}
+```
+
+The reference definitions for the provider.
+
+### commit_max_length
+
+```
+commit_max_length = 40
+```
+
+The maximum length of a commit hash.
+
+### commit_min_length
+
+```
+commit_min_length = 8
+```
+
+The minimum length of a commit hash.
+
+### namespace
+
+```
+namespace: str = namespace
+```
+
+The namespace for the provider.
+
+### project
+
+```
+project: str = project
+```
+
+The project for the provider.
+
+### project_url
+
+```
+project_url: str = '{base_url}/{namespace}/{project}'
+```
+
+The project URL for the provider.
+
+### tag_url
+
+```
+tag_url: str = "{base_url}/{namespace}/{project}/tags/{ref}"
+```
+
+The tag URL for the provider.
+
+### url
+
+```
+url: str = 'https://gitlab.com'
+```
+
+The base URL for the provider.
+
+### build_ref_url
+
+```
+build_ref_url(
+    ref_type: str, match_dict: dict[str, str]
+) -> str
+```
+
+Build the URL for a reference type and a dictionary of matched groups.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`match_dict`** (`dict[str, str]`) – The matched groups.
+
+Returns:
+
+- `str` – The built URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
+    match_dict["base_url"] = self.url
+    if not match_dict.get("namespace"):
+        match_dict["namespace"] = self.namespace
+    if not match_dict.get("project"):
+        match_dict["project"] = self.project
+    if ref_type.startswith("label"):
+        match_dict["ref"] = match_dict["ref"].replace('"', "").replace(" ", "+")
+    return super().build_ref_url(ref_type, match_dict)
+```
+
+### get_compare_url
+
+```
+get_compare_url(base: str, target: str) -> str
+```
+
+Get the URL for a tag comparison.
+
+Parameters:
+
+- **`base`** (`str`) – The base tag.
+- **`target`** (`str`) – The target tag.
+
+Returns:
+
+- `str` – The comparison URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_compare_url(self, base: str, target: str) -> str:
+    return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})
+```
+
+### get_refs
+
+```
+get_refs(ref_type: str, text: str) -> list[Ref]
+```
+
+Find all references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text in which to search references.
+
+Returns:
+
+- `list[Ref]` – A list of references (instances of Ref).
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_refs(self, ref_type: str, text: str) -> list[Ref]:
+    """Find all references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text in which to search references.
+
+    Returns:
+        A list of references (instances of [Ref][git_changelog.Ref]).
+    """
+    return [
+        Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
+        for match in self.parse_refs(ref_type, text)
+    ]
+```
+
+### get_tag_url
+
+```
+get_tag_url(tag: str = '') -> str
+```
+
+Get the URL for a git tag.
+
+Parameters:
+
+- **`tag`** (`str`) – The git tag.
+
+Returns:
+
+- `str` – The tag URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_tag_url(self, tag: str = "") -> str:
+    return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+```
+
+### parse_refs
+
+```
+parse_refs(ref_type: str, text: str) -> list[Match]
+```
+
+Parse references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text to parse.
+
+Returns:
+
+- `list[Match]` – A list of regular expressions matches.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def parse_refs(self, ref_type: str, text: str) -> list[Match]:
+    """Parse references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text to parse.
+
+    Returns:
+        A list of regular expressions matches.
+    """
+    if ref_type not in self.REF:
+        refs = [key for key in self.REF if key.startswith(ref_type)]
+        return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
+    return list(self.REF[ref_type].regex.finditer(text))
+```
+
+## PEP440Bumper
+
+```
+PEP440Bumper(strategies: tuple[str, ...])
+```
+
+Bases: `VersionBumper`
+
+PEP 440 version bumper.
+
+Parameters:
+
+- **`strategies`** (`tuple[str, ...]`) – The supported bumping strategies.
+
+Methods:
+
+- **`__call__`** – Bump a PEP 440 version.
+
+Attributes:
+
+- **`initial`** (`str`) – The initial version.
+- **`strategies`** – The supported bumping strategies.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __init__(self, strategies: tuple[str, ...]) -> None:
+    """Initialize the bumper.
+
+    Parameters:
+        strategies: The supported bumping strategies.
+    """
+    self.strategies = strategies
+    """The supported bumping strategies."""
+```
+
+### initial
+
+```
+initial: str = '0.0.0'
+```
+
+The initial version.
+
+### strategies
+
+```
+strategies = strategies
+```
+
+The supported bumping strategies.
+
+### __call__
+
+```
+__call__(
+    version: str,
+    strategy: PEP440Strategy = "micro",
+    *,
+    zerover: bool = False,
+    trim: bool = False,
+) -> str
+```
+
+Bump a PEP 440 version.
+
+Parameters:
+
+- **`version`** (`str`) – The version to bump.
+- **`strategy`** (`PEP440Strategy`, default: `'micro'` ) – The part of the version to bump.
+- **`zerover`** (`bool`, default: `False` ) – Keep major version at zero, even for breaking changes.
+- **`trim`** (`bool`, default: `False` ) – Whether to trim all zeroes on the right after bumping.
+
+Returns:
+
+- `str` – The bumped version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __call__(  # type: ignore[override]
+    self,
+    version: str,
+    strategy: PEP440Strategy = "micro",
+    *,
+    zerover: bool = False,
+    trim: bool = False,
+) -> str:
+    """Bump a PEP 440 version.
+
+    Parameters:
+        version: The version to bump.
+        strategy: The part of the version to bump.
+        zerover: Keep major version at zero, even for breaking changes.
+        trim: Whether to trim all zeroes on the right after bumping.
+
+    Returns:
+        The bumped version.
+    """
+    pep440_version, prefix = parse_pep440(version)
+
+    # Split into main part and pre/dev markers
+    # (+alpha, +beta, +candidate, +dev).
+    main_part, *predev = strategy.split("+")
+
+    # Bump main part.
+    if main_part == "epoch":
+        pep440_version = pep440_version.bump_epoch()
+    elif main_part == "release":
+        pep440_version = pep440_version.bump_release(trim=trim)
+    elif main_part == "major":
+        # If major version is 0 and zerover is active, only bump minor.
+        if pep440_version.major == 0 and zerover:
+            pep440_version = pep440_version.bump_minor(trim=trim)
+        else:
+            pep440_version = pep440_version.bump_major(trim=trim)
+    elif main_part == "minor":
+        pep440_version = pep440_version.bump_minor(trim=trim)
+    elif main_part in ("micro", "patch"):
+        pep440_version = pep440_version.bump_micro(trim=trim)
+    elif main_part == "pre":
+        pep440_version = pep440_version.bump_pre()
+    elif main_part == "alpha":
+        pep440_version = pep440_version.bump_alpha()
+    elif main_part == "beta":
+        pep440_version = pep440_version.bump_beta()
+    elif main_part == "candidate":
+        pep440_version = pep440_version.bump_candidate()
+    elif main_part == "post":
+        pep440_version = pep440_version.bump_post()
+    elif main_part == "dev":
+        pep440_version = pep440_version.bump_dev()
+    else:
+        raise ValueError(f"Invalid strategy {main_part}, use one of {', '.join(self.strategies)}")
+
+    # Dent to pre-release (+alpha, +beta, +candidate).
+    if "alpha" in predev:
+        pep440_version = pep440_version.dent_alpha()
+    elif "beta" in predev:
+        pep440_version = pep440_version.dent_beta()
+    elif "candidate" in predev:
+        pep440_version = pep440_version.dent_candidate()
+
+    # Dent to dev-release (+dev).
+    if "dev" in predev:
+        pep440_version = pep440_version.dent_dev()
+
+    # Return new version with preserved prefix.
+    return prefix + str(pep440_version)
+```
+
+## PEP440Version
+
+Bases: `Version`, `ParsedVersion`
+
+PEP 440 version.
+
+Methods:
+
+- **`__eq__`** – Implement == comparison.
+- **`__ge__`** – Implement >= comparison.
+- **`__gt__`** – Implement > comparison.
+- **`__le__`** – Implement \<= comparison.
+- **`__lt__`** – Implement < comparison.
+- **`__ne__`** – Implement != comparison.
+- **`bump_alpha`** – Bump alpha-release.
+- **`bump_beta`** – Bump beta-release.
+- **`bump_candidate`** – Bump candidate release.
+- **`bump_dev`** – Bump dev-release.
+- **`bump_epoch`** – Bump epoch.
+- **`bump_major`** – Bump major.
+- **`bump_micro`** – Bump micro.
+- **`bump_minor`** – Bump minor.
+- **`bump_post`** – Bump post-release.
+- **`bump_pre`** – Bump pre-release.
+- **`bump_release`** – Bump given release level.
+- **`dent_alpha`** – Dent to alpha-release.
+- **`dent_beta`** – Dent to beta-release.
+- **`dent_candidate`** – Dent to candidate release.
+- **`dent_dev`** – Dent to dev-release.
+- **`dent_pre`** – Dent to pre-release.
+- **`from_parts`** – Build a version from its parts.
+
+### __eq__
+
+```
+__eq__(other: object) -> bool
+```
+
+Implement `==` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __eq__(self, other: object) -> bool:
+    """Implement `==` comparison."""
+    ...
+```
+
+### __ge__
+
+```
+__ge__(other: object) -> bool
+```
+
+Implement `>=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ge__(self, other: object) -> bool:
+    """Implement `>=` comparison."""
+    ...
+```
+
+### __gt__
+
+```
+__gt__(other: object) -> bool
+```
+
+Implement `>` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __gt__(self, other: object) -> bool:
+    """Implement `>` comparison."""
+    ...
+```
+
+### __le__
+
+```
+__le__(other: object) -> bool
+```
+
+Implement `<=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __le__(self, other: object) -> bool:
+    """Implement `<=` comparison."""
+    ...
+```
+
+### __lt__
+
+```
+__lt__(other: object) -> bool
+```
+
+Implement `<` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __lt__(self, other: object) -> bool:
+    """Implement `<` comparison."""
+    ...
+```
+
+### __ne__
+
+```
+__ne__(other: object) -> bool
+```
+
+Implement `!=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ne__(self, other: object) -> bool:
+    """Implement `!=` comparison."""
+    ...
+```
+
+### bump_alpha
+
+```
+bump_alpha() -> PEP440Version
+```
+
+Bump alpha-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_alpha()
+ValueError: Cannot bump from release to alpha pre-release (use `dent_alpha`)
+>>> PEP440Version("1a0").bump_alpha()
+<Version('1a1')>
+>>> PEP440Version("1a0").bump_alpha("a")
+<Version('1a1')>
+>>> PEP440Version("1a0.post0").bump_alpha()
+<Version('1a1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, bumped alpha pre-release and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_alpha(self) -> PEP440Version:
+    """Bump alpha-release.
+
+    Examples:
+        >>> PEP440Version("1").bump_alpha()
+        ValueError: Cannot bump from release to alpha pre-release (use `dent_alpha`)
+        >>> PEP440Version("1a0").bump_alpha()
+        <Version('1a1')>
+        >>> PEP440Version("1a0").bump_alpha("a")
+        <Version('1a1')>
+        >>> PEP440Version("1a0.post0").bump_alpha()
+        <Version('1a1')>
+
+    Returns:
+        Version with same epoch, same release, bumped alpha pre-release and the right parts reset to 0 or nothing.
+    """
+    return self.bump_pre("a")
+```
+
+### bump_beta
+
+```
+bump_beta() -> PEP440Version
+```
+
+Bump beta-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_beta()
+ValueError: Cannot bump from release to beta pre-release (use `dent_beta`)
+>>> PEP440Version("1b0").bump_beta()
+<Version('1b1')>
+>>> PEP440Version("1b0").bump_beta()
+<Version('1b1')>
+>>> PEP440Version("1b0.post0").bump_beta()
+<Version('1b1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, bumped beta pre-release and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_beta(self) -> PEP440Version:
+    """Bump beta-release.
+
+    Examples:
+        >>> PEP440Version("1").bump_beta()
+        ValueError: Cannot bump from release to beta pre-release (use `dent_beta`)
+        >>> PEP440Version("1b0").bump_beta()
+        <Version('1b1')>
+        >>> PEP440Version("1b0").bump_beta()
+        <Version('1b1')>
+        >>> PEP440Version("1b0.post0").bump_beta()
+        <Version('1b1')>
+
+    Returns:
+        Version with same epoch, same release, bumped beta pre-release and the right parts reset to 0 or nothing.
+    """
+    return self.bump_pre("b")
+```
+
+### bump_candidate
+
+```
+bump_candidate() -> PEP440Version
+```
+
+Bump candidate release.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_candidate()
+ValueError: Cannot bump from release to candidate pre-release (use `dent_candidate`)
+>>> PEP440Version("1c0").bump_candidate()
+<Version('1rc1')>
+>>> PEP440Version("1c0").bump_candidate()
+<Version('1rc1')>
+>>> PEP440Version("1c0.post0").bump_candidate()
+<Version('1rc1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, bumped candidate pre-release and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_candidate(self) -> PEP440Version:
+    """Bump candidate release.
+
+    Examples:
+        >>> PEP440Version("1").bump_candidate()
+        ValueError: Cannot bump from release to candidate pre-release (use `dent_candidate`)
+        >>> PEP440Version("1c0").bump_candidate()
+        <Version('1rc1')>
+        >>> PEP440Version("1c0").bump_candidate()
+        <Version('1rc1')>
+        >>> PEP440Version("1c0.post0").bump_candidate()
+        <Version('1rc1')>
+
+    Returns:
+        Version with same epoch, same release, bumped candidate pre-release and the right parts reset to 0 or nothing.
+    """
+    return self.bump_pre("rc")
+```
+
+### bump_dev
+
+```
+bump_dev() -> PEP440Version
+```
+
+Bump dev-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_dev()
+ValueError: Cannot bump from release to dev-release (use `dent_dev`)
+>>> PEP440Version("1a0").bump_dev()
+ValueError: Cannot bump from alpha to dev-release (use `dent_dev`)
+>>> PEP440Version("1b1").bump_dev()
+ValueError: Cannot bump from beta to dev-release (use `dent_dev`)
+>>> PEP440Version("1rc2").bump_dev()
+ValueError: Cannot bump from candidate to dev-release (use `dent_dev`)
+>>> PEP440Version("1.post0").bump_dev()
+ValueError: Cannot bump from post to dev-release (use `dent_dev`)
+>>> PEP440Version("1a0.dev1").bump_dev()
+<Version('1a0.dev2')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, same pre-release, same post-release and bumped dev-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_dev(self) -> PEP440Version:
+    """Bump dev-release.
+
+    Examples:
+        >>> PEP440Version("1").bump_dev()
+        ValueError: Cannot bump from release to dev-release (use `dent_dev`)
+        >>> PEP440Version("1a0").bump_dev()
+        ValueError: Cannot bump from alpha to dev-release (use `dent_dev`)
+        >>> PEP440Version("1b1").bump_dev()
+        ValueError: Cannot bump from beta to dev-release (use `dent_dev`)
+        >>> PEP440Version("1rc2").bump_dev()
+        ValueError: Cannot bump from candidate to dev-release (use `dent_dev`)
+        >>> PEP440Version("1.post0").bump_dev()
+        ValueError: Cannot bump from post to dev-release (use `dent_dev`)
+        >>> PEP440Version("1a0.dev1").bump_dev()
+        <Version('1a0.dev2')>
+
+    Returns:
+        Version with same epoch, same release, same pre-release, same post-release and bumped dev-release.
+    """
+    if self.dev is None:
+        if self.post is not None:
+            kind = "p"
+        elif self.pre is not None:
+            kind = self.pre[0]
+        else:
+            kind = "z"
+        raise ValueError(f"Cannot bump from {_release_kind.get(kind, 'release')} to dev-release (use `dent_dev`)")
+    return PEP440Version.from_parts(
+        epoch=self.epoch,
+        release=self.release,
+        pre=self.pre,
+        post=self.post,
+        dev=self.dev + 1,
+    )
+```
+
+### bump_epoch
+
+```
+bump_epoch() -> PEP440Version
+```
+
+Bump epoch.
+
+Examples:
+
+```
+>>> PEP440Version("1.0").bump_epoch()
+<Version('1!1.0')>
+>>> PEP440Version("0!1.0").bump_epoch()
+<Version('1!1.0')>
+>>> PEP440Version("1!1.0").bump_epoch()
+<Version('2!1.0')>
+>>> PEP440Version("1.0a2.post3").bump_epoch()
+<Version('2!1.0')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with bumped epoch, same release, and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_epoch(self) -> PEP440Version:
+    """Bump epoch.
+
+    Examples:
+        >>> PEP440Version("1.0").bump_epoch()
+        <Version('1!1.0')>
+        >>> PEP440Version("0!1.0").bump_epoch()
+        <Version('1!1.0')>
+        >>> PEP440Version("1!1.0").bump_epoch()
+        <Version('2!1.0')>
+        >>> PEP440Version("1.0a2.post3").bump_epoch()
+        <Version('2!1.0')>
+
+    Returns:
+        Version with bumped epoch, same release, and the right parts reset to 0 or nothing.
+    """
+    return PEP440Version.from_parts(epoch=self.epoch + 1, release=self.release)
+```
+
+### bump_major
+
+```
+bump_major(*, trim: bool = False) -> PEP440Version
+```
+
+Bump major.
+
+Parameters:
+
+- **`trim`** (`bool`, default: `False` ) – Whether to trim all zeroes on the right after bumping.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_major()
+<Version('2')>
+>>> PEP440Version("1.1").bump_major()
+<Version('2.0')>
+>>> PEP440Version("1.1.1").bump_major()
+<Version('2.0.0')>
+>>> PEP440Version("1.1.1").bump_major(trim=True)
+<Version('2')>
+>>> PEP440Version("1a2.post3").bump_major()
+<Version('2')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, bumped major and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_major(self, *, trim: bool = False) -> PEP440Version:
+    """Bump major.
+
+    Parameters:
+        trim: Whether to trim all zeroes on the right after bumping.
+
+    Examples:
+        >>> PEP440Version("1").bump_major()
+        <Version('2')>
+        >>> PEP440Version("1.1").bump_major()
+        <Version('2.0')>
+        >>> PEP440Version("1.1.1").bump_major()
+        <Version('2.0.0')>
+        >>> PEP440Version("1.1.1").bump_major(trim=True)
+        <Version('2')>
+        >>> PEP440Version("1a2.post3").bump_major()
+        <Version('2')>
+
+    Returns:
+        Version with same epoch, bumped major and the right parts reset to 0 or nothing.
+    """
+    return self.bump_release(level=0, trim=trim)
+```
+
+### bump_micro
+
+```
+bump_micro(*, trim: bool = False) -> PEP440Version
+```
+
+Bump micro.
+
+Parameters:
+
+- **`trim`** (`bool`, default: `False` ) – Whether to trim all zeroes on the right after bumping.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_micro()
+<Version('1.0.1')>
+>>> PEP440Version("1.1").bump_micro()
+<Version('1.1.1')>
+>>> PEP440Version("1.1.1").bump_micro()
+<Version('1.1.2')>
+>>> PEP440Version("1.1.1").bump_micro()
+<Version('1.1.2')>
+>>> PEP440Version("1.1.1.1").bump_micro()
+<Version('1.1.2.0')>
+>>> PEP440Version("1.1.1.1").bump_micro(trim=True)
+<Version('1.1.2')>
+>>> PEP440Version("1a2.post3").bump_micro()
+<Version('1.0.1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same major, same minor, bumped micro and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_micro(self, *, trim: bool = False) -> PEP440Version:
+    """Bump micro.
+
+    Parameters:
+        trim: Whether to trim all zeroes on the right after bumping.
+
+    Examples:
+        >>> PEP440Version("1").bump_micro()
+        <Version('1.0.1')>
+        >>> PEP440Version("1.1").bump_micro()
+        <Version('1.1.1')>
+        >>> PEP440Version("1.1.1").bump_micro()
+        <Version('1.1.2')>
+        >>> PEP440Version("1.1.1").bump_micro()
+        <Version('1.1.2')>
+        >>> PEP440Version("1.1.1.1").bump_micro()
+        <Version('1.1.2.0')>
+        >>> PEP440Version("1.1.1.1").bump_micro(trim=True)
+        <Version('1.1.2')>
+        >>> PEP440Version("1a2.post3").bump_micro()
+        <Version('1.0.1')>
+
+    Returns:
+        Version with same epoch, same major, same minor, bumped micro and the right parts reset to 0 or nothing.
+    """
+    return self.bump_release(level=2, trim=trim)
+```
+
+### bump_minor
+
+```
+bump_minor(*, trim: bool = False) -> PEP440Version
+```
+
+Bump minor.
+
+Parameters:
+
+- **`trim`** (`bool`, default: `False` ) – Whether to trim all zeroes on the right after bumping.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_minor()
+<Version('1.1')>
+>>> PEP440Version("1.1").bump_minor()
+<Version('1.2')>
+>>> PEP440Version("1.1.1").bump_minor()
+<Version('1.2.0')>
+>>> PEP440Version("1.1.1").bump_minor(trim=True)
+<Version('1.2')>
+>>> PEP440Version("1a2.post3").bump_minor()
+<Version('1.1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same major, bumped minor and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_minor(self, *, trim: bool = False) -> PEP440Version:
+    """Bump minor.
+
+    Parameters:
+        trim: Whether to trim all zeroes on the right after bumping.
+
+    Examples:
+        >>> PEP440Version("1").bump_minor()
+        <Version('1.1')>
+        >>> PEP440Version("1.1").bump_minor()
+        <Version('1.2')>
+        >>> PEP440Version("1.1.1").bump_minor()
+        <Version('1.2.0')>
+        >>> PEP440Version("1.1.1").bump_minor(trim=True)
+        <Version('1.2')>
+        >>> PEP440Version("1a2.post3").bump_minor()
+        <Version('1.1')>
+
+    Returns:
+        Version with same epoch, same major, bumped minor and the right parts reset to 0 or nothing.
+    """
+    return self.bump_release(level=1, trim=trim)
+```
+
+### bump_post
+
+```
+bump_post() -> PEP440Version
+```
+
+Bump post-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_post()
+<Version('1.post0')>
+>>> PEP440Version("1.post0").bump_post()
+<Version('1.post1')>
+>>> PEP440Version("1a0.post0").bump_post()
+<Version('1a0.post1')>
+>>> PEP440Version("1.post0.dev1").bump_post()
+<Version('1.post1')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, same pre-release, bumped post-release and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_post(self) -> PEP440Version:
+    """Bump post-release.
+
+    Examples:
+        >>> PEP440Version("1").bump_post()
+        <Version('1.post0')>
+        >>> PEP440Version("1.post0").bump_post()
+        <Version('1.post1')>
+        >>> PEP440Version("1a0.post0").bump_post()
+        <Version('1a0.post1')>
+        >>> PEP440Version("1.post0.dev1").bump_post()
+        <Version('1.post1')>
+
+    Returns:
+        Version with same epoch, same release, same pre-release, bumped post-release and the right parts reset to 0 or nothing.
+    """
+    post = 0 if self.post is None else self.post + 1
+    return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=self.pre, post=post)
+```
+
+### bump_pre
+
+```
+bump_pre(
+    pre: Literal["a", "b", "c", "rc"] | None = None,
+) -> PEP440Version
+```
+
+Bump pre-release.
+
+Parameters:
+
+- **`pre`** (`Literal['a', 'b', 'c', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_pre()
+ValueError: Cannot bump from release to alpha pre-release (use `dent_pre`)
+>>> PEP440Version("1a0").bump_pre()
+<Version('1a1')>
+>>> PEP440Version("1a0").bump_pre("a")
+<Version('1a1')>
+>>> PEP440Version("1a0.post0").bump_pre()
+<Version('1a1')>
+>>> PEP440Version("1b2").bump_pre("a")
+ValueError: Cannot bump from beta to alpha pre-release (use `dent_alpha`)
+>>> PEP440Version("1c2").bump_pre("a")
+ValueError: Cannot bump from candidate to alpha pre-release (use `dent_alpha`)
+```
+
+```
+>>> PEP440Version("1").bump_pre("b")
+ValueError: Cannot bump from release to beta pre-release (use `dent_beta`)
+>>> PEP440Version("1a2").bump_pre("b")
+<Version('1b0')>
+>>> PEP440Version("1b2").bump_pre("b")
+<Version('1b3')>
+>>> PEP440Version("1c2").bump_pre("b")
+ValueError: Cannot bump from candidate to beta pre-release (use `dent_beta`)
+```
+
+```
+>>> PEP440Version("1").bump_pre("c")
+ValueError: Cannot bump from release to candidate pre-release (use `dent_candidate`)
+>>> PEP440Version("1a2").bump_pre("c")
+<Version('1rc0')>
+>>> PEP440Version("1b2").bump_pre("rc")
+<Version('1rc0')>
+>>> PEP440Version("1rc2").bump_pre("c")
+<Version('1rc3')>
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, same release, bumped pre-release and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+    """Bump pre-release.
+
+    Parameters:
+        pre: Kind of pre-release to bump.
+
+            - a means alpha
+            - b means beta
+            - c or rc means (release) candidate
+
+    Examples:
+        >>> PEP440Version("1").bump_pre()
+        ValueError: Cannot bump from release to alpha pre-release (use `dent_pre`)
+        >>> PEP440Version("1a0").bump_pre()
+        <Version('1a1')>
+        >>> PEP440Version("1a0").bump_pre("a")
+        <Version('1a1')>
+        >>> PEP440Version("1a0.post0").bump_pre()
+        <Version('1a1')>
+        >>> PEP440Version("1b2").bump_pre("a")
+        ValueError: Cannot bump from beta to alpha pre-release (use `dent_alpha`)
+        >>> PEP440Version("1c2").bump_pre("a")
+        ValueError: Cannot bump from candidate to alpha pre-release (use `dent_alpha`)
+
+        >>> PEP440Version("1").bump_pre("b")
+        ValueError: Cannot bump from release to beta pre-release (use `dent_beta`)
+        >>> PEP440Version("1a2").bump_pre("b")
+        <Version('1b0')>
+        >>> PEP440Version("1b2").bump_pre("b")
+        <Version('1b3')>
+        >>> PEP440Version("1c2").bump_pre("b")
+        ValueError: Cannot bump from candidate to beta pre-release (use `dent_beta`)
+
+        >>> PEP440Version("1").bump_pre("c")
+        ValueError: Cannot bump from release to candidate pre-release (use `dent_candidate`)
+        >>> PEP440Version("1a2").bump_pre("c")
+        <Version('1rc0')>
+        >>> PEP440Version("1b2").bump_pre("rc")
+        <Version('1rc0')>
+        >>> PEP440Version("1rc2").bump_pre("c")
+        <Version('1rc3')>
+
+    Returns:
+        Version with same epoch, same release, bumped pre-release and the right parts reset to 0 or nothing.
+    """
+    if self.pre is None:
+        kind = _release_kind.get(pre, "")  # type: ignore[arg-type]
+        raise ValueError(
+            f"Cannot bump from release to {kind + ' ' if kind else ''}pre-release (use `dent_{kind or 'pre'}`)",
+        )
+    current_pre: Literal["a", "b", "c", "rc"]
+    current_pre, number = self.pre  # type: ignore[assignment]
+    if pre is None:
+        pre = current_pre
+    if pre == current_pre:
+        number += 1
+    elif current_pre < pre:
+        number = 0
+    else:
+        raise ValueError(
+            f"Cannot bump from {_release_kind.get(current_pre, 'release')} to {_release_kind[pre]} pre-release (use `dent_{_release_kind[pre]}`)",
+        )
+    return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=(pre, number))
+```
+
+### bump_release
+
+```
+bump_release(
+    level: int | None = None, *, trim: bool = False
+) -> PEP440Version
+```
+
+Bump given release level.
+
+Parameters:
+
+- **`level`** (`int | None`, default: `None` ) – The release level to bump. 0 means major 1 means minor 2 means micro (patch) 3+ don't have names None means move from pre-release to release (unchanged)
+- **`trim`** (`bool`, default: `False` ) – Whether to trim all zeroes on the right after bumping.
+
+Examples:
+
+```
+>>> PEP440Version("1").bump_release(0)
+<Version('2')>
+>>> PEP440Version("1.1").bump_release(0)
+<Version('2.0')>
+>>> PEP440Version("1.1.1").bump_release(0)
+<Version('2.0.0')>
+>>> PEP440Version("1.1.1").bump_release(0, trim=True)
+<Version('2')>
+>>> PEP440Version("1a2.post3").bump_release(0)
+<Version('2')>
+```
+
+```
+>>> PEP440Version("1").bump_release(1)
+<Version('1.1')>
+>>> PEP440Version("1.1").bump_release(1)
+<Version('1.2')>
+>>> PEP440Version("1.1.1").bump_release(1)
+<Version('1.2.0')>
+>>> PEP440Version("1.1.1").bump_release(1, trim=True)
+<Version('1.2')>
+>>> PEP440Version("1a2.post3").bump_release(1)
+<Version('1.1')>
+```
+
+```
+>>> PEP440Version("1a0").bump_release()
+<Version('1')>
+>>> PEP440Version("1b1").bump_release()
+<Version('1')>
+>>> PEP440Version("1rc2").bump_release()
+<Version('1')>
+>>> PEP440Version("1a2.dev0").bump_release()
+<Version('1')>
+>>> PEP440Version("1post0").bump_release()
+ValueError: Cannot bump from post-release to release
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch, bumped release level, and the right parts reset to 0 or nothing.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_release(self, level: int | None = None, *, trim: bool = False) -> PEP440Version:
+    """Bump given release level.
+
+    Parameters:
+        level: The release level to bump.
+
+            - 0 means major
+            - 1 means minor
+            - 2 means micro (patch)
+            - 3+ don't have names
+            - None means move from pre-release to release (unchanged)
+        trim: Whether to trim all zeroes on the right after bumping.
+
+    Examples:
+        >>> PEP440Version("1").bump_release(0)
+        <Version('2')>
+        >>> PEP440Version("1.1").bump_release(0)
+        <Version('2.0')>
+        >>> PEP440Version("1.1.1").bump_release(0)
+        <Version('2.0.0')>
+        >>> PEP440Version("1.1.1").bump_release(0, trim=True)
+        <Version('2')>
+        >>> PEP440Version("1a2.post3").bump_release(0)
+        <Version('2')>
+
+        >>> PEP440Version("1").bump_release(1)
+        <Version('1.1')>
+        >>> PEP440Version("1.1").bump_release(1)
+        <Version('1.2')>
+        >>> PEP440Version("1.1.1").bump_release(1)
+        <Version('1.2.0')>
+        >>> PEP440Version("1.1.1").bump_release(1, trim=True)
+        <Version('1.2')>
+        >>> PEP440Version("1a2.post3").bump_release(1)
+        <Version('1.1')>
+
+        >>> PEP440Version("1a0").bump_release()
+        <Version('1')>
+        >>> PEP440Version("1b1").bump_release()
+        <Version('1')>
+        >>> PEP440Version("1rc2").bump_release()
+        <Version('1')>
+        >>> PEP440Version("1a2.dev0").bump_release()
+        <Version('1')>
+        >>> PEP440Version("1post0").bump_release()
+        ValueError: Cannot bump from post-release to release
+
+    Returns:
+        Version with same epoch, bumped release level, and the right parts reset to 0 or nothing.
+    """
+    release = list(self.release)
+
+    # When level is not specified, user wants to bump the version
+    # as a "release", going out of alpha/beta/candidate phase.
+    # So we simply keep the release part as it is, optionally trimming it.
+    if level is None:
+        # However if this is a post-release, this is an error:
+        # we can't bump from a post-release to the same, regular release.
+        if self.post is not None:
+            raise ValueError("Cannot bump from post-release to release")
+        if trim:
+            while release[-1] == 0:
+                release.pop()
+
+    # When level is specified, we bump the specified level.
+    # If the given level is higher that the number of release parts,
+    # we insert the missing parts as 0.
+    else:
+        try:
+            release[level] += 1
+        except IndexError:
+            while len(release) < level:
+                release.append(0)
+            release.append(1)
+        if trim:
+            release = release[: level + 1]
+        else:
+            for index in range(level + 1, len(release)):
+                release[index] = 0
+
+    # We rebuild the version with same epoch, updated release,
+    # and pre/post/dev parts dropped.
+    return PEP440Version.from_parts(epoch=self.epoch, release=tuple(release))
+```
+
+### dent_alpha
+
+```
+dent_alpha() -> PEP440Version
+```
+
+Dent to alpha-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").dent_alpha()
+<Version('1a0')>
+>>> PEP440Version("1a0").dent_alpha()
+ValueError: Cannot dent alpha pre-releases
+>>> PEP440Version("1b0").dent_alpha()
+ValueError: Cannot dent beta pre-releases
+>>> PEP440Version("1rc0").dent_alpha()
+ValueError: Cannot dent candidate pre-releases
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch and release dented to alpha pre-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def dent_alpha(self) -> PEP440Version:
+    """Dent to alpha-release.
+
+    Examples:
+        >>> PEP440Version("1").dent_alpha()
+        <Version('1a0')>
+        >>> PEP440Version("1a0").dent_alpha()
+        ValueError: Cannot dent alpha pre-releases
+        >>> PEP440Version("1b0").dent_alpha()
+        ValueError: Cannot dent beta pre-releases
+        >>> PEP440Version("1rc0").dent_alpha()
+        ValueError: Cannot dent candidate pre-releases
+
+    Returns:
+        Version with same epoch and release dented to alpha pre-release.
+    """
+    return self.dent_pre("a")
+```
+
+### dent_beta
+
+```
+dent_beta() -> PEP440Version
+```
+
+Dent to beta-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").dent_beta()
+<Version('1b0')>
+>>> PEP440Version("1a0").dent_beta()
+ValueError: Cannot dent alpha pre-releases
+>>> PEP440Version("1b0").dent_beta()
+ValueError: Cannot dent beta pre-releases
+>>> PEP440Version("1rc0").dent_beta()
+ValueError: Cannot dent candidate pre-releases
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch and release dented to beta pre-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def dent_beta(self) -> PEP440Version:
+    """Dent to beta-release.
+
+    Examples:
+        >>> PEP440Version("1").dent_beta()
+        <Version('1b0')>
+        >>> PEP440Version("1a0").dent_beta()
+        ValueError: Cannot dent alpha pre-releases
+        >>> PEP440Version("1b0").dent_beta()
+        ValueError: Cannot dent beta pre-releases
+        >>> PEP440Version("1rc0").dent_beta()
+        ValueError: Cannot dent candidate pre-releases
+
+    Returns:
+        Version with same epoch and release dented to beta pre-release.
+    """
+    return self.dent_pre("b")
+```
+
+### dent_candidate
+
+```
+dent_candidate() -> PEP440Version
+```
+
+Dent to candidate release.
+
+Examples:
+
+```
+>>> PEP440Version("1").dent_candidate()
+<Version('1rc0')>
+>>> PEP440Version("1a0").dent_candidate()
+ValueError: Cannot dent alpha pre-releases
+>>> PEP440Version("1b0").dent_candidate()
+ValueError: Cannot dent beta pre-releases
+>>> PEP440Version("1rc0").dent_candidate()
+ValueError: Cannot dent candidate pre-releases
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch and release dented to candidate pre-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def dent_candidate(self) -> PEP440Version:
+    """Dent to candidate release.
+
+    Examples:
+        >>> PEP440Version("1").dent_candidate()
+        <Version('1rc0')>
+        >>> PEP440Version("1a0").dent_candidate()
+        ValueError: Cannot dent alpha pre-releases
+        >>> PEP440Version("1b0").dent_candidate()
+        ValueError: Cannot dent beta pre-releases
+        >>> PEP440Version("1rc0").dent_candidate()
+        ValueError: Cannot dent candidate pre-releases
+
+    Returns:
+        Version with same epoch and release dented to candidate pre-release.
+    """
+    return self.dent_pre("rc")
+```
+
+### dent_dev
+
+```
+dent_dev() -> PEP440Version
+```
+
+Dent to dev-release.
+
+Examples:
+
+```
+>>> PEP440Version("1").dent_dev()
+<Version('1.dev0')>
+>>> PEP440Version("1a0").dent_dev()
+<Version('1a0.dev0')>
+>>> PEP440Version("1b1").dent_dev()
+<Version('1b1.dev0')>
+>>> PEP440Version("1c2").dent_dev()
+<Version('1rc2.dev0')>
+>>> PEP440Version("1.post0").dent_dev()
+<Version('1.post0.dev0')>
+>>> PEP440Version("1a0.dev1").dent_dev()
+ValueError: Cannot dent dev-releases
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch and release dented to dev-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def dent_dev(self) -> PEP440Version:
+    """Dent to dev-release.
+
+    Examples:
+        >>> PEP440Version("1").dent_dev()
+        <Version('1.dev0')>
+        >>> PEP440Version("1a0").dent_dev()
+        <Version('1a0.dev0')>
+        >>> PEP440Version("1b1").dent_dev()
+        <Version('1b1.dev0')>
+        >>> PEP440Version("1c2").dent_dev()
+        <Version('1rc2.dev0')>
+        >>> PEP440Version("1.post0").dent_dev()
+        <Version('1.post0.dev0')>
+        >>> PEP440Version("1a0.dev1").dent_dev()
+        ValueError: Cannot dent dev-releases
+
+    Returns:
+        Version with same epoch and release dented to dev-release.
+    """
+    if self.dev is not None:
+        raise ValueError("Cannot dent dev-releases")
+    return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=self.pre, post=self.post, dev=0)
+```
+
+### dent_pre
+
+```
+dent_pre(
+    pre: Literal["a", "b", "c", "rc"] | None = None,
+) -> PEP440Version
+```
+
+Dent to pre-release.
+
+This method dents a release down to an alpha, beta or candidate pre-release.
+
+Parameters:
+
+- **`pre`** (`Literal['a', 'b', 'c', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
+
+Examples:
+
+```
+>>> PEP440Version("1").dent_pre()
+<Version('1a0')>
+>>> PEP440Version("1").dent_pre("a")
+<Version('1a0')>
+>>> PEP440Version("1a0").dent_pre("a")
+ValueError: Cannot dent alpha pre-releases
+>>> PEP440Version("1").dent_pre("b")
+<Version('1b0')>
+>>> PEP440Version("1b0").dent_pre("b")
+ValueError: Cannot dent beta pre-releases
+>>> PEP440Version("1").dent_pre("c")
+<Version('1rc0')>
+>>> PEP440Version("1").dent_pre("rc")
+<Version('1rc0')>
+>>> PEP440Version("1rc0").dent_pre("c")
+ValueError: Cannot dent candidate pre-releases
+```
+
+Returns:
+
+- `PEP440Version` – Version with same epoch and release dented to pre-release.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def dent_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+    """Dent to pre-release.
+
+    This method dents a release down to an alpha, beta or candidate pre-release.
+
+    Parameters:
+        pre: Kind of pre-release to bump.
+
+            - a means alpha
+            - b means beta
+            - c or rc means (release) candidate
+
+    Examples:
+        >>> PEP440Version("1").dent_pre()
+        <Version('1a0')>
+        >>> PEP440Version("1").dent_pre("a")
+        <Version('1a0')>
+        >>> PEP440Version("1a0").dent_pre("a")
+        ValueError: Cannot dent alpha pre-releases
+        >>> PEP440Version("1").dent_pre("b")
+        <Version('1b0')>
+        >>> PEP440Version("1b0").dent_pre("b")
+        ValueError: Cannot dent beta pre-releases
+        >>> PEP440Version("1").dent_pre("c")
+        <Version('1rc0')>
+        >>> PEP440Version("1").dent_pre("rc")
+        <Version('1rc0')>
+        >>> PEP440Version("1rc0").dent_pre("c")
+        ValueError: Cannot dent candidate pre-releases
+
+    Returns:
+        Version with same epoch and release dented to pre-release.
+    """
+    if self.pre is not None:
+        raise ValueError(f"Cannot dent {_release_kind[self.pre[0]]} pre-releases")
+    if pre is None:
+        pre = "a"
+    return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=(pre, 0))
+```
+
+### from_parts
+
+```
+from_parts(
+    epoch: int | None = None,
+    release: tuple[int, ...] | None = None,
+    pre: tuple[str, int] | None = None,
+    post: int | None = None,
+    dev: int | None = None,
+) -> PEP440Version
+```
+
+Build a version from its parts.
+
+Parameters:
+
+- **`epoch`** (`int | None`, default: `None` ) – Version's epoch number.
+- **`release`** (`tuple[int, ...] | None`, default: `None` ) – Version's release numbers.
+- **`pre`** (`tuple[str, int] | None`, default: `None` ) – Version's prerelease kind and number.
+- **`post`** (`int | None`, default: `None` ) – Version's post number.
+- **`dev`** (`int | None`, default: `None` ) – Version's dev number.
+
+Returns:
+
+- `PEP440Version` – A PEP 440 version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+@classmethod
+def from_parts(
+    cls,
+    epoch: int | None = None,
+    release: tuple[int, ...] | None = None,
+    pre: tuple[str, int] | None = None,
+    post: int | None = None,
+    dev: int | None = None,
+) -> PEP440Version:
+    """Build a version from its parts.
+
+    Parameters:
+        epoch: Version's epoch number.
+        release: Version's release numbers.
+        pre: Version's prerelease kind and number.
+        post: Version's post number.
+        dev: Version's dev number.
+
+    Returns:
+        A PEP 440 version.
+    """
+    # Since the original class only allows instantiating a version
+    # by passing a string, we first create a dummy version "1"
+    # and then re-assign its internal `_version` with the real one.
+    version = cls("1")
+    version._version = packaging_version._Version(
+        epoch=epoch or 0,
+        release=release or (),
+        pre=pre,
+        post=None if post is None else ("post", post),
+        dev=None if dev is None else ("dev", dev),
+        local=None,
+    )
+
+    # We also have to update its `_key` attribute.
+    # This is a hack and I would prefer that such functionality
+    # is exposed directly in the original class.
+    version._key = packaging_version._cmpkey(
+        version._version.epoch,
+        version._version.release,
+        version._version.pre,
+        version._version.post,
+        version._version.dev,
+        version._version.local,
+    )
+
+    return version
+```
+
+## ParsedVersion
+
+Bases: `Protocol`
+
+Base class for versioning schemes.
+
+Methods:
+
+- **`__eq__`** – Implement == comparison.
+- **`__ge__`** – Implement >= comparison.
+- **`__gt__`** – Implement > comparison.
+- **`__le__`** – Implement \<= comparison.
+- **`__lt__`** – Implement < comparison.
+- **`__ne__`** – Implement != comparison.
+
+### __eq__
+
+```
+__eq__(other: object) -> bool
+```
+
+Implement `==` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __eq__(self, other: object) -> bool:
+    """Implement `==` comparison."""
+    ...
+```
+
+### __ge__
+
+```
+__ge__(other: object) -> bool
+```
+
+Implement `>=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ge__(self, other: object) -> bool:
+    """Implement `>=` comparison."""
+    ...
+```
+
+### __gt__
+
+```
+__gt__(other: object) -> bool
+```
+
+Implement `>` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __gt__(self, other: object) -> bool:
+    """Implement `>` comparison."""
+    ...
+```
+
+### __le__
+
+```
+__le__(other: object) -> bool
+```
+
+Implement `<=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __le__(self, other: object) -> bool:
+    """Implement `<=` comparison."""
+    ...
+```
+
+### __lt__
+
+```
+__lt__(other: object) -> bool
+```
+
+Implement `<` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __lt__(self, other: object) -> bool:
+    """Implement `<` comparison."""
+    ...
+```
+
+### __ne__
+
+```
+__ne__(other: object) -> bool
+```
+
+Implement `!=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ne__(self, other: object) -> bool:
+    """Implement `!=` comparison."""
+    ...
+```
+
+## ProviderRefParser
+
+```
+ProviderRefParser(
+    namespace: str, project: str, url: str | None = None
+)
+```
+
+Bases: `ABC`
+
+A base class for specific providers reference parsers.
+
+Parameters:
+
+- **`namespace`** (`str`) – The Bitbucket namespace.
+- **`project`** (`str`) – The Bitbucket project.
+- **`url`** (`str | None`, default: `None` ) – The Bitbucket URL.
+
+Methods:
+
+- **`build_ref_url`** – Build the URL for a reference type and a dictionary of matched groups.
+- **`get_compare_url`** – Get the URL for a tag comparison.
+- **`get_refs`** – Find all references in the given text.
+- **`get_tag_url`** – Get the URL for a git tag.
+- **`parse_refs`** – Parse references in the given text.
+
+Attributes:
+
+- **`REF`** (`dict[str, RefDef]`) – The reference definitions for the provider.
+- **`namespace`** (`str`) – The namespace for the provider.
+- **`project`** (`str`) – The project for the provider.
+- **`url`** (`str`) – The URL for the provider.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, namespace: str, project: str, url: str | None = None):
+    """Initialization method.
+
+    Parameters:
+        namespace: The Bitbucket namespace.
+        project: The Bitbucket project.
+        url: The Bitbucket URL.
+    """
+    self.namespace: str = namespace
+    """The namespace for the provider."""
+    self.project: str = project
+    """The project for the provider."""
+    self.url: str = url or self.url
+    """The URL for the provider."""
+```
+
+### REF
+
+```
+REF: dict[str, RefDef] = {}
+```
+
+The reference definitions for the provider.
+
+### namespace
+
+```
+namespace: str = namespace
+```
+
+The namespace for the provider.
+
+### project
+
+```
+project: str = project
+```
+
+The project for the provider.
+
+### url
+
+```
+url: str = url or url
+```
+
+The URL for the provider.
+
+### build_ref_url
+
+```
+build_ref_url(
+    ref_type: str, match_dict: dict[str, str]
+) -> str
+```
+
+Build the URL for a reference type and a dictionary of matched groups.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`match_dict`** (`dict[str, str]`) – The matched groups.
+
+Returns:
+
+- `str` – The built URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
+    """Build the URL for a reference type and a dictionary of matched groups.
+
+    Parameters:
+        ref_type: The reference type.
+        match_dict: The matched groups.
+
+    Returns:
+        The built URL.
+    """
+    return self.REF[ref_type].url_string.format(**match_dict)
+```
+
+### get_compare_url
+
+```
+get_compare_url(base: str, target: str) -> str
+```
+
+Get the URL for a tag comparison.
+
+Parameters:
+
+- **`base`** (`str`) – The base tag.
+- **`target`** (`str`) – The target tag.
+
+Returns:
+
+- `str` – The comparison URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+@abstractmethod
+def get_compare_url(self, base: str, target: str) -> str:
+    """Get the URL for a tag comparison.
+
+    Parameters:
+        base: The base tag.
+        target: The target tag.
+
+    Returns:
+        The comparison URL.
+    """
+    raise NotImplementedError
+```
+
+### get_refs
+
+```
+get_refs(ref_type: str, text: str) -> list[Ref]
+```
+
+Find all references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text in which to search references.
+
+Returns:
+
+- `list[Ref]` – A list of references (instances of Ref).
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def get_refs(self, ref_type: str, text: str) -> list[Ref]:
+    """Find all references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text in which to search references.
+
+    Returns:
+        A list of references (instances of [Ref][git_changelog.Ref]).
+    """
+    return [
+        Ref(ref=match.group().strip(), url=self.build_ref_url(ref_type, match.groupdict()))
+        for match in self.parse_refs(ref_type, text)
+    ]
+```
+
+### get_tag_url
+
+```
+get_tag_url(tag: str) -> str
+```
+
+Get the URL for a git tag.
+
+Parameters:
+
+- **`tag`** (`str`) – The git tag.
+
+Returns:
+
+- `str` – The tag URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+@abstractmethod
+def get_tag_url(self, tag: str) -> str:
+    """Get the URL for a git tag.
+
+    Parameters:
+        tag: The git tag.
+
+    Returns:
+        The tag URL.
+    """
+    raise NotImplementedError
+```
+
+### parse_refs
+
+```
+parse_refs(ref_type: str, text: str) -> list[Match]
+```
+
+Parse references in the given text.
+
+Parameters:
+
+- **`ref_type`** (`str`) – The reference type.
+- **`text`** (`str`) – The text to parse.
+
+Returns:
+
+- `list[Match]` – A list of regular expressions matches.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def parse_refs(self, ref_type: str, text: str) -> list[Match]:
+    """Parse references in the given text.
+
+    Parameters:
+        ref_type: The reference type.
+        text: The text to parse.
+
+    Returns:
+        A list of regular expressions matches.
+    """
+    if ref_type not in self.REF:
+        refs = [key for key in self.REF if key.startswith(ref_type)]
+        return [match for ref in refs for match in self.REF[ref].regex.finditer(text)]
+    return list(self.REF[ref_type].regex.finditer(text))
+```
+
+## Ref
+
+```
+Ref(ref: str, url: str)
+```
+
+A class to represent a reference and its URL.
+
+Parameters:
+
+- **`ref`** (`str`) – The reference text.
+- **`url`** (`str`) – The reference URL.
+
+Attributes:
+
+- **`ref`** (`str`) – The reference text.
+- **`url`** (`str`) – The reference URL.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, ref: str, url: str) -> None:
+    """Initialization method.
+
+    Parameters:
+        ref: The reference text.
+        url: The reference URL.
+    """
+    self.ref: str = ref
+    """The reference text."""
+    self.url: str = url
+    """The reference URL."""
+```
+
+### ref
+
+```
+ref: str = ref
+```
+
+The reference text.
+
+### url
+
+```
+url: str = url
+```
+
+The reference URL.
+
+## RefDef
+
+```
+RefDef(regex: Pattern, url_string: str)
+```
+
+A class to store a reference regular expression and URL building string.
+
+Parameters:
+
+- **`regex`** (`Pattern`) – The regular expression to match the reference.
+- **`url_string`** (`str`) – The URL string to format using matched groups.
+
+Attributes:
+
+- **`regex`** – The regular expression to match the reference.
+- **`url_string`** – The URL string to format using matched groups.
+
+Source code in `src/git_changelog/_internal/providers.py`
+
+```
+def __init__(self, regex: Pattern, url_string: str):
+    """Initialization method.
+
+    Parameters:
+        regex: The regular expression to match the reference.
+        url_string: The URL string to format using matched groups.
+    """
+    self.regex = regex
+    """The regular expression to match the reference."""
+    self.url_string = url_string
+    """The URL string to format using matched groups."""
+```
+
+### regex
+
+```
+regex = regex
+```
+
+The regular expression to match the reference.
+
+### url_string
+
+```
+url_string = url_string
+```
+
+The URL string to format using matched groups.
+
+## RefRe
+
+An enum helper to store parts of regular expressions for references.
+
+Attributes:
+
+- **`BA`** – Blank after the reference.
+- **`BB`** – Blank before the reference.
+- **`COMMIT`** – Commit hash.
+- **`COMMIT_RANGE`** – Commit range.
+- **`ID`** – Issue or pull request ID.
+- **`MENTION`** – Mention.
+- **`MULTI_WORD`** – Multi word reference.
+- **`NP`** – Namespace and project.
+- **`ONE_WORD`** – One word reference.
+
+### BA
+
+```
+BA = '(?:[\\s,]|$)'
+```
+
+Blank after the reference.
+
+### BB
+
+```
+BB = '(?:^|[\\s,])'
+```
+
+Blank before the reference.
+
+### COMMIT
+
+```
+COMMIT = '(?P<ref>[0-9a-f]{{{min},{max}}})'
+```
+
+Commit hash.
+
+### COMMIT_RANGE
+
+```
+COMMIT_RANGE = "(?P<ref>[0-9a-f]{{{min},{max}}}\\.\\.\\.[0-9a-f]{{{min},{max}}})"
+```
+
+Commit range.
+
+### ID
+
+```
+ID = '{symbol}(?P<ref>[1-9]\\d*)'
+```
+
+Issue or pull request ID.
+
+### MENTION
+
+```
+MENTION = '@(?P<ref>\\w[-\\w]*)'
+```
+
+Mention.
+
+### MULTI_WORD
+
+```
+MULTI_WORD = '{symbol}(?P<ref>"\\w[- \\w]*")'
+```
+
+Multi word reference.
+
+### NP
+
+```
+NP = '(?:(?P<namespace>[-\\w]+)/)?(?P<project>[-\\w]+)'
+```
+
+Namespace and project.
+
+### ONE_WORD
+
+```
+ONE_WORD = '{symbol}(?P<ref>\\w*[-a-z_ ][-\\w]*)'
+```
+
+One word reference.
+
+## Section
+
+```
+Section(
+    section_type: str = "",
+    commits: list[Commit] | None = None,
+)
+```
+
+A list of commits grouped by section_type.
+
+Parameters:
+
+- **`section_type`** (`str`, default: `''` ) – The section section_type.
+- **`commits`** (`list[Commit] | None`, default: `None` ) – The list of commits.
+
+Attributes:
+
+- **`commits`** (`list[Commit]`) – The list of commits.
+- **`type`** (`str`) – The section type.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def __init__(self, section_type: str = "", commits: list[Commit] | None = None):
+    """Initialization method.
+
+    Parameters:
+        section_type: The section section_type.
+        commits: The list of commits.
+    """
+    self.type: str = section_type
+    """The section type."""
+    self.commits: list[Commit] = commits or []
+    """The list of commits."""
+```
+
+### commits
+
+```
+commits: list[Commit] = commits or []
+```
+
+The list of commits.
+
+### type
+
+```
+type: str = section_type
+```
+
+The section type.
+
+## SemVerBumper
+
+```
+SemVerBumper(strategies: tuple[str, ...])
+```
+
+Bases: `VersionBumper`
+
+SemVer version bumper.
+
+Parameters:
+
+- **`strategies`** (`tuple[str, ...]`) – The supported bumping strategies.
+
+Methods:
+
+- **`__call__`** – Bump a SemVer version.
+
+Attributes:
+
+- **`initial`** (`str`) – The initial version.
+- **`strategies`** – The supported bumping strategies.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __init__(self, strategies: tuple[str, ...]) -> None:
+    """Initialize the bumper.
+
+    Parameters:
+        strategies: The supported bumping strategies.
+    """
+    self.strategies = strategies
+    """The supported bumping strategies."""
+```
+
+### initial
+
+```
+initial: str = '0.0.0'
+```
+
+The initial version.
+
+### strategies
+
+```
+strategies = strategies
+```
+
+The supported bumping strategies.
+
+### __call__
+
+```
+__call__(
+    version: str,
+    strategy: SemVerStrategy = "patch",
+    *,
+    zerover: bool = True,
+) -> str
+```
+
+Bump a SemVer version.
+
+Parameters:
+
+- **`version`** (`str`) – The version to bump.
+- **`strategy`** (`SemVerStrategy`, default: `'patch'` ) – The bumping strategy to use.
+- **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
+
+Returns:
+
+- `str` – The bumped version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __call__(  # type: ignore[override]
+    self,
+    version: str,
+    strategy: SemVerStrategy = "patch",
+    *,
+    zerover: bool = True,
+) -> str:
+    """Bump a SemVer version.
+
+    Parameters:
+        version: The version to bump.
+        strategy: The bumping strategy to use.
+        zerover: Keep major version at zero, even for breaking changes.
+
+    Returns:
+        The bumped version.
+    """
+    semver_version, prefix = parse_semver(version)
+    if strategy == "major":
+        if semver_version.major == 0 and zerover:
+            semver_version = semver_version.bump_minor()
+        else:
+            semver_version = semver_version.bump_major()
+    elif strategy == "minor":
+        semver_version = semver_version.bump_minor()
+    elif strategy == "patch":
+        semver_version = semver_version.bump_patch()
+    elif strategy == "release":
+        semver_version = semver_version.bump_release()
+    else:
+        raise ValueError(f"Invalid strategy {strategy}, use one of {', '.join(self.strategies)}")
+    return prefix + str(semver_version)
+```
+
+## SemVerVersion
+
+Bases: `Version`, `ParsedVersion`
+
+SemVer version.
+
+Methods:
+
+- **`__eq__`** – Implement == comparison.
+- **`__ge__`** – Implement >= comparison.
+- **`__gt__`** – Implement > comparison.
+- **`__le__`** – Implement \<= comparison.
+- **`__lt__`** – Implement < comparison.
+- **`__ne__`** – Implement != comparison.
+- **`bump_major`** – Bump the major version.
+- **`bump_minor`** – Bump the minor version.
+- **`bump_patch`** – Bump the patch version.
+- **`bump_release`** – Bump from a pre-release to the same, regular release.
+
+### __eq__
+
+```
+__eq__(other: object) -> bool
+```
+
+Implement `==` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __eq__(self, other: object) -> bool:
+    """Implement `==` comparison."""
+    ...
+```
+
+### __ge__
+
+```
+__ge__(other: object) -> bool
+```
+
+Implement `>=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ge__(self, other: object) -> bool:
+    """Implement `>=` comparison."""
+    ...
+```
+
+### __gt__
+
+```
+__gt__(other: object) -> bool
+```
+
+Implement `>` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __gt__(self, other: object) -> bool:
+    """Implement `>` comparison."""
+    ...
+```
+
+### __le__
+
+```
+__le__(other: object) -> bool
+```
+
+Implement `<=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __le__(self, other: object) -> bool:
+    """Implement `<=` comparison."""
+    ...
+```
+
+### __lt__
+
+```
+__lt__(other: object) -> bool
+```
+
+Implement `<` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __lt__(self, other: object) -> bool:
+    """Implement `<` comparison."""
+    ...
+```
+
+### __ne__
+
+```
+__ne__(other: object) -> bool
+```
+
+Implement `!=` comparison.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __ne__(self, other: object) -> bool:
+    """Implement `!=` comparison."""
+    ...
+```
+
+### bump_major
+
+```
+bump_major() -> SemVerVersion
+```
+
+Bump the major version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_major(self) -> SemVerVersion:
+    """Bump the major version."""
+    return SemVerVersion(*super().bump_major())  # type: ignore[misc]
+```
+
+### bump_minor
+
+```
+bump_minor() -> SemVerVersion
+```
+
+Bump the minor version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_minor(self) -> SemVerVersion:
+    """Bump the minor version."""
+    return SemVerVersion(*super().bump_minor())  # type: ignore[misc]
+```
+
+### bump_patch
+
+```
+bump_patch() -> SemVerVersion
+```
+
+Bump the patch version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_patch(self) -> SemVerVersion:
+    """Bump the patch version."""
+    return SemVerVersion(*super().bump_patch())  # type: ignore[misc]
+```
+
+### bump_release
+
+```
+bump_release() -> SemVerVersion
+```
+
+Bump from a pre-release to the same, regular release.
+
+Returns:
+
+- `SemVerVersion` – The same version, without pre-release or build metadata.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def bump_release(self) -> SemVerVersion:
+    """Bump from a pre-release to the same, regular release.
+
+    Returns:
+        The same version, without pre-release or build metadata.
+    """
+    return SemVerVersion(self.major, self.minor, self.patch)
+```
+
+## Templates
+
+Bases: `tuple`
+
+Helper to pick a template on the command line.
+
+Methods:
+
+- **`__contains__`** – Check if the template is in the list.
+
+### __contains__
+
+```
+__contains__(item: object) -> bool
+```
+
+Check if the template is in the list.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def __contains__(self, item: object) -> bool:
+    """Check if the template is in the list."""
+    if isinstance(item, str):
+        return item.startswith("path:") or super().__contains__(item)
+    return False
+```
+
+## Version
+
+```
+Version(
+    tag: str = "",
+    date: date | None = None,
+    sections: list[Section] | None = None,
+    commits: list[Commit] | None = None,
+    url: str = "",
+    compare_url: str = "",
+)
+```
+
+A class to represent a changelog version.
+
+Parameters:
+
+- **`tag`** (`str`, default: `''` ) – The version tag.
+- **`date`** (`date | None`, default: `None` ) – The version date.
+- **`sections`** (`list[Section] | None`, default: `None` ) – The version sections.
+- **`commits`** (`list[Commit] | None`, default: `None` ) – The version commits.
+- **`url`** (`str`, default: `''` ) – The version URL.
+- **`compare_url`** (`str`, default: `''` ) – The version 'compare' URL.
+
+Methods:
+
+- **`add_commit`** – Register the given commit and add it to the relevant section based on its message convention.
+
+Attributes:
+
+- **`commits`** (`list[Commit]`) – The version commits.
+- **`compare_url`** (`str`) – The version 'compare' URL.
+- **`date`** – The version date.
+- **`is_major`** (`bool`) – Tell if this version is a major one.
+- **`is_minor`** (`bool`) – Tell if this version is a minor one.
+- **`next_version`** (`Version | None`) – The next version.
+- **`planned_tag`** (`str | None`) – The planned version tag.
+- **`previous_version`** (`Version | None`) – The previous version.
+- **`sections_dict`** (`dict[str, Section]`) – The version sections (dict).
+- **`sections_list`** (`list[Section]`) – The version sections (list).
+- **`tag`** – The version tag.
+- **`typed_sections`** (`list[Section]`) – Return typed sections only.
+- **`untyped_section`** (`Section | None`) – Return untyped section if any.
+- **`url`** (`str`) – The version URL.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def __init__(
+    self,
+    tag: str = "",
+    date: datetime.date | None = None,
+    sections: list[Section] | None = None,
+    commits: list[Commit] | None = None,
+    url: str = "",
+    compare_url: str = "",
+):
+    """Initialization method.
+
+    Parameters:
+        tag: The version tag.
+        date: The version date.
+        sections: The version sections.
+        commits: The version commits.
+        url: The version URL.
+        compare_url: The version 'compare' URL.
+    """
+    self.tag = tag
+    """The version tag."""
+    self.date = date
+    """The version date."""
+
+    self.sections_list: list[Section] = sections or []
+    """The version sections (list)."""
+    self.sections_dict: dict[str, Section] = {section.type: section for section in self.sections_list}
+    """The version sections (dict)."""
+    self.commits: list[Commit] = commits or []
+    """The version commits."""
+    self.url: str = url
+    """The version URL."""
+    self.compare_url: str = compare_url
+    """The version 'compare' URL."""
+    self.previous_version: Version | None = None
+    """The previous version."""
+    self.next_version: Version | None = None
+    """The next version."""
+    self.planned_tag: str | None = None
+    """The planned version tag."""
+```
+
+### commits
+
+```
+commits: list[Commit] = commits or []
+```
+
+The version commits.
+
+### compare_url
+
+```
+compare_url: str = compare_url
+```
+
+The version 'compare' URL.
+
+### date
+
+```
+date = date
+```
+
+The version date.
+
+### is_major
+
+```
+is_major: bool
+```
+
+Tell if this version is a major one.
+
+Returns:
+
+- `bool` – Whether this version is major.
+
+### is_minor
+
+```
+is_minor: bool
+```
+
+Tell if this version is a minor one.
+
+Returns:
+
+- `bool` – Whether this version is minor.
+
+### next_version
+
+```
+next_version: Version | None = None
+```
+
+The next version.
+
+### planned_tag
+
+```
+planned_tag: str | None = None
+```
+
+The planned version tag.
+
+### previous_version
+
+```
+previous_version: Version | None = None
+```
+
+The previous version.
+
+### sections_dict
+
+```
+sections_dict: dict[str, Section] = {(type): _QK8Fuifor section in (sections_list)}
+```
+
+The version sections (dict).
+
+### sections_list
+
+```
+sections_list: list[Section] = sections or []
+```
+
+The version sections (list).
+
+### tag
+
+```
+tag = tag
+```
+
+The version tag.
+
+### typed_sections
+
+```
+typed_sections: list[Section]
+```
+
+Return typed sections only.
+
+Returns:
+
+- `list[Section]` – The typed sections.
+
+### untyped_section
+
+```
+untyped_section: Section | None
+```
+
+Return untyped section if any.
+
+Returns:
+
+- `Section | None` – The untyped section if any.
+
+### url
+
+```
+url: str = url
+```
+
+The version URL.
+
+### add_commit
+
+```
+add_commit(commit: Commit) -> None
+```
+
+Register the given commit and add it to the relevant section based on its message convention.
+
+Parameters:
+
+- **`commit`** (`Commit`) – The git commit.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def add_commit(self, commit: Commit) -> None:
+    """Register the given commit and add it to the relevant section based on its message convention.
+
+    Parameters:
+        commit: The git commit.
+    """
+    self.commits.append(commit)
+    commit.version = self.tag or "HEAD"
+    commit_type: str = commit.convention.get("type")  # type: ignore[assignment]
+    if commit_type not in self.sections_dict:
+        section = Section(section_type=commit_type)
+        self.sections_list.append(section)
+        self.sections_dict[commit_type] = section
+    self.sections_dict[commit_type].commits.append(commit)
+```
+
+## VersionBumper
+
+```
+VersionBumper(strategies: tuple[str, ...])
+```
+
+Base class for version bumpers.
+
+Parameters:
+
+- **`strategies`** (`tuple[str, ...]`) – The supported bumping strategies.
+
+Methods:
+
+- **`__call__`** – Bump a version.
+
+Attributes:
+
+- **`initial`** (`str`) – The initial version.
+- **`strategies`** – The supported bumping strategies.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __init__(self, strategies: tuple[str, ...]) -> None:
+    """Initialize the bumper.
+
+    Parameters:
+        strategies: The supported bumping strategies.
+    """
+    self.strategies = strategies
+    """The supported bumping strategies."""
+```
+
+### initial
+
+```
+initial: str
+```
+
+The initial version.
+
+### strategies
+
+```
+strategies = strategies
+```
+
+The supported bumping strategies.
+
+### __call__
+
+```
+__call__(
+    version: str, strategy: str = ..., **kwargs: Any
+) -> str
+```
+
+Bump a version.
+
+Parameters:
+
+- **`version`** (`str`) – The version to bump.
+- **`strategy`** (`str`, default: `...` ) – The bumping strategy.
+- **`**kwargs`** (`Any`, default: `{}` ) – Additional bumper-specific arguments.
+
+Returns:
+
+- `str` – The bumped version.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def __call__(self, version: str, strategy: str = ..., **kwargs: Any) -> str:
+    """Bump a version.
+
+    Parameters:
+        version: The version to bump.
+        strategy: The bumping strategy.
+        **kwargs: Additional bumper-specific arguments.
+
+    Returns:
+        The bumped version.
+    """
+    raise NotImplementedError
+```
+
+## build_and_render
+
+```
+build_and_render(
+    repository: str,
+    template: str,
+    convention: str | CommitConvention,
+    parse_refs: bool = False,
+    parse_trailers: bool = False,
+    sections: list[str] | None = None,
+    in_place: bool = False,
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    bump_latest: bool = False,
+    omit_empty_versions: bool = False,
+    provider: str | None = None,
+    bump: str | None = None,
+    zerover: bool = True,
+    filter_commits: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+    versioning: Literal["pep440", "semver"] = "semver",
+    **kwargs: Any,
+) -> tuple[Changelog, str]
+```
+
+Build a changelog and render it.
+
+This function returns the changelog instance and the rendered contents, but also updates the specified output file (side-effect) or writes to stdout.
+
+Parameters:
+
+- **`repository`** (`str`) – Path to a local repository.
+- **`template`** (`str`) – Name of a builtin template, or path to a custom template (prefixed with path:).
+- **`convention`** (`str | CommitConvention`) – Name of a commit message style/convention.
+- **`parse_refs`** (`bool`, default: `False` ) – Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+- **`parse_trailers`** (`bool`, default: `False` ) – Whether to parse Git trailers.
+- **`sections`** (`list[str] | None`, default: `None` ) – Sections to render (features, bug fixes, etc.).
+- **`in_place`** (`bool`, default: `False` ) – Whether to update the changelog in-place.
+- **`output`** (`str | TextIO | None`, default: `None` ) – Output/changelog file.
+- **`version_regex`** (`str`, default: `DEFAULT_VERSION_REGEX` ) – Regular expression to match versions in an existing changelog file.
+- **`marker_line`** (`str`, default: `DEFAULT_MARKER_LINE` ) – Marker line used to insert contents in an existing changelog.
+- **`bump_latest`** (`bool`, default: `False` ) – Deprecated, use --bump=auto instead. Whether to try and bump the latest version to guess the new one.
+- **`omit_empty_versions`** (`bool`, default: `False` ) – Whether to omit empty versions from the output.
+- **`provider`** (`str | None`, default: `None` ) – Provider class used by this repository.
+- **`bump`** (`str | None`, default: `None` ) – Whether to try and bump to a given version.
+- **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
+- **`filter_commits`** (`str | None`, default: `None` ) – The Git revision-range used to filter commits in git-log.
+- **`jinja_context`** (`dict[str, Any] | None`, default: `None` ) – Key/value pairs passed to the Jinja template.
+- **`versioning`** (`Literal['pep440', 'semver']`, default: `'semver'` ) – Versioning scheme to use when grouping commits and bumping versions.
+- **`**kwargs`** (`Any`, default: `{}` ) – Swallowing kwargs to allow passing all settings at once.
+
+Raises:
+
+- `ValueError` – When some arguments are incompatible or missing.
+
+Returns:
+
+- `tuple[Changelog, str]` – The built changelog and the rendered contents.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def build_and_render(
+    repository: str,
+    template: str,
+    convention: str | CommitConvention,
+    parse_refs: bool = False,  # noqa: FBT001,FBT002
+    parse_trailers: bool = False,  # noqa: FBT001,FBT002
+    sections: list[str] | None = None,
+    in_place: bool = False,  # noqa: FBT001,FBT002
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    # YORE: Bump 3: Remove line.
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
+    omit_empty_versions: bool = False,  # noqa: FBT001,FBT002
+    provider: str | None = None,
+    bump: str | None = None,
+    zerover: bool = True,  # noqa: FBT001,FBT002
+    filter_commits: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+    versioning: Literal["pep440", "semver"] = "semver",
+    **kwargs: Any,  # noqa: ARG001
+) -> tuple[Changelog, str]:
+    """Build a changelog and render it.
+
+    This function returns the changelog instance and the rendered contents,
+    but also updates the specified output file (side-effect) or writes to stdout.
+
+    Parameters:
+        repository: Path to a local repository.
+        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
+        convention: Name of a commit message style/convention.
+        parse_refs: Whether to parse provider-specific references (GitHub/GitLab issues, PRs, etc.).
+        parse_trailers: Whether to parse Git trailers.
+        sections: Sections to render (features, bug fixes, etc.).
+        in_place: Whether to update the changelog in-place.
+        output: Output/changelog file.
+        version_regex: Regular expression to match versions in an existing changelog file.
+        marker_line: Marker line used to insert contents in an existing changelog.
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
+        omit_empty_versions: Whether to omit empty versions from the output.
+        provider: Provider class used by this repository.
+        bump: Whether to try and bump to a given version.
+        zerover: Keep major version at zero, even for breaking changes.
+        filter_commits: The Git revision-range used to filter commits in git-log.
+        jinja_context: Key/value pairs passed to the Jinja template.
+        versioning: Versioning scheme to use when grouping commits and bumping versions.
+        **kwargs: Swallowing kwargs to allow passing all settings at once.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The built changelog and the rendered contents.
+    """
+    changelog = build(
+        repository=repository,
+        convention=convention,
+        parse_refs=parse_refs,
+        parse_trailers=parse_trailers,
+        sections=sections,
+        bump_latest=bump_latest,
+        omit_empty_versions=omit_empty_versions,
+        provider=provider,
+        bump=bump,
+        zerover=zerover,
+        filter_commits=filter_commits,
+        versioning=versioning,
+    )
+    rendered = render(
+        changelog=changelog,
+        template=template,
+        in_place=in_place,
+        output=output,
+        version_regex=version_regex,
+        marker_line=marker_line,
+        bump_latest=bump_latest,
+        bump=bump,
+        jinja_context=jinja_context,
+    )
+    return changelog, rendered
+```
+
+## bump
+
+```
+bump(
+    version: str,
+    part: Literal["major", "minor", "patch"] = "patch",
+    *,
+    zerover: bool = True,
+) -> str
+```
+
+Bump a version. Deprecated, use bump_semver instead.
+
+Parameters:
+
+- **`version`** (`str`) – The version to bump.
+- **`part`** (`Literal['major', 'minor', 'patch']`, default: `'patch'` ) – The part of the version to bump (major, minor, or patch).
+- **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
+
+Returns:
+
+- `str` – The bumped version.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
+    """Bump a version. Deprecated, use [`bump_semver`][git_changelog.bump_semver] instead.
+
+    Parameters:
+        version: The version to bump.
+        part: The part of the version to bump (major, minor, or patch).
+        zerover: Keep major version at zero, even for breaking changes.
+
+    Returns:
+        The bumped version.
+    """
+    warnings.warn(
+        "This function is deprecated in favor of `git_changelog.versioning.bump_semver`",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return bump_semver(version, part, zerover=zerover)
+```
+
+## configure_env
+
+```
+configure_env(env: Environment) -> None
+```
+
+Configure the Jinja environment.
+
+Parameters:
+
+- **`env`** (`Environment`) – The environment to configure.
+
+Source code in `src/git_changelog/_internal/templates/__init__.py`
+
+```
+def configure_env(env: Environment) -> None:
+    """Configure the Jinja environment.
+
+    Parameters:
+        env: The environment to configure.
+    """
+    env.filters.update({"is_url": _filter_is_url})
+```
+
+## get_custom_template
+
+```
+get_custom_template(path: str | Path) -> Template
+```
+
+Get a custom template instance.
+
+Parameters:
+
+- **`path`** (`str | Path`) – Path to the custom template.
+
+Returns:
+
+- `Template` – The Jinja template.
+
+Source code in `src/git_changelog/_internal/templates/__init__.py`
+
+```
+def get_custom_template(path: str | Path) -> Template:
+    """Get a custom template instance.
+
+    Parameters:
+        path: Path to the custom template.
+
+    Returns:
+        The Jinja template.
+    """
+    return JINJA_ENV.from_string(Path(path).read_text())
+```
+
+## get_parser
+
+```
+get_parser() -> ArgumentParser
+```
+
+Return the CLI argument parser.
+
+Returns:
+
+- `ArgumentParser` – An argparse parser.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def get_parser() -> argparse.ArgumentParser:
+    """Return the CLI argument parser.
+
+    Returns:
+        An argparse parser.
+    """
+    parser = argparse.ArgumentParser(
+        add_help=False,
+        prog="git-changelog",
+        description=re.sub(
+            r"\n *",
+            "\n",
+            f"""
+            Automatic Changelog generator using Jinja2 templates.
+
+            This tool parses your commit messages to extract useful data
+            that is then rendered using Jinja2 templates, for example to
+            a changelog file formatted in Markdown.
+
+            Each Git tag will be treated as a version of your project.
+            Each version contains a set of commits, and will be an entry
+            in your changelog. Commits in each version will be grouped
+            by sections, depending on the commit convention you follow.
+
+            ### Conventions
+
+            {BasicConvention._format_sections_help()}
+            {AngularConvention._format_sections_help()}
+            {ConventionalCommitConvention._format_sections_help()}
+            """,
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    parser.add_argument(
+        "repository",
+        metavar="REPOSITORY",
+        nargs="?",
+        help="The repository path, relative or absolute. Default: current working directory.",
+    )
+
+    parser.add_argument(
+        "--config-file",
+        metavar="PATH",
+        nargs="*",
+        help="Configuration file(s).",
+    )
+
+    # YORE: Bump 3: Remove block.
+    parser.add_argument(
+        "-b",
+        "--bump-latest",
+        action="store_true",
+        dest="bump_latest",
+        help="Deprecated, use --bump=auto instead. "
+        "Guess the new latest version by bumping the previous one based on the set of unreleased commits. "
+        "For example, if a commit contains breaking changes, bump the major number (or the minor number for 0.x versions). "
+        "Else if there are new features, bump the minor number. Else just bump the patch number. "
+        "Default: unset (false).",
+    )
+
+    parser.add_argument(
+        "--bumped-version",
+        action="store_true",
+        dest="bumped_version",
+        help="Show bumped version and exit.",
+    )
+    parser.add_argument(
+        "-B",
+        "--bump",
+        action="store",
+        dest="bump",
+        metavar="VERSION",
+        help="Specify the bump from latest version for the set of unreleased commits. "
+        "Can be one of `auto`, `major`, `minor`, `patch` or a valid SemVer version (eg. 1.2.3). "
+        "For both SemVer and PEP 440 versioning schemes (see -n), `auto` will bump the major number "
+        "if a commit contains breaking changes (or the minor number for 0.x versions, see -Z), "
+        "else the minor number if there are new features, else the patch number. "
+        "Default: unset (false).",
+    )
+    parser.add_argument(
+        "-n",
+        "--versioning",
+        action="store",
+        dest="versioning",
+        metavar="SCHEME",
+        help="Versioning scheme to use when bumping and comparing versions. "
+        "The selected scheme will impact the values accepted by the `--bump` option. "
+        "Supported: `pep440`, `semver`. PEP 440 provides the following bump strategies: `auto`, "
+        f"`{'`, `'.join(part for part in bump_pep440.strategies if '+' not in part)}`. "
+        "Values `auto`, `major`, `minor`, `micro` can be suffixed with one of `+alpha`, `+beta`, `+candidate`, "
+        "and/or `+dev`. Values `alpha`, `beta` and `candidate` can be suffixed with `+dev`. "
+        "Examples: `auto+alpha`, `major+beta+dev`, `micro+dev`, `candidate+dev`, etc.. "
+        "SemVer provides the following bump strategies: `auto`, "
+        f"`{'`, `'.join(bump_semver.strategies)}`. "
+        "See the docs for more information. Default: unset (`semver`).",
+    )
+    parser.add_argument(
+        "-h",
+        "--help",
+        action="help",
+        default=argparse.SUPPRESS,
+        help="Show this help message and exit.",
+    )
+    parser.add_argument(
+        "-i",
+        "--in-place",
+        action="store_true",
+        dest="in_place",
+        help="Insert new entries (versions missing from changelog) in-place. "
+        "An output file must be specified. With custom templates, "
+        "you can pass two additional Parameters: `--version-regex` and `--marker-line`. "
+        "When writing in-place, an `in_place` variable "
+        "will be injected in the Jinja context, "
+        "allowing to adapt the generated contents "
+        "(for example to skip changelog headers or footers). Default: unset (false).",
+    )
+    parser.add_argument(
+        "-g",
+        "--version-regex",
+        action="store",
+        metavar="REGEX",
+        dest="version_regex",
+        help="A regular expression to match versions in the existing changelog "
+        "(used to find the latest release) when writing in-place. "
+        "The regular expression must be a Python regex with a `version` named group. "
+        f"Default: `{DEFAULT_VERSION_REGEX}`.",
+    )
+
+    parser.add_argument(
+        "-m",
+        "--marker-line",
+        action="store",
+        metavar="MARKER",
+        dest="marker_line",
+        help="A marker line at which to insert new entries "
+        "(versions missing from changelog). "
+        "If two marker lines are present in the changelog, "
+        "the contents between those two lines will be overwritten "
+        "(useful to update an 'Unreleased' entry for example). "
+        f"Default: `{DEFAULT_MARKER_LINE}`.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        action="store",
+        metavar="FILE",
+        dest="output",
+        help="Output to given file. Default: standard output.",
+    )
+    parser.add_argument(
+        "-p",
+        "--provider",
+        metavar="PROVIDER",
+        dest="provider",
+        choices=providers.keys(),
+        help="Explicitly specify the repository provider. Default: unset.",
+    )
+    parser.add_argument(
+        "-r",
+        "--parse-refs",
+        action="store_true",
+        dest="parse_refs",
+        help="Parse provider-specific references in commit messages (GitHub/GitLab/Bitbucket "
+        "issues, PRs, etc.). Default: unset (false).",
+    )
+    parser.add_argument(
+        "-R",
+        "--release-notes",
+        action="store_true",
+        dest="release_notes",
+        help="Output release notes to stdout based on the last entry in the changelog. Default: unset (false).",
+    )
+    parser.add_argument(
+        "-I",
+        "--input",
+        metavar="FILE",
+        dest="input",
+        help=f"Read from given file when creating release notes. Default: `{DEFAULT_CHANGELOG_FILE}`.",
+    )
+    parser.add_argument(
+        "-c",
+        "--convention",
+        "--commit-style",
+        "--style",
+        metavar="CONVENTION",
+        choices=CONVENTIONS,
+        dest="convention",
+        help=f"The commit convention to match against. Default: `{DEFAULT_SETTINGS['convention']}`.",
+    )
+    parser.add_argument(
+        "-s",
+        "--sections",
+        action="store",
+        type=_comma_separated_list,
+        metavar="SECTIONS",
+        dest="sections",
+        help="A comma-separated list of sections to render. "
+        "See the available sections for each supported convention in the description. "
+        "Default: unset (None).",
+    )
+    parser.add_argument(
+        "-t",
+        "--template",
+        choices=Templates(("angular", "keepachangelog")),
+        metavar="TEMPLATE",
+        dest="template",
+        help="The Jinja2 template to use. Prefix it with `path:` to specify the path "
+        "to a Jinja templated file. "
+        f"Default: `{DEFAULT_SETTINGS['template']}`.",
+    )
+    parser.add_argument(
+        "-T",
+        "--trailers",
+        "--git-trailers",
+        action="store_true",
+        dest="parse_trailers",
+        help="Parse Git trailers in the commit message. "
+        "See https://git-scm.com/docs/git-interpret-trailers. Default: unset (false).",
+    )
+    parser.add_argument(
+        "-E",
+        "--omit-empty-versions",
+        action="store_true",
+        dest="omit_empty_versions",
+        help="Omit empty versions from the output. Default: unset (false).",
+    )
+    parser.add_argument(
+        "-Z",
+        "--no-zerover",
+        action="store_false",
+        dest="zerover",
+        help="By default, breaking changes on a 0.x don't bump the major version, maintaining it at 0. "
+        "With this option, a breaking change will bump a 0.x version to 1.0.",
+    )
+    parser.add_argument(
+        "-F",
+        "--filter-commits",
+        action="store",
+        metavar="RANGE",
+        dest="filter_commits",
+        help="The Git revision-range filter to use (e.g. `v1.2.0..`). Default: no filter.",
+    )
+    parser.add_argument(
+        "-j",
+        "--jinja-context",
+        action=_ParseDictAction,
+        metavar="KEY=VALUE",
+        dest="jinja_context",
+        help="Pass additional key/value pairs to the template. Option can be used multiple times. "
+        "The key/value pairs are accessible as 'jinja_context' in the template.",
+    )
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        version=f"%(prog)s {debug._get_version()}",
+        help="Show the current version of the program and exit.",
+    )
+    parser.add_argument("--debug-info", action=_DebugInfo, help="Print debug information.")
+
+    return parser
+```
+
+## get_release_notes
+
+```
+get_release_notes(
+    input_file: str | Path = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+) -> str
+```
+
+Get release notes from existing changelog.
+
+This will return the latest entry in the changelog.
+
+Parameters:
+
+- **`input_file`** (`str | Path`, default: `'CHANGELOG.md'` ) – The changelog to read from.
+- **`version_regex`** (`str`, default: `DEFAULT_VERSION_REGEX` ) – A regular expression to match version entries.
+- **`marker_line`** (`str`, default: `DEFAULT_MARKER_LINE` ) – The insertion marker line in the changelog.
+
+Returns:
+
+- `str` – The latest changelog entry.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def get_release_notes(
+    input_file: str | Path = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+) -> str:
+    """Get release notes from existing changelog.
+
+    This will return the latest entry in the changelog.
+
+    Parameters:
+        input_file: The changelog to read from.
+        version_regex: A regular expression to match version entries.
+        marker_line: The insertion marker line in the changelog.
+
+    Returns:
+        The latest changelog entry.
+    """
+    release_notes = []
+    found_marker = False
+    found_version = False
+    with open(input_file) as changelog:
+        for line in changelog:
+            line = line.strip()  # noqa: PLW2901
+            if not found_marker:
+                if line == marker_line:
+                    found_marker = True
+                continue
+            if re.search(version_regex, line):
+                if found_version:
+                    break
+                found_version = True
+            release_notes.append(line)
+    result = "\n".join(release_notes).strip()
+    if result.endswith(marker_line):
+        result = result[: -len(marker_line)].strip()
+    return result
+```
+
+## get_template
+
+```
+get_template(name: str) -> Template
+```
+
+Get a builtin template instance.
+
+Parameters:
+
+- **`name`** (`str`) – The template name.
+
+Returns:
+
+- `Template` – The Jinja template.
+
+Source code in `src/git_changelog/_internal/templates/__init__.py`
+
+```
+def get_template(name: str) -> Template:
+    """Get a builtin template instance.
+
+    Parameters:
+        name: The template name.
+
+    Returns:
+        The Jinja template.
+    """
+    return JINJA_ENV.from_string(TEMPLATES_PATH.joinpath(f"{name}.md.jinja").read_text())
+```
+
+## get_version
+
+```
+get_version() -> str
+```
+
+Return the current `git-changelog` version.
+
+Returns:
+
+- `str` – The current git-changelog version.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def get_version() -> str:
+    """Return the current `git-changelog` version.
+
+    Returns:
+        The current `git-changelog` version.
+    """
+    try:
+        return metadata.version("git-changelog")
+    except metadata.PackageNotFoundError:
+        return "0.0.0"
+```
+
+## main
+
+```
+main(args: list[str] | None = None) -> int
+```
+
+Run the main program.
+
+This function is executed when you type `git-changelog` or `python -m git_changelog`.
+
+Parameters:
+
+- **`args`** (`list[str] | None`, default: `None` ) – Arguments passed from the command line.
+
+Returns:
+
+- `int` – An exit code.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def main(args: list[str] | None = None) -> int:
+    """Run the main program.
+
+    This function is executed when you type `git-changelog` or `python -m git_changelog`.
+
+    Parameters:
+        args: Arguments passed from the command line.
+
+    Returns:
+        An exit code.
+    """
+    settings = parse_settings(args)
+
+    if settings.pop("release_notes"):
+        output_release_notes(
+            input_file=settings["input"],
+            version_regex=settings["version_regex"],
+            marker_line=settings["marker_line"],
+            output_file=None,  # force writing to stdout
+        )
+        return 0
+
+    if settings.pop("bumped_version"):
+        settings["bump"] = settings.get("bump") or "auto"
+        changelog = build(**settings)
+        if not changelog.versions_list:
+            print("git-changelog: No version found in the repository.", file=sys.stderr)
+            return 1
+        print(changelog.versions_list[0].planned_tag)
+        return 0
+
+    try:
+        build_and_render(**settings)
+    except ValueError as error:
+        print(f"git-changelog: {error}", file=sys.stderr)
+        return 1
+
+    return 0
+```
+
+## output_release_notes
+
+```
+output_release_notes(
+    input_file: str = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    output_file: str | TextIO | None = None,
+) -> None
+```
+
+Print release notes from existing changelog.
+
+This will print the latest entry in the changelog.
+
+Parameters:
+
+- **`input_file`** (`str`, default: `'CHANGELOG.md'` ) – The changelog to read from.
+- **`version_regex`** (`str`, default: `DEFAULT_VERSION_REGEX` ) – A regular expression to match version entries.
+- **`marker_line`** (`str`, default: `DEFAULT_MARKER_LINE` ) – The insertion marker line in the changelog.
+- **`output_file`** (`str | TextIO | None`, default: `None` ) – Where to print/write the release notes.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def output_release_notes(
+    input_file: str = "CHANGELOG.md",
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    output_file: str | TextIO | None = None,
+) -> None:
+    """Print release notes from existing changelog.
+
+    This will print the latest entry in the changelog.
+
+    Parameters:
+        input_file: The changelog to read from.
+        version_regex: A regular expression to match version entries.
+        marker_line: The insertion marker line in the changelog.
+        output_file: Where to print/write the release notes.
+    """
+    output_file = output_file or sys.stdout
+    release_notes = get_release_notes(input_file, version_regex, marker_line)
+    try:
+        output_file.write(release_notes)  # type: ignore[union-attr]
+    except AttributeError:
+        with open(output_file, "w") as file:  # type: ignore[arg-type]
+            file.write(release_notes)
+```
+
+## parse_pep440
+
+```
+parse_pep440(version: str) -> tuple[PEP440Version, str]
+```
+
+Parse a PEP version.
+
+Returns:
+
+- `tuple[PEP440Version, str]` – A PEP 440 version instance with useful methods.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def parse_pep440(version: str) -> tuple[PEP440Version, str]:
+    """Parse a PEP version.
+
+    Returns:
+        A PEP 440 version instance with useful methods.
+    """
+    version, prefix = version_prefix(version)
+    return PEP440Version(version), prefix
+```
+
+## parse_semver
+
+```
+parse_semver(version: str) -> tuple[SemVerVersion, str]
+```
+
+Parse a SemVer version.
+
+Returns:
+
+- `tuple[SemVerVersion, str]` – A semver version instance with useful methods.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def parse_semver(version: str) -> tuple[SemVerVersion, str]:
+    """Parse a SemVer version.
+
+    Returns:
+        A semver version instance with useful methods.
+    """
+    version, prefix = version_prefix(version)
+    return SemVerVersion.parse(version), prefix
+```
+
+## parse_settings
+
+```
+parse_settings(args: list[str] | None = None) -> dict
+```
+
+Parse arguments and config files to build the final settings set.
+
+Parameters:
+
+- **`args`** (`list[str] | None`, default: `None` ) – Arguments passed from the command line.
+
+Returns:
+
+- `dict` – A dictionary with the final settings.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def parse_settings(args: list[str] | None = None) -> dict:
+    """Parse arguments and config files to build the final settings set.
+
+    Parameters:
+        args: Arguments passed from the command line.
+
+    Returns:
+        A dictionary with the final settings.
+    """
+    parser = get_parser()
+    opts = vars(parser.parse_args(args=args))
+
+    # Determine which arguments were explicitly set with the CLI
+    sentinel = object()
+    sentinel_ns = argparse.Namespace(**dict.fromkeys(opts, sentinel))
+    explicit_opts_dict = {
+        key: opts.get(key, None)
+        for key, value in vars(parser.parse_args(namespace=sentinel_ns, args=args)).items()
+        if value is not sentinel
+    }
+
+    config_file = explicit_opts_dict.pop("config_file", DEFAULT_CONFIG_FILES)
+    if str(config_file).strip().lower() in ("no", "none", "off", "false", "0", ""):
+        config_file = None
+    elif str(config_file).strip().lower() in ("yes", "default", "on", "true", "1"):
+        config_file = DEFAULT_CONFIG_FILES
+
+    jinja_context = explicit_opts_dict.pop("jinja_context", {})
+
+    settings = read_config(config_file)
+
+    # CLI arguments override the config file settings
+    settings.update(explicit_opts_dict)
+
+    # Merge jinja context, CLI values override config file values.
+    settings["jinja_context"].update(jinja_context)
+
+    # YORE: Bump 3: Remove block.
+    if "bump_latest" in explicit_opts_dict:
+        warnings.warn("`--bump-latest` is deprecated in favor of `--bump=auto`", FutureWarning, stacklevel=1)
+
+    return settings
+```
+
+## parse_version
+
+```
+parse_version(version: str) -> tuple[SemVerVersion, str]
+```
+
+Parse a version. Deprecated, use bump_semver instead.
+
+Parameters:
+
+- **`version`** (`str`) – The version to parse.
+
+Returns:
+
+- **`semver_version`** ( `SemVerVersion` ) – The semantic version.
+- **`prefix`** ( `str` ) – The version prefix.
+
+Source code in `src/git_changelog/_internal/build.py`
+
+```
+def parse_version(version: str) -> tuple[SemVerVersion, str]:
+    """Parse a version. Deprecated, use [`bump_semver`][git_changelog.parse_semver] instead.
+
+    Parameters:
+        version: The version to parse.
+
+    Returns:
+        semver_version: The semantic version.
+        prefix: The version prefix.
+    """
+    warnings.warn(
+        "This function is deprecated in favor of `git_changelog.versioning.parse_semver`",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return parse_semver(version)
+```
+
+## read_config
+
+```
+read_config(
+    config_file: Sequence[str | Path]
+    | str
+    | Path
+    | None = DEFAULT_CONFIG_FILES,
+) -> dict
+```
+
+Find config files and initialize settings with the one of highest priority.
+
+Parameters:
+
+- **`config_file`** (`Sequence[str | Path] | str | Path | None`, default: `DEFAULT_CONFIG_FILES` ) – A path or list of paths to configuration file(s); or None to disable config file settings. Default: a list of paths given by git_changelog.DEFAULT_CONFIG_FILES.
+
+Returns:
+
+- `dict` – A settings dictionary. Default settings if no config file is found or config_file is None.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def read_config(
+    config_file: Sequence[str | Path] | str | Path | None = DEFAULT_CONFIG_FILES,
+) -> dict:
+    """Find config files and initialize settings with the one of highest priority.
+
+    Parameters:
+        config_file: A path or list of paths to configuration file(s); or `None` to
+            disable config file settings. Default: a list of paths given by
+            [`git_changelog.DEFAULT_CONFIG_FILES`][].
+
+    Returns:
+        A settings dictionary. Default settings if no config file is found or `config_file` is `None`.
+
+    """
+    project_config = DEFAULT_SETTINGS.copy()
+    if config_file is None:  # Unset config file.
+        return project_config
+
+    for filename in config_file if isinstance(config_file, (list, tuple)) else [config_file]:
+        _path = Path(filename)
+
+        if not _path.exists():
+            continue
+
+        with _path.open("rb") as file:
+            new_settings = tomllib.load(file)
+        if _path.name == "pyproject.toml":
+            new_settings = new_settings.get("tool", {}).get("git-changelog", {}) or new_settings.get(
+                "tool.git-changelog",
+                {},
+            )
+
+            if not new_settings:  # pyproject.toml did not have a git-changelog section.
+                continue
+
+        # Settings can have hyphens like in the CLI.
+        new_settings = {key.replace("-", "_"): value for key, value in new_settings.items()}
+
+        # YORE: Bump 3: Remove block.
+        if "bump_latest" in new_settings:
+            _opt_value = new_settings["bump_latest"]
+            _suggestion = (
+                "remove it from the config file" if not _opt_value else "set `bump = 'auto'` in the config file instead"
+            )
+            warnings.warn(
+                f"`bump-latest = {str(_opt_value).lower()}` option found "
+                f"in config file ({_path.absolute()}). This option will be removed in the future. "
+                f"To achieve the same result, please {_suggestion}.",
+                FutureWarning,
+                stacklevel=1,
+            )
+
+        # Massage found values to meet expectations.
+        # Parse sections.
+        if "sections" in new_settings:
+            # Remove "sections" from dict, only restore if the list is valid.
+            sections = new_settings.pop("sections", None)
+            if isinstance(sections, str):
+                sections = sections.split(",")
+
+            sections = [s.strip() for s in sections if isinstance(s, str) and s.strip()]
+
+            if sections:  # TOML doesn't store null/nil.
+                new_settings["sections"] = sections
+
+        project_config.update(new_settings)
+        break
+
+    return project_config
+```
+
+## render
+
+```
+render(
+    changelog: Changelog,
+    template: str,
+    in_place: bool = False,
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    bump_latest: bool = False,
+    bump: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+) -> str
+```
+
+Render a changelog.
+
+This function updates the specified output file (side-effect) or writes to stdout.
+
+Parameters:
+
+- **`changelog`** (`Changelog`) – The changelog to render.
+- **`template`** (`str`) – Name of a builtin template, or path to a custom template (prefixed with path:).
+- **`in_place`** (`bool`, default: `False` ) – Whether to update the changelog in-place.
+- **`output`** (`str | TextIO | None`, default: `None` ) – Output/changelog file.
+- **`version_regex`** (`str`, default: `DEFAULT_VERSION_REGEX` ) – Regular expression to match versions in an existing changelog file.
+- **`marker_line`** (`str`, default: `DEFAULT_MARKER_LINE` ) – Marker line used to insert contents in an existing changelog.
+- **`bump_latest`** (`bool`, default: `False` ) – Deprecated, use --bump=auto instead. Whether to try and bump the latest version to guess the new one.
+- **`bump`** (`str | None`, default: `None` ) – Whether to try and bump to a given version.
+- **`jinja_context`** (`dict[str, Any] | None`, default: `None` ) – Key/value pairs passed to the Jinja template.
+
+Raises:
+
+- `ValueError` – When some arguments are incompatible or missing.
+
+Returns:
+
+- `str` – The rendered changelog.
+
+Source code in `src/git_changelog/_internal/cli.py`
+
+```
+def render(
+    changelog: Changelog,
+    template: str,
+    in_place: bool = False,  # noqa: FBT001,FBT002
+    output: str | TextIO | None = None,
+    version_regex: str = DEFAULT_VERSION_REGEX,
+    marker_line: str = DEFAULT_MARKER_LINE,
+    # YORE: Bump 3: Remove line.
+    bump_latest: bool = False,  # noqa: FBT001,FBT002
+    bump: str | None = None,
+    jinja_context: dict[str, Any] | None = None,
+) -> str:
+    """Render a changelog.
+
+    This function updates the specified output file (side-effect) or writes to stdout.
+
+    Parameters:
+        changelog: The changelog to render.
+        template: Name of a builtin template, or path to a custom template (prefixed with `path:`).
+        in_place: Whether to update the changelog in-place.
+        output: Output/changelog file.
+        version_regex: Regular expression to match versions in an existing changelog file.
+        marker_line: Marker line used to insert contents in an existing changelog.
+        bump_latest: Deprecated, use --bump=auto instead.
+            Whether to try and bump the latest version to guess the new one.
+        bump: Whether to try and bump to a given version.
+        jinja_context: Key/value pairs passed to the Jinja template.
+
+    Raises:
+        ValueError: When some arguments are incompatible or missing.
+
+    Returns:
+        The rendered changelog.
+    """
+    # Get template.
+    if template.startswith("path:"):
+        path = template.replace("path:", "", 1)
+        try:
+            jinja_template = templates.get_custom_template(path)
+        except TemplateNotFound as error:
+            raise ValueError(f"No such file: {path}") from error
+    else:
+        jinja_template = templates.get_template(template)
+
+    if output is None:
+        output = sys.stdout
+
+    # Handle misconfiguration early.
+    if in_place and output is sys.stdout:
+        raise ValueError("Cannot write in-place to stdout")
+
+    # YORE: Bump 3: Remove block.
+    if bump_latest:
+        warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)
+        if bump is None:
+            bump = "auto"
+
+    # Render new entries in-place.
+    if in_place:
+        # Read current changelog lines.
+        with open(output) as changelog_file:  # type: ignore[arg-type]
+            lines = changelog_file.read().splitlines()
+
+        # Prepare version regex and marker line.
+        if template in {"angular", "keepachangelog"}:
+            version_regex = DEFAULT_VERSION_REGEX
+            marker_line = DEFAULT_MARKER_LINE
+
+        # Only keep new entries (missing from changelog).
+        last_released = _latest(lines, re.compile(version_regex))
+        if last_released:
+            # Check if the latest version is already in the changelog.
+            if last_released in [
+                changelog.versions_list[0].tag,
+                changelog.versions_list[0].planned_tag,
+            ]:
+                raise ValueError(f"Version {last_released} already in changelog")
+            changelog.versions_list = _unreleased(
+                changelog.versions_list,
+                last_released,
+            )
+
+        # Render new entries.
+        rendered = (
+            jinja_template.render(
+                changelog=changelog,
+                jinja_context=jinja_context,
+                in_place=True,
+            ).rstrip("\n")
+            + "\n"
+        )
+
+        # Find marker line(s) in current changelog.
+        marker = lines.index(marker_line)
+        try:
+            marker2 = lines[marker + 1 :].index(marker_line)
+        except ValueError:
+            # Apply new entries at marker line.
+            lines[marker] = rendered
+        else:
+            # Apply new entries between marker lines.
+            lines[marker : marker + marker2 + 2] = [rendered]
+
+        # Write back updated changelog lines.
+        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
+
+    # Overwrite output file.
+    else:
+        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
+
+        # Write result in specified output.
+        if output is sys.stdout:
+            sys.stdout.write(rendered)
+        else:
+            with open(output, "w") as stream:  # type: ignore[arg-type]
+                stream.write(rendered)
+
+    return rendered
+```
+
+## version_prefix
+
+```
+version_prefix(version: str) -> tuple[str, str]
+```
+
+Return a version and its optional `v` prefix.
+
+Parameters:
+
+- **`version`** (`str`) – The full version.
+
+Returns:
+
+- **`version`** ( `str` ) – The version without its prefix.
+- **`prefix`** ( `str` ) – The version prefix.
+
+Source code in `src/git_changelog/_internal/versioning.py`
+
+```
+def version_prefix(version: str) -> tuple[str, str]:
+    """Return a version and its optional `v` prefix.
+
+    Parameters:
+        version: The full version.
+
+    Returns:
+        version: The version without its prefix.
+        prefix: The version prefix.
+    """
+    prefix = ""
+    if version[0] == "v":
+        prefix = "v"
+        version = version[1:]
+    return version, prefix
+```
+
+## build
+
+Deprecated. Import from `git_changelog` directly.
+
+## cli
+
+Deprecated. Import from `git_changelog` directly.
+
+## commit
+
+Deprecated. Import from `git_changelog` directly.
+
+## providers
+
+Deprecated. Import from `git_changelog` directly.
+
+## templates
+
+Deprecated. Import from `git_changelog` directly.
+
+## versioning
+
+Deprecated. Import from `git_changelog` directly.

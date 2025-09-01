@@ -1,0 +1,12 @@
+# git-changelog
+
+> Automatic Changelog generator using Jinja2 templates.
+
+## Usage
+
+- [Overview](https://pawamoy.github.io/git-changelog/index.md)
+
+## API
+
+- [API reference](https://pawamoy.github.io/git-changelog/reference/api/index.md)
+
