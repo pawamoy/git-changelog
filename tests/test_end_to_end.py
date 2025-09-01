@@ -8,11 +8,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 import pytest
 
-from git_changelog import Changelog
-from git_changelog._internal.commit import AngularConvention
-from git_changelog._internal.versioning import bump_semver
-from git_changelog.cli import build_and_render
-from git_changelog.templates import get_template
+from git_changelog import AngularConvention, Changelog, build_and_render, bump_semver, get_template
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -32,7 +28,7 @@ def test_bumping_latest(repo: GitRepo) -> None:
         repo: Temporary Git repository (fixture).
     """
     changelog = Changelog(repo.path, convention=AngularConvention, bump="auto")
-    # features, no breaking changes: minor bumped
+    # Features, no breaking changes: minor bumped.
     assert changelog.versions_list[0].planned_tag is not None
     assert changelog.versions_list[0].planned_tag.lstrip("v") == bump_semver(
         VERSIONS[-2],

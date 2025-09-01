@@ -61,24 +61,44 @@ _release_kind = {"a": "alpha", "b": "beta", "c": "candidate", "rc": "candidate",
 class ParsedVersion(Protocol):  # noqa: PLW1641
     """Base class for versioning schemes."""
 
-    def __lt__(self, other: object) -> bool: ...
-    def __le__(self, other: object) -> bool: ...
-    def __eq__(self, other: object) -> bool: ...
-    def __ge__(self, other: object) -> bool: ...
-    def __gt__(self, other: object) -> bool: ...
-    def __ne__(self, other: object) -> bool: ...
+    def __lt__(self, other: object) -> bool:
+        """Implement `<` comparison."""
+        ...
+
+    def __le__(self, other: object) -> bool:
+        """Implement `<=` comparison."""
+        ...
+
+    def __eq__(self, other: object) -> bool:
+        """Implement `==` comparison."""
+        ...
+
+    def __ge__(self, other: object) -> bool:
+        """Implement `>=` comparison."""
+        ...
+
+    def __gt__(self, other: object) -> bool:
+        """Implement `>` comparison."""
+        ...
+
+    def __ne__(self, other: object) -> bool:
+        """Implement `!=` comparison."""
+        ...
 
 
 class SemVerVersion(semver.Version, ParsedVersion):  # type: ignore[misc]
     """SemVer version."""
 
     def bump_major(self) -> SemVerVersion:
+        """Bump the major version."""
         return SemVerVersion(*super().bump_major())  # type: ignore[misc]
 
     def bump_minor(self) -> SemVerVersion:
+        """Bump the minor version."""
         return SemVerVersion(*super().bump_minor())  # type: ignore[misc]
 
     def bump_patch(self) -> SemVerVersion:
+        """Bump the patch version."""
         return SemVerVersion(*super().bump_patch())  # type: ignore[misc]
 
     def bump_release(self) -> SemVerVersion:
@@ -610,7 +630,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
 def version_prefix(version: str) -> tuple[str, str]:
     """Return a version and its optional `v` prefix.
 
-    Arguments:
+    Parameters:
         version: The full version.
 
     Returns:
@@ -648,6 +668,7 @@ class VersionBumper:
     """Base class for version bumpers."""
 
     initial: str
+    """The initial version."""
 
     def __init__(self, strategies: tuple[str, ...]) -> None:
         """Initialize the bumper.
@@ -656,6 +677,7 @@ class VersionBumper:
             strategies: The supported bumping strategies.
         """
         self.strategies = strategies
+        """The supported bumping strategies."""
 
     def __call__(self, version: str, strategy: str = ..., **kwargs: Any) -> str:
         """Bump a version.
@@ -675,6 +697,7 @@ class PEP440Bumper(VersionBumper):
     """PEP 440 version bumper."""
 
     initial: str = "0.0.0"
+    """The initial version."""
 
     def __call__(  # type: ignore[override]
         self,
@@ -686,7 +709,7 @@ class PEP440Bumper(VersionBumper):
     ) -> str:
         """Bump a PEP 440 version.
 
-        Arguments:
+        Parameters:
             version: The version to bump.
             strategy: The part of the version to bump.
             zerover: Keep major version at zero, even for breaking changes.
@@ -751,6 +774,7 @@ class SemVerBumper(VersionBumper):
     """SemVer version bumper."""
 
     initial: str = "0.0.0"
+    """The initial version."""
 
     def __call__(  # type: ignore[override]
         self,
@@ -761,9 +785,9 @@ class SemVerBumper(VersionBumper):
     ) -> str:
         """Bump a SemVer version.
 
-        Arguments:
+        Parameters:
             version: The version to bump.
-            part: The part of the version to bump.
+            strategy: The bumping strategy to use.
             zerover: Keep major version at zero, even for breaking changes.
 
         Returns:

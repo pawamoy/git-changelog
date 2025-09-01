@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from git_changelog._internal.commit import Commit
+from git_changelog import Commit
 
 
 @pytest.mark.parametrize(

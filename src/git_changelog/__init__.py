@@ -7,19 +7,23 @@ from __future__ import annotations
 
 from git_changelog._internal.build import Changelog, ConventionType, Section, Version, bump, parse_version
 from git_changelog._internal.cli import (
+    CONVENTIONS,
     DEFAULT_CHANGELOG_FILE,
     DEFAULT_CONFIG_FILES,
     DEFAULT_MARKER_LINE,
     DEFAULT_SETTINGS,
     DEFAULT_VERSION_REGEX,
     DEFAULT_VERSIONING,
+    Templates,
     build,
     build_and_render,
     get_parser,
     get_release_notes,
+    get_version,
     main,
     output_release_notes,
     parse_settings,
+    providers,
     read_config,
     render,
 )
@@ -55,6 +59,7 @@ from git_changelog._internal.versioning import (
 )
 
 __all__: list[str] = [
+    "CONVENTIONS",
     "DEFAULT_CHANGELOG_FILE",
     "DEFAULT_CONFIG_FILES",
     "DEFAULT_MARKER_LINE",
@@ -85,6 +90,7 @@ __all__: list[str] = [
     "SemVerBumper",
     "SemVerStrategy",
     "SemVerVersion",
+    "Templates",
     "Version",
     "VersionBumper",
     "build",
@@ -97,12 +103,14 @@ __all__: list[str] = [
     "get_parser",
     "get_release_notes",
     "get_template",
+    "get_version",
     "main",
     "output_release_notes",
     "parse_pep440",
     "parse_semver",
     "parse_settings",
     "parse_version",
+    "providers",
     "read_config",
     "render",
     "version_prefix",

@@ -94,6 +94,7 @@ class Templates(tuple):  # (subclassing tuple)
     """Helper to pick a template on the command line."""
 
     def __contains__(self, item: object) -> bool:
+        """Check if the template is in the list."""
         if isinstance(item, str):
             return item.startswith("path:") or super().__contains__(item)
         return False
@@ -259,7 +260,7 @@ def get_parser() -> argparse.ArgumentParser:
         dest="in_place",
         help="Insert new entries (versions missing from changelog) in-place. "
         "An output file must be specified. With custom templates, "
-        "you can pass two additional arguments: `--version-regex` and `--marker-line`. "
+        "you can pass two additional Parameters: `--version-regex` and `--marker-line`. "
         "When writing in-place, an `in_place` variable "
         "will be injected in the Jinja context, "
         "allowing to adapt the generated contents "
@@ -442,7 +443,7 @@ def read_config(
 
     """
     project_config = DEFAULT_SETTINGS.copy()
-    if config_file is None:  # Unset config file
+    if config_file is None:  # Unset config file.
         return project_config
 
     for filename in config_file if isinstance(config_file, (list, tuple)) else [config_file]:
@@ -459,10 +460,10 @@ def read_config(
                 {},
             )
 
-            if not new_settings:  # pyproject.toml did not have a git-changelog section
+            if not new_settings:  # pyproject.toml did not have a git-changelog section.
                 continue
 
-        # Settings can have hyphens like in the CLI
+        # Settings can have hyphens like in the CLI.
         new_settings = {key.replace("-", "_"): value for key, value in new_settings.items()}
 
         # YORE: Bump 3: Remove block.
@@ -479,17 +480,17 @@ def read_config(
                 stacklevel=1,
             )
 
-        # Massage found values to meet expectations
-        # Parse sections
+        # Massage found values to meet expectations.
+        # Parse sections.
         if "sections" in new_settings:
-            # Remove "sections" from dict, only restore if the list is valid
+            # Remove "sections" from dict, only restore if the list is valid.
             sections = new_settings.pop("sections", None)
             if isinstance(sections, str):
                 sections = sections.split(",")
 
             sections = [s.strip() for s in sections if isinstance(s, str) and s.strip()]
 
-            if sections:  # toml doesn't store null/nil
+            if sections:  # TOML doesn't store null/nil.
                 new_settings["sections"] = sections
 
         project_config.update(new_settings)
@@ -887,7 +888,7 @@ def main(args: list[str] | None = None) -> int:
 
     This function is executed when you type `git-changelog` or `python -m git_changelog`.
 
-    Arguments:
+    Parameters:
         args: Arguments passed from the command line.
 
     Returns:

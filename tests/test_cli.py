@@ -1,6 +1,6 @@
 """Tests for the CLI."""
 
-# IMPORTANT: Do not call `git_changelog.cli.main()`
+# IMPORTANT: Do not call `git_changelog.main()`
 # without passing a config file path, otherwise
 # it will use its own config file and possibly modify
 # the CHANGELOG!
@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING, Any
 import pytest
 import tomli_w
 
-from git_changelog._internal import cli, debug
+from git_changelog import DEFAULT_SETTINGS, get_version, main, parse_settings, read_config
+from git_changelog._internal import debug
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -47,7 +48,7 @@ def test_main(tmp_path: Path) -> None:
     Parameters:
         tmp_path: A temporary path to write an empty config to.
     """
-    assert cli.main(["--config-file", str(tmp_path / "conf.toml")]) == 0
+    assert main(["--config-file", str(tmp_path / "conf.toml")]) == 0
 
 
 # IMPORTANT: See top module comment.
@@ -58,14 +59,14 @@ def test_show_help(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["-h"])
+        main(["-h"])
     captured = capsys.readouterr()
     assert "git-changelog" in captured.out
 
 
 def test_get_version() -> None:
     """Get self version."""
-    assert cli.get_version()
+    assert get_version()
 
 
 @pytest.mark.parametrize(
@@ -83,7 +84,7 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
         args: Command line arguments.
     """
     ch = tmp_path.joinpath("ch.md")
-    parsed_settings = cli.parse_settings([*args, "-o", ch.as_posix(), "-c", "angular"])
+    parsed_settings = parse_settings([*args, "-o", ch.as_posix(), "-c", "angular"])
 
     assert parsed_settings["output"] == str(ch.as_posix())
     assert parsed_settings["sections"] == ["feat", "fix"]
@@ -143,9 +144,9 @@ def test_config_reading(
             ),
         )
 
-        settings = cli.read_config(tmp_path / config_fname) if config_fname == "custom-file.toml" else cli.read_config()
+        settings = read_config(tmp_path / config_fname) if config_fname == "custom-file.toml" else read_config()
 
-        ground_truth: dict[str, Any] = cli.DEFAULT_SETTINGS.copy()
+        ground_truth: dict[str, Any] = DEFAULT_SETTINGS.copy()
         ground_truth["sections"] = sections_value
         ground_truth["parse_refs"] = bool(parse_refs)
 
@@ -173,7 +174,7 @@ def test_settings_warning(
             args = ["--bump-latest"]
 
         with pytest.warns(FutureWarning) as record:
-            cli.parse_settings(args)
+            parse_settings(args)
 
         solution = "is deprecated in favor of"  # Warning comes from CLI parsing.
         if value is not None:  # Warning is issued when parsing the config file.
@@ -185,7 +186,7 @@ def test_settings_warning(
         # If setting is in config file AND passed by CLI, two FutureWarnings are issued.
         if (tmp_path / ".git-changelog.toml").exists():
             with pytest.warns(FutureWarning) as record:
-                cli.parse_settings(["--bump-latest"])
+                parse_settings(["--bump-latest"])
 
             assert len(record) == 2
 
@@ -198,7 +199,7 @@ def test_show_version(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["-V"])
+        main(["-V"])
     captured = capsys.readouterr()
     assert debug._get_version() in captured.out
 
@@ -211,7 +212,7 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["--debug-info"])
+        main(["--debug-info"])
     captured = capsys.readouterr().out.lower()
     assert "python" in captured
     assert "system" in captured
@@ -240,7 +241,7 @@ def test_jinja_context(repo: GitRepo) -> None:
     template = repo.path.joinpath(".custom_template.md.jinja")
     template.write_text("{% for key, val in jinja_context.items() %}{{ key }} = {{ val }}\n{% endfor %}")
 
-    exit_code = cli.main(
+    exit_code = main(
         [
             "--config-file",
             str(repo.path / "conf.toml"),
@@ -273,18 +274,18 @@ def test_versioning(repo: GitRepo) -> None:
     repo.tag("1.0.0")
     repo.commit("fix: Fix")
     with repo.enter():
-        assert cli.main(["-cconventional", "-nsemver", "-Bauto"]) == 0
-        assert cli.main(["-cconventional", "-npep440", "-Bauto"]) == 0
-        assert cli.main(["-cconventional", "-nsemver", "-B1.1.0"]) == 0
-        assert cli.main(["-cconventional", "-npep440", "-B1.1.0"]) == 0
-        assert cli.main(["-cconventional", "-nsemver", "-Bunknown"]) == 1
-        assert cli.main(["-cconventional", "-npep440", "-Bunknown"]) == 1
-        assert cli.main(["-cconventional", "-npep440", "-Balpha"]) == 1
+        assert main(["-cconventional", "-nsemver", "-Bauto"]) == 0
+        assert main(["-cconventional", "-npep440", "-Bauto"]) == 0
+        assert main(["-cconventional", "-nsemver", "-B1.1.0"]) == 0
+        assert main(["-cconventional", "-npep440", "-B1.1.0"]) == 0
+        assert main(["-cconventional", "-nsemver", "-Bunknown"]) == 1
+        assert main(["-cconventional", "-npep440", "-Bunknown"]) == 1
+        assert main(["-cconventional", "-npep440", "-Balpha"]) == 1
 
 
 def test_bumped_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
     """The `--bumped-version` CLI option outputs the expected bumped version string."""
-    cli.main(
+    main(
         [
             "--config-file",
             str(tmp_path / "conf.toml"),

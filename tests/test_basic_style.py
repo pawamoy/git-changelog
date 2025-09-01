@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from git_changelog._internal.commit import BasicConvention, Commit
+from git_changelog import BasicConvention, Commit
 
 
 def test_basic_convention_breaking_change() -> None:

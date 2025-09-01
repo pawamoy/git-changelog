@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from git_changelog.cli import get_release_notes
+from git_changelog import get_release_notes
 
 if TYPE_CHECKING:
     from pathlib import Path

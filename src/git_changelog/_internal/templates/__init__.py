@@ -1,4 +1,4 @@
-"""The subpackage containing the builtin templates."""
+# The subpackage containing the builtin templates.
 
 from __future__ import annotations
 
@@ -8,7 +8,9 @@ from urllib.parse import urlparse
 from jinja2 import Environment, Template
 
 TEMPLATES_PATH = Path(__file__).parent
+"""The path to the templates directory."""
 JINJA_ENV = Environment()  # noqa: S701
+"""The Jinja environment."""
 
 
 def _filter_is_url(value: str) -> bool:
@@ -27,7 +29,7 @@ def configure_env(env: Environment) -> None:
 def get_custom_template(path: str | Path) -> Template:
     """Get a custom template instance.
 
-    Arguments:
+    Parameters:
         path: Path to the custom template.
 
     Returns:
@@ -39,7 +41,7 @@ def get_custom_template(path: str | Path) -> Template:
 def get_template(name: str) -> Template:
     """Get a builtin template instance.
 
-    Arguments:
+    Parameters:
         name: The template name.
 
     Returns:

@@ -105,6 +105,7 @@ ci = [
     "tomli-w>=1.0",
 ]
  docs = [
+    "griffe-inherited-docstrings>=1.1",
     "markdown-callouts>=0.4",
     "markdown-exec>=1.8",
     "mkdocs>=1.6",

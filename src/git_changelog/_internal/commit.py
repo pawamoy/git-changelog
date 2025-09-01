@@ -143,7 +143,7 @@ class Commit:
     ):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             commit_hash: The commit hash.
             author_name: The author name.
             author_email: The author email.
@@ -167,15 +167,25 @@ class Commit:
             committer_date = datetime.fromtimestamp(float(committer_date), tz=timezone.utc)
 
         self.hash: str = commit_hash
+        """The commit hash."""
         self.author_name: str = author_name
+        """The author name."""
         self.author_email: str = author_email
+        """The author email."""
         self.author_date: datetime = author_date
+        """The author date."""
         self.committer_name: str = committer_name
+        """The committer name."""
         self.committer_email: str = committer_email
+        """The committer email."""
         self.committer_date: datetime = committer_date
+        """The committer date."""
         self.subject: str = subject
+        """The commit subject."""
         self.body: list[str] = _clean_body(body) if body else []
+        """The commit body."""
         self.url: str = url
+        """The commit URL."""
 
         tag = ""
         for ref in refs.split(","):
@@ -186,19 +196,26 @@ class Commit:
                     tag = ref
                     break
         self.tag: str = tag
+        """The commit tag."""
         self.version: str = tag
+        """The commit version."""
 
         if isinstance(parent_hashes, str):
             parent_hashes = parent_hashes.split()
         self.parent_hashes = parent_hashes
+        """The parent commit hashes."""
         self._commits_map = commits_map
 
         self.text_refs: dict[str, list[Ref]] = {}
+        """The commit text references."""
         self.convention: dict[str, Any] = {}
+        """The commit message convention."""
 
         # YORE: Bump 3: Replace `_Trailers()` with `[]` within line.
         self.trailers: list[tuple[str, str]] = _Trailers()
+        """The commit trailers."""
         self.body_without_trailers = self.body
+        """The commit body without trailers."""
 
         if parse_trailers:
             self._parse_trailers()
@@ -215,7 +232,7 @@ class Commit:
     def update_with_convention(self, convention: CommitConvention) -> None:
         """Apply the convention-parsed data to this commit.
 
-        Arguments:
+        Parameters:
             convention: The convention to use.
         """
         self.convention.update(convention.parse_commit(self))
@@ -227,19 +244,19 @@ class Commit:
     ) -> None:
         """Apply the provider-parsed data to this commit.
 
-        Arguments:
+        Parameters:
             provider: The provider to use.
             parse_refs: Whether to parse references for this provider.
         """
-        # set the commit url based on provider
+        # Set the commit URL based on the provider.
         # FIXME: hardcoded 'commits'
         if "commits" in provider.REF:
             self.url = provider.build_ref_url("commits", {"ref": self.hash})
         else:
-            # use default "commit" url (could be wrong)
+            # Use default "commit" URL (could be wrong).
             self.url = f"{provider.url}/{provider.namespace}/{provider.project}/commit/{self.hash}"
 
-        # build commit text references from its subject and body
+        # Build commit text references from its subject and body.
         if parse_refs:
             for ref_type in provider.REF:
                 self.text_refs[ref_type] = provider.get_refs(
@@ -269,22 +286,26 @@ class Commit:
         for line in lines:
             title, value = line.split(": ", 1)
             trailers.append((title, value.strip()))
-        return trailers  # or raise ValueError due to split unpacking
+        return trailers  # Or raise `ValueError` due to split unpacking.
 
 
 class CommitConvention(ABC):
     """A base class for a convention of commit messages."""
 
     TYPES: ClassVar[dict[str, str]]
+    """The commit message types."""
     TYPE_REGEX: ClassVar[Pattern]
+    """The commit message type regex."""
     BREAK_REGEX: ClassVar[Pattern]
+    """The commit message breaking change regex."""
     DEFAULT_RENDER: ClassVar[list[str]]
+    """The sections rendered by default."""
 
     @abstractmethod
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
         """Parse the commit to extract information.
 
-        Arguments:
+        Parameters:
             commit: The commit to parse.
 
         Returns:
@@ -330,20 +351,32 @@ class BasicConvention(CommitConvention):
         "merge": "Merged",
         "doc": "Documented",
     }
+    """The commit message types."""
 
     TYPE_REGEX: ClassVar[Pattern] = re.compile(rf"^(?P<type>({'|'.join(TYPES.keys())}))", re.I)
+    """The commit message type regex."""
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
     )
+    """The commit message breaking change regex."""
     DEFAULT_RENDER: ClassVar[list[str]] = [
         TYPES["add"],
         TYPES["fix"],
         TYPES["change"],
         TYPES["remove"],
     ]
+    """The default sections to render."""
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+        """Parse the commit to extract information.
+
+        Parameters:
+            commit: The commit to parse.
+
+        Returns:
+            A dictionary containing the parsed data.
+        """
         commit_type = self.parse_type(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
@@ -360,7 +393,7 @@ class BasicConvention(CommitConvention):
     def parse_type(self, commit_subject: str) -> str:
         """Parse the type of the commit given its subject.
 
-        Arguments:
+        Parameters:
             commit_subject: The commit message subject.
 
         Returns:
@@ -374,7 +407,7 @@ class BasicConvention(CommitConvention):
     def is_minor(self, commit_type: str) -> bool:
         """Tell if this commit is worth a minor bump.
 
-        Arguments:
+        Parameters:
             commit_type: The commit type.
 
         Returns:
@@ -385,7 +418,7 @@ class BasicConvention(CommitConvention):
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
 
-        Arguments:
+        Parameters:
             commit_message: The commit message.
 
         Returns:
@@ -414,13 +447,16 @@ class AngularConvention(CommitConvention):
         "test": "Tests",
         "tests": "Tests",
     }
+    """The commit message types."""
     SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
         rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?: (?P<subject>.+)$",
     )
+    """The commit message subject regex."""
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
         re.I | re.MULTILINE,
     )
+    """The commit message breaking change regex."""
     DEFAULT_RENDER: ClassVar[list[str]] = [
         TYPES["feat"],
         TYPES["fix"],
@@ -428,8 +464,17 @@ class AngularConvention(CommitConvention):
         TYPES["refactor"],
         TYPES["perf"],
     ]
+    """The default sections to render."""
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+        """Parse the commit to extract information.
+
+        Parameters:
+            commit: The commit to parse.
+
+        Returns:
+            A dictionary containing the parsed data.
+        """
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message)
@@ -448,7 +493,7 @@ class AngularConvention(CommitConvention):
     def parse_subject(self, commit_subject: str) -> dict[str, str]:
         """Parse the subject of the commit (`<type>[(scope)]: Subject`).
 
-        Arguments:
+        Parameters:
             commit_subject: The commit message subject.
 
         Returns:
@@ -464,7 +509,7 @@ class AngularConvention(CommitConvention):
     def is_minor(self, commit_type: str) -> bool:
         """Tell if this commit is worth a minor bump.
 
-        Arguments:
+        Parameters:
             commit_type: The commit type.
 
         Returns:
@@ -475,7 +520,7 @@ class AngularConvention(CommitConvention):
     def is_major(self, commit_message: str) -> bool:
         """Tell if this commit is worth a major bump.
 
-        Arguments:
+        Parameters:
             commit_message: The commit message.
 
         Returns:
@@ -488,12 +533,23 @@ class ConventionalCommitConvention(AngularConvention):
     """Conventional commit message convention."""
 
     TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
+    """The commit message types."""
     DEFAULT_RENDER: ClassVar[list[str]] = AngularConvention.DEFAULT_RENDER
+    """The default sections to render."""
     SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
         rf"^(?P<type>({'|'.join(TYPES.keys())}))(?:\((?P<scope>.+)\))?(?P<breaking>!)?: (?P<subject>.+)$",
     )
+    """The commit message subject regex."""
 
     def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+        """Parse the commit to extract information.
+
+        Parameters:
+            commit: The commit to parse.
+
+        Returns:
+            A dictionary containing the parsed data.
+        """
         subject = self.parse_subject(commit.subject)
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message) or subject.get("breaking") == "!"

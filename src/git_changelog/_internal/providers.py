@@ -37,12 +37,14 @@ class Ref:
     def __init__(self, ref: str, url: str) -> None:
         """Initialization method.
 
-        Arguments:
+        Parameters:
             ref: The reference text.
             url: The reference URL.
         """
         self.ref: str = ref
+        """The reference text."""
         self.url: str = url
+        """The reference URL."""
 
     def __str__(self):
         return self.ref + ": " + self.url
@@ -54,12 +56,14 @@ class RefDef:
     def __init__(self, regex: Pattern, url_string: str):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             regex: The regular expression to match the reference.
             url_string: The URL string to format using matched groups.
         """
         self.regex = regex
+        """The regular expression to match the reference."""
         self.url_string = url_string
+        """The URL string to format using matched groups."""
 
 
 class ProviderRefParser(ABC):
@@ -77,19 +81,22 @@ class ProviderRefParser(ABC):
     def __init__(self, namespace: str, project: str, url: str | None = None):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             namespace: The Bitbucket namespace.
             project: The Bitbucket project.
             url: The Bitbucket URL.
         """
         self.namespace: str = namespace
+        """The namespace for the provider."""
         self.project: str = project
+        """The project for the provider."""
         self.url: str = url or self.url
+        """The URL for the provider."""
 
     def get_refs(self, ref_type: str, text: str) -> list[Ref]:
         """Find all references in the given text.
 
-        Arguments:
+        Parameters:
             ref_type: The reference type.
             text: The text in which to search references.
 
@@ -104,7 +111,7 @@ class ProviderRefParser(ABC):
     def parse_refs(self, ref_type: str, text: str) -> list[Match]:
         """Parse references in the given text.
 
-        Arguments:
+        Parameters:
             ref_type: The reference type.
             text: The text to parse.
 
@@ -119,7 +126,7 @@ class ProviderRefParser(ABC):
     def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
         """Build the URL for a reference type and a dictionary of matched groups.
 
-        Arguments:
+        Parameters:
             ref_type: The reference type.
             match_dict: The matched groups.
 
@@ -132,7 +139,7 @@ class ProviderRefParser(ABC):
     def get_tag_url(self, tag: str) -> str:
         """Get the URL for a git tag.
 
-        Arguments:
+        Parameters:
             tag: The git tag.
 
         Returns:
@@ -144,7 +151,7 @@ class ProviderRefParser(ABC):
     def get_compare_url(self, base: str, target: str) -> str:
         """Get the URL for a tag comparison.
 
-        Arguments:
+        Parameters:
             base: The base tag.
             target: The target tag.
 

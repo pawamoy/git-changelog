@@ -26,13 +26,14 @@ if TYPE_CHECKING:
     from git_changelog._internal.versioning import SemVerVersion
 
 ConventionType = Union[str, CommitConvention, type[CommitConvention]]
+"""The type of convention used for commits."""
 
 
 # TODO: Remove at some point.
 def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
     """Bump a version. Deprecated, use [`bump_semver`][git_changelog.bump_semver] instead.
 
-    Arguments:
+    Parameters:
         version: The version to bump.
         part: The part of the version to bump (major, minor, or patch).
         zerover: Keep major version at zero, even for breaking changes.
@@ -52,7 +53,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
 def parse_version(version: str) -> tuple[SemVerVersion, str]:
     """Parse a version. Deprecated, use [`bump_semver`][git_changelog.parse_semver] instead.
 
-    Arguments:
+    Parameters:
         version: The version to parse.
 
     Returns:
@@ -73,12 +74,14 @@ class Section:
     def __init__(self, section_type: str = "", commits: list[Commit] | None = None):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             section_type: The section section_type.
             commits: The list of commits.
         """
         self.type: str = section_type
+        """The section type."""
         self.commits: list[Commit] = commits or []
+        """The list of commits."""
 
 
 class Version:
@@ -95,7 +98,7 @@ class Version:
     ):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             tag: The version tag.
             date: The version date.
             sections: The version sections.
@@ -104,16 +107,26 @@ class Version:
             compare_url: The version 'compare' URL.
         """
         self.tag = tag
+        """The version tag."""
         self.date = date
+        """The version date."""
 
         self.sections_list: list[Section] = sections or []
+        """The version sections (list)."""
         self.sections_dict: dict[str, Section] = {section.type: section for section in self.sections_list}
+        """The version sections (dict)."""
         self.commits: list[Commit] = commits or []
+        """The version commits."""
         self.url: str = url
+        """The version URL."""
         self.compare_url: str = compare_url
+        """The version 'compare' URL."""
         self.previous_version: Version | None = None
+        """The previous version."""
         self.next_version: Version | None = None
+        """The next version."""
         self.planned_tag: str | None = None
+        """The planned version tag."""
 
     @property
     def typed_sections(self) -> list[Section]:
@@ -154,7 +167,7 @@ class Version:
     def add_commit(self, commit: Commit) -> None:
         """Register the given commit and add it to the relevant section based on its message convention.
 
-        Arguments:
+        Parameters:
             commit: The git commit.
         """
         self.commits.append(commit)
@@ -171,6 +184,7 @@ class Changelog:
     """The main changelog class."""
 
     MARKER: ClassVar[str] = "--GIT-CHANGELOG MARKER--"
+    """Marker for the changelog."""
     FORMAT: ClassVar[str] = (
         r"%H%n"  # commit commit_hash
         r"%an%n"  # author name
@@ -184,11 +198,13 @@ class Changelog:
         r"%s%n"  # subject
         r"%b%n" + MARKER  # body
     )
+    """Format string for the changelog."""
     CONVENTION: ClassVar[dict[str, type[CommitConvention]]] = {
         "basic": BasicConvention,
         "angular": AngularConvention,
         "conventional": ConventionalCommitConvention,
     }
+    """Available commit message conventions."""
 
     def __init__(
         self,
@@ -208,7 +224,7 @@ class Changelog:
     ):
         """Initialization method.
 
-        Arguments:
+        Parameters:
             repository: The repository (directory) for which to build the changelog.
             provider: The provider to use (github.com, gitlab.com, etc.).
             convention: The commit convention to use (angular, etc.).
@@ -221,12 +237,17 @@ class Changelog:
             filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
         """
         self.repository: str | Path = repository
+        """The repository (directory) for which to build the changelog."""
         self.parse_provider_refs: bool = parse_provider_refs
+        """Whether to parse provider-specific references in the commit messages."""
         self.parse_trailers: bool = parse_trailers
+        """Whether to parse Git trailers in the commit messages."""
         self.zerover: bool = zerover
+        """Whether to keep major version at zero, even for breaking changes."""
         self.filter_commits: str | None = filter_commits
+        """The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`)."""
 
-        # set provider
+        # Set provider.
         if not isinstance(provider, ProviderRefParser):
             remote_url = self.get_remote_url()
             split = remote_url.split("/")
@@ -243,9 +264,11 @@ class Changelog:
             else:
                 provider = None
             self.remote_url: str = remote_url
+            """The remote URL of the repository."""
         self.provider = provider
+        """The provider to use (github.com, gitlab.com, etc.)."""
 
-        # set convention
+        # Set convention.
         if isinstance(convention, str):
             try:
                 convention = self.CONVENTION[convention]()
@@ -260,29 +283,40 @@ class Changelog:
         elif not isinstance(convention, CommitConvention) and issubclass(convention, CommitConvention):
             convention = convention()
         self.convention: CommitConvention = convention
+        """The commit convention to use."""
 
-        # set sections
+        # Set sections.
         sections = (
             [self.convention.TYPES[section] for section in sections] if sections else self.convention.DEFAULT_RENDER
         )
         self.sections = sections
+        """The sections to include in the changelog."""
 
-        # get version parser based on selected versioning scheme
-        self.version_parser, self.version_bumper = {
+        # Get version parser based on selected versioning scheme.
+        version_parser, version_bumper = {
             "semver": (parse_semver, bump_semver),
             "pep440": (parse_pep440, bump_pep440),
         }[versioning]
+        self.version_parser = version_parser
+        """The version parser function."""
+        self.version_bumper = version_bumper
+        """The version bumper function."""
 
-        # get git log and parse it into list of commits
+        # Get git log and parse it into list of commits.
         self.raw_log: str = self.get_log()
+        """The raw Git log output."""
         self.commits: list[Commit] = self.parse_commits()
+        """The list of parsed commits."""
         self.tag_commits: list[Commit] = [commit for commit in self.commits[1:] if commit.tag]
+        """The list of tagged commits."""
         self.tag_commits.insert(0, self.commits[0])
 
-        # apply dates to commits and group them by version
+        # Apply dates to commits and group them by version.
         v_list, v_dict = self._group_commits_by_version()
         self.versions_list = v_list
+        """The list of versions."""
         self.versions_dict = v_dict
+        """The dictionary of versions."""
 
         # YORE: Bump 3: Remove block.
         if bump_latest:
@@ -300,7 +334,7 @@ class Changelog:
     def run_git(self, *args: str) -> str:
         """Run a git command in the chosen repository.
 
-        Arguments:
+        Parameters:
             *args: Arguments passed to the git command.
 
         Returns:
@@ -462,7 +496,7 @@ class Changelog:
         due to the commit filter excluding it, the compare URL is created with the
         first commit (oldest).
 
-        Arguments:
+        Parameters:
             versions_dict: A dictionary of versions with the tag name as keys.
             previous_versions: A dictonary with version and previous version.
         """
@@ -486,7 +520,7 @@ class Changelog:
                 last_tag = self.version_bumper.initial
             version, *plus = version.split("+")
             if version == "auto":
-                # guess the next version number based on last version and recent commits
+                # Guess the next version number based on last version and recent commits.
                 version = "patch"
                 for commit in last_version.commits:
                     if commit.convention["is_major"]:
@@ -496,7 +530,7 @@ class Changelog:
                         version = "minor"
             version = "+".join((version, *plus))
             if version in self.version_bumper.strategies:
-                # bump version
+                # Bump version.
                 last_version.planned_tag = self.version_bumper(last_tag, version, zerover=self.zerover)
             else:
                 # user specified version
@@ -505,7 +539,7 @@ class Changelog:
                 except ValueError as error:
                     raise ValueError(f"{error}; typo in bumping strategy? Check the CLI help and our docs") from error
                 last_version.planned_tag = version
-            # update URLs
+            # Update URLs.
             if self.provider:
                 last_version.url = self.provider.get_tag_url(tag=last_version.planned_tag)
                 last_version.compare_url = self.provider.get_compare_url(
