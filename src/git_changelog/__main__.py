@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import sys
 
-from git_changelog.cli import main
+from git_changelog._internal.cli import main
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

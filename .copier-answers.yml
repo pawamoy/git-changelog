@@ -1,5 +1,5 @@
-# Changes here will be overwritten by Copier
-_commit: 1.5.4
+# Changes here will be overwritten by Copier.
+_commit: 1.8.9
 _src_path: gh:pawamoy/copier-uv
 author_email: dev@pawamoy.fr
 author_fullname: Timothée Mazzucotelli
@@ -7,7 +7,7 @@ author_username: pawamoy
 copyright_date: '2020'
 copyright_holder: Timothée Mazzucotelli
 copyright_holder_email: dev@pawamoy.fr
-copyright_license: ISC License
+copyright_license: ISC
 insiders: false
 project_description: Automatic Changelog generator using Jinja2 templates.
 project_name: git-changelog

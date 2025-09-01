@@ -35,7 +35,7 @@ jobs:
         python-version: "3.12"
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
         cache-dependency-glob: pyproject.toml
@@ -55,8 +55,16 @@ jobs:
     - name: Check for breaking changes in the API
       run: make check-api
 
+    - name: Store objects inventory for tests
+      uses: actions/upload-artifact@v4
+      with:
+        name: objects.inv
+        path: site/objects.inv
+
   tests:
 
+    needs:
+    - quality
     strategy:
       matrix:
         os:
@@ -95,16 +103,22 @@ jobs:
         allow-prereleases: true
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
         cache-dependency-glob: pyproject.toml
-        cache-suffix: py${{ matrix.python-version }}
+        cache-suffix: ${{ matrix.resolution }}
 
     - name: Install dependencies
       env:
         UV_RESOLUTION: ${{ matrix.resolution }}
       run: make setup
+
+    - name: Download objects inventory
+      uses: actions/download-artifact@v4
+      with:
+        name: objects.inv
+        path: site/
 
     - name: Run the test suite
       run: make test

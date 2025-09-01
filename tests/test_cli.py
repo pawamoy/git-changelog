@@ -1,4 +1,4 @@
-"""Tests for the `cli` module."""
+"""Tests for the CLI."""
 
 # IMPORTANT: Do not call `git_changelog.cli.main()`
 # without passing a config file path, otherwise
@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING, Any
 import pytest
 import tomli_w
 
-from git_changelog import cli, debug
+from git_changelog import main
+from git_changelog._internal import debug
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -58,7 +59,7 @@ def test_show_help(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["-h"])
+        main(["-h"])
     captured = capsys.readouterr()
     assert "git-changelog" in captured.out
 
@@ -198,9 +199,9 @@ def test_show_version(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["-V"])
+        main(["-V"])
     captured = capsys.readouterr()
-    assert debug.get_version() in captured.out
+    assert debug._get_version() in captured.out
 
 
 # IMPORTANT: See top module comment.
@@ -211,7 +212,7 @@ def test_show_debug_info(capsys: pytest.CaptureFixture) -> None:
         capsys: Pytest fixture to capture output.
     """
     with pytest.raises(SystemExit):
-        cli.main(["--debug-info"])
+        main(["--debug-info"])
     captured = capsys.readouterr().out.lower()
     assert "python" in captured
     assert "system" in captured
