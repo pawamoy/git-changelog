@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.6.1](https://github.com/pawamoy/git-changelog/releases/tag/2.6.1) - 2025-09-01
+
+<small>[Compare with 2.6.0](https://github.com/pawamoy/git-changelog/compare/2.6.0...2.6.1)</small>
+
+### Deprecations
+
+- Symbols must now be imported from the top-level `git_changelog` module. All submodules are deprecated.
+
+### Code Refactoring
+
+- Re-expose API in the top-level module, sync docs ([093721c](https://github.com/pawamoy/git-changelog/commit/093721c62687b7c9f01bd304b2e826d5b4a514f2) by Timothée Mazzucotelli).
+- Move modules under internal folder ([06e7282](https://github.com/pawamoy/git-changelog/commit/06e7282d56c915b74e0ffb34faba00cd774ae7b6) by Timothée Mazzucotelli).
+
 ## [2.6.0](https://github.com/pawamoy/git-changelog/releases/tag/2.6.0) - 2025-09-01
 
 <small>[Compare with 2.5.3](https://github.com/pawamoy/git-changelog/compare/2.5.3...2.6.0)</small>
