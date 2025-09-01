@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.6.0](https://github.com/pawamoy/git-changelog/releases/tag/2.6.0) - 2025-09-01
+
+<small>[Compare with 2.5.3](https://github.com/pawamoy/git-changelog/compare/2.5.3...2.6.0)</small>
+
+### Features
+
+- Add `--bumped-version` CLI option to print the computed new version ([abaf28a](https://github.com/pawamoy/git-changelog/commit/abaf28afe1d89cf4cfaa53add5b1948711b6a987) by fgagarin). [PR-103](https://github.com/pawamoy/git-changelog/pull/103), Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
+
 ## [2.5.3](https://github.com/pawamoy/git-changelog/releases/tag/2.5.3) - 2024-11-26
 
 <small>[Compare with 2.5.2](https://github.com/pawamoy/git-changelog/compare/2.5.2...2.5.3)</small>
