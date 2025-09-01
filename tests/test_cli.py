@@ -25,10 +25,10 @@ if TYPE_CHECKING:
     from tests.helpers import GitRepo
 
 
+# YORE: EOL 3.10: Replace block with line 2.
 if sys.version_info >= (3, 11):
     from contextlib import chdir
 else:
-    # TODO: remove once support for Python 3.10 is dropped
     from contextlib import contextmanager
 
     @contextmanager

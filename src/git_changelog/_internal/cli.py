@@ -34,7 +34,7 @@ from git_changelog._internal.commit import (
 from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 from git_changelog._internal.versioning import bump_pep440, bump_semver
 
-# TODO: Remove once support for Python 3.10 is dropped.
+# YORE: EOL 3.10: Replace block with line 2.
 if sys.version_info >= (3, 11):
     import tomllib
 else:

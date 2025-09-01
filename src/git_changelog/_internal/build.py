@@ -29,7 +29,7 @@ ConventionType = Union[str, CommitConvention, type[CommitConvention]]
 """The type of convention used for commits."""
 
 
-# TODO: Remove at some point.
+# YORE: Bump 3: Remove block.
 def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, zerover: bool = True) -> str:
     """Bump a version. Deprecated, use [`bump_semver`][git_changelog.bump_semver] instead.
 
@@ -49,7 +49,7 @@ def bump(version: str, part: Literal["major", "minor", "patch"] = "patch", *, ze
     return bump_semver(version, part, zerover=zerover)
 
 
-# TODO: Remove at some point.
+# YORE: Bump 3: Remove block.
 def parse_version(version: str) -> tuple[SemVerVersion, str]:
     """Parse a version. Deprecated, use [`bump_semver`][git_changelog.parse_semver] instead.
 
