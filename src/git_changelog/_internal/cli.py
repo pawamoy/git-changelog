@@ -20,8 +20,8 @@ from pathlib import Path
 from re import Pattern
 from typing import TYPE_CHECKING, Any, Literal, TextIO
 
-from appdirs import user_config_dir
 from jinja2.exceptions import TemplateNotFound
+from platformdirs import user_config_dir
 
 from git_changelog._internal import debug, templates
 from git_changelog._internal.build import Changelog, Version
