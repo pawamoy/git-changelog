@@ -5400,7 +5400,7 @@ The previous version.
 ### sections_dict
 
 ```
-sections_dict: dict[str, Section] = {(type): _QK8Fuifor section in (sections_list)}
+sections_dict: dict[str, Section] = {(type): _R8WmVKfor section in (sections_list)}
 ```
 
 The version sections (dict).
