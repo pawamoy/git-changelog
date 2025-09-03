@@ -38,9 +38,9 @@ classifiers = [
 ]
 dependencies = [
     "appdirs>=1.4",
-    "Jinja2>=2.10",
+    "Jinja2>=3.0",
     "packaging>=24.0",
-    "semver>=2.13",
+    "semver>=3.0",
     "tomli>=2.0; python_version < '3.11'",
     "typing-extensions>=4.9; python_version < '3.13'",
 ]
