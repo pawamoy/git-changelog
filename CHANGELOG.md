@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.6.2](https://github.com/pawamoy/git-changelog/releases/tag/2.6.2) - 2025-09-03
+
+<small>[Compare with 2.6.1](https://github.com/pawamoy/git-changelog/compare/2.6.1...2.6.2)</small>
+
+### Dependencies
+
+- Replace appdirs (deprecated) by platformdirs ([12623b4](https://github.com/pawamoy/git-changelog/commit/12623b4e99c00f3905b59064b6ffadf1bbd3a720) by Timothée Mazzucotelli).
+- Upgrade lower bounds of Jinja2 and semver to 3.0 ([169d7bf](https://github.com/pawamoy/git-changelog/commit/169d7bf50771023b4db0a1c64f266077e505f1fa) by Timothée Mazzucotelli).
+
+### Code Refactoring
+
+- Update entry point to avoid deprecation warning ([e7ca136](https://github.com/pawamoy/git-changelog/commit/e7ca136e7effa47b1e4bdee1b5a1e9f6768c477a) by fgagarin). [PR-104](https://github.com/pawamoy/git-changelog/pull/104)
+
 ## [2.6.1](https://github.com/pawamoy/git-changelog/releases/tag/2.6.1) - 2025-09-01
 
 <small>[Compare with 2.6.0](https://github.com/pawamoy/git-changelog/compare/2.6.0...2.6.1)</small>
