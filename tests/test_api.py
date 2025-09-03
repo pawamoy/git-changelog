@@ -161,7 +161,7 @@ def test_inventory_matches_api(
             and (item.name == "git_changelog" or item.name.startswith("git_changelog."))
         ):
             obj = loader.modules_collection[item.name]
-            if obj.path not in public_api_paths and not any(path in public_api_paths for path in obj.aliases):
+            if obj.path not in public_api_paths and not any(path in public_api_paths for path in obj.aliases):  # noqa: SIM102
                 # YORE: Bump 3: Replace block with line 8.
                 if obj.path not in (
                     "git_changelog.build",
