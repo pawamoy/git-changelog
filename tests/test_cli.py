@@ -283,12 +283,13 @@ def test_versioning(repo: GitRepo) -> None:
         assert main(["-cconventional", "-npep440", "-Balpha"]) == 1
 
 
-def test_bumped_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> None:
     """The `--bumped-version` CLI option outputs the expected bumped version string."""
     main(
         [
+            str(repo.path),
             "--config-file",
-            str(tmp_path / "conf.toml"),
+            str(repo.path / "conf.toml"),
             "--bump",
             "1.2.3",
             "--bumped-version",
