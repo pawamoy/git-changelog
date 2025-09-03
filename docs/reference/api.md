@@ -5,5 +5,3 @@ hide:
 ---
 
 # ::: git_changelog
-    options:
-        show_submodules: true
