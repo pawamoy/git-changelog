@@ -5400,7 +5400,7 @@ The previous version.
 ### sections_dict
 
 ```
-sections_dict: dict[str, Section] = {(type): _R8WmVKfor section in (sections_list)}
+sections_dict: dict[str, Section] = {(type): _OLsQIxfor section in (sections_list)}
 ```
 
 The version sections (dict).
@@ -6143,7 +6143,7 @@ def get_release_notes(
     release_notes = []
     found_marker = False
     found_version = False
-    with open(input_file) as changelog:
+    with open(input_file, encoding="utf8") as changelog:
         for line in changelog:
             line = line.strip()  # noqa: PLW2901
             if not found_marker:
@@ -6679,7 +6679,7 @@ def render(
     # Render new entries in-place.
     if in_place:
         # Read current changelog lines.
-        with open(output) as changelog_file:  # type: ignore[arg-type]
+        with open(output, encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
@@ -6723,7 +6723,7 @@ def render(
             lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+        with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # Overwrite output file.
@@ -6734,7 +6734,7 @@ def render(
         if output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w") as stream:  # type: ignore[arg-type]
+            with open(output, "w", encoding="utf8") as stream:  # type: ignore[arg-type]
                 stream.write(rendered)
 
     return rendered
@@ -6776,27 +6776,3 @@ def version_prefix(version: str) -> tuple[str, str]:
         version = version[1:]
     return version, prefix
 ```
-
-## build
-
-Deprecated. Import from `git_changelog` directly.
-
-## cli
-
-Deprecated. Import from `git_changelog` directly.
-
-## commit
-
-Deprecated. Import from `git_changelog` directly.
-
-## providers
-
-Deprecated. Import from `git_changelog` directly.
-
-## templates
-
-Deprecated. Import from `git_changelog` directly.
-
-## versioning
-
-Deprecated. Import from `git_changelog` directly.
