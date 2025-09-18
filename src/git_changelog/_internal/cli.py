@@ -676,7 +676,7 @@ def render(
     # Render new entries in-place.
     if in_place:
         # Read current changelog lines.
-        with open(output) as changelog_file:  # type: ignore[arg-type]
+        with open(output, encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
@@ -720,7 +720,7 @@ def render(
             lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
-        with open(output, "w") as changelog_file:  # type: ignore[arg-type]
+        with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # Overwrite output file.
@@ -731,7 +731,7 @@ def render(
         if output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w") as stream:  # type: ignore[arg-type]
+            with open(output, "w", encoding="utf8") as stream:  # type: ignore[arg-type]
                 stream.write(rendered)
 
     return rendered
@@ -840,7 +840,7 @@ def get_release_notes(
     release_notes = []
     found_marker = False
     found_version = False
-    with open(input_file) as changelog:
+    with open(input_file, encoding="utf8") as changelog:
         for line in changelog:
             line = line.strip()  # noqa: PLW2901
             if not found_marker:
