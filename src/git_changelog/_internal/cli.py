@@ -731,7 +731,7 @@ def render(
         if output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w", encoding="utf-8") as stream:  # type: ignore[arg-type]
+            with open(output, "w", encoding="utf8") as stream:  # type: ignore[arg-type]
                 stream.write(rendered)
 
     return rendered
