@@ -840,7 +840,7 @@ def get_release_notes(
     release_notes = []
     found_marker = False
     found_version = False
-    with open(input_file, encoding="utf-8") as changelog:
+    with open(input_file, encoding="utf8") as changelog:
         for line in changelog:
             line = line.strip()  # noqa: PLW2901
             if not found_marker:
