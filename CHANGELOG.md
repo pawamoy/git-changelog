@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.6.3](https://github.com/pawamoy/git-changelog/releases/tag/2.6.3) - 2025-09-18
+
+<small>[Compare with 2.6.2](https://github.com/pawamoy/git-changelog/compare/2.6.2...2.6.3)</small>
+
+### Bug Fixes
+
+- Use UTF-8 encoding in all text-mode `open()` calls ([982377c](https://github.com/pawamoy/git-changelog/commit/982377c1997d05b7d2d5ac5fbc2a29abafdbf23c) by Bartosz Sławecki). [PR-105](https://github.com/pawamoy/git-changelog/pull/105)
+
 ## [2.6.2](https://github.com/pawamoy/git-changelog/releases/tag/2.6.2) - 2025-09-03
 
 <small>[Compare with 2.6.1](https://github.com/pawamoy/git-changelog/compare/2.6.1...2.6.2)</small>
