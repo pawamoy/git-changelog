@@ -59,7 +59,7 @@ class GitRepo:
         Returns:
             The Git commit hash.
         """
-        with self.path.joinpath(str(uuid.uuid4())).open("w", encoding="utf-8") as fh:
+        with self.path.joinpath(str(uuid.uuid4())).open("w", encoding="utf8") as fh:
             fh.write(str(random.randint(0, 1)))  # noqa: S311
         self.git("add", "-A")
         self.git("commit", "-m", message)
