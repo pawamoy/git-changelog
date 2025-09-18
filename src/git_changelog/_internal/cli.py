@@ -720,7 +720,7 @@ def render(
             lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
-        with open(output, "w", encoding="utf-8") as changelog_file:  # type: ignore[arg-type]
+        with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # Overwrite output file.
