@@ -676,7 +676,7 @@ def render(
     # Render new entries in-place.
     if in_place:
         # Read current changelog lines.
-        with open(output, encoding="utf-8") as changelog_file:  # type: ignore[arg-type]
+        with open(output, encoding="utf8") as changelog_file:  # type: ignore[arg-type]
             lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
