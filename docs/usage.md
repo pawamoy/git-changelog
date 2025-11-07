@@ -126,6 +126,7 @@ for most of the command line options:
 bump = "auto"
 convention = "basic"
 in-place = false
+include-all = false
 filter-commits = "0.5.0.."
 marker-line = "<!-- insertion marker -->"
 output = "output.log"
@@ -148,6 +149,7 @@ settings must be found in the appropriate section:
 bump = "minor"
 convention = "conventional"
 in-place = false
+include-all = false
 filter-commits = "0.5.0.."
 marker-line = "<!-- insertion marker -->"
 output = "output.log"
@@ -292,6 +294,43 @@ without having to list them explicitly.
 
 See the previous paragraphs to get the list of available sections
 for each commit message convetions.
+
+## Include non-conventional commits
+
+[(--include-all)](cli.md#include_all)
+
+By default, *git-changelog* only includes commits that match the configured
+commit message convention. Commits that don't follow the convention (e.g., random
+commit messages like "fix typo", "wip", or "update stuff") are silently filtered out.
+
+If you want to include **all commits** in your changelog, even those that don't
+follow the convention, use the `-a` or `--include-all` CLI option:
+
+```bash
+git-changelog --include-all
+```
+
+Non-conventional commits will be rendered in a "Misc" section at the end of each version.
+This is particularly useful for:
+
+- Projects with mixed commit styles or during transitions to conventional commits
+- Ensuring a complete history of all changes, not just the conventional ones
+- Debugging or reviewing what commits were made in a version
+
+Example configuration in a TOML file:
+
+```toml
+convention = "angular"
+include-all = true
+```
+
+When combined with the `--sections` option, the "Misc" section will appear
+after all specified sections:
+
+```bash
+git-changelog --sections feat,fix --include-all
+# Renders: Features, Bug Fixes, Misc
+```
 
 ## Choose a changelog template
 

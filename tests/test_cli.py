@@ -312,3 +312,44 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
     )
     captured = capsys.readouterr()
     assert captured.out.strip() == "1.2.3"
+
+
+def test_include_all_cli_option(tmp_path: Path) -> None:
+    """Test that --include-all CLI option is parsed correctly.
+
+    Parameters:
+        tmp_path: A temporary path to write an empty config to.
+    """
+    # Test default (False)
+    settings = parse_settings(["--config-file", str(tmp_path / "conf.toml")])
+    assert settings["include_all"] is False
+
+    # Test explicit --include-all flag
+    settings = parse_settings(["--config-file", str(tmp_path / "conf.toml"), "--include-all"])
+    assert settings["include_all"] is True
+
+    # Test short flag -a
+    settings = parse_settings(["--config-file", str(tmp_path / "conf.toml"), "-a"])
+    assert settings["include_all"] is True
+
+
+def test_include_all_config_option(tmp_path: Path) -> None:
+    """Test that include-all config option is read correctly.
+
+    Parameters:
+        tmp_path: A temporary path to write config file to.
+    """
+    with chdir(str(tmp_path)):
+        # Test include-all = true in config file
+        (tmp_path / ".git-changelog.toml").write_text(
+            tomli_w.dumps({"include-all": True}),
+        )
+        settings = read_config()
+        assert settings["include_all"] is True
+
+        # Test include-all = false in config file
+        (tmp_path / ".git-changelog.toml").write_text(
+            tomli_w.dumps({"include-all": False}),
+        )
+        settings = read_config()
+        assert settings["include_all"] is False

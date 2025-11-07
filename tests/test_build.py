@@ -42,7 +42,13 @@ def test_bump_with_semver_on_new_repo(
         bump: The bump parameter value.
         expected: Expected version for the new changelog entry.
     """
-    changelog = Changelog(repo.path, convention=AngularConvention, bump=bump, versioning=versioning, zerover=False)
+    changelog = Changelog(
+        repo.path,
+        convention=AngularConvention,
+        bump=bump,
+        versioning=versioning,
+        zerover=False,
+    )
     assert len(changelog.versions_list) == 1
     assert changelog.versions_list[0].planned_tag == expected
 
@@ -187,15 +193,30 @@ def test_two_release_branches(repo: GitRepo) -> None:
 
     assert len(changelog.versions_list) == 4
     versions = iter(changelog.versions_list)
-    _assert_version(next(versions), expected_tag="", expected_prev_tag="2.0.0", expected_commits=[commit_g, commit_f])
+    _assert_version(
+        next(versions),
+        expected_tag="",
+        expected_prev_tag="2.0.0",
+        expected_commits=[commit_g, commit_f],
+    )
     _assert_version(
         next(versions),
         expected_tag="2.0.0",
         expected_prev_tag="1.1.0",
         expected_commits=[commit_e, commit_c],
     )
-    _assert_version(next(versions), expected_tag="1.1.0", expected_prev_tag="1.0.0", expected_commits=[commit_d])
-    _assert_version(next(versions), expected_tag="1.0.0", expected_prev_tag=None, expected_commits=[commit_b, commit_a])
+    _assert_version(
+        next(versions),
+        expected_tag="1.1.0",
+        expected_prev_tag="1.0.0",
+        expected_commits=[commit_d],
+    )
+    _assert_version(
+        next(versions),
+        expected_tag="1.0.0",
+        expected_prev_tag=None,
+        expected_commits=[commit_b, commit_a],
+    )
 
 
 def _assert_version(
@@ -206,7 +227,9 @@ def _assert_version(
 ) -> None:
     assert expected_tag in (version.tag, version.planned_tag)
     if expected_prev_tag:
-        assert version.previous_version is not None, f"Expected previous version '{expected_prev_tag}', but was None"
+        assert version.previous_version is not None, (
+            f"Expected previous version '{expected_prev_tag}', but was None"
+        )
         assert version.previous_version.tag == expected_prev_tag
     else:
         assert version.previous_version is None
@@ -329,7 +352,9 @@ def test_untyped_commits(repo: GitRepo) -> None:
         repo: GitRepo to a temporary repository.
     """
     commit_a = repo.first_hash
-    commit_b = repo.commit("this commit is untyped and therefore does not have a section!")
+    commit_b = repo.commit(
+        "this commit is untyped and therefore does not have a section!"
+    )
     repo.tag("1.0.0")
     changelog = Changelog(repo.path, convention=AngularConvention)
     assert len(changelog.versions_list) == 1
@@ -346,6 +371,107 @@ def test_untyped_commits(repo: GitRepo) -> None:
     (typed_commit,) = typed.commits
     assert untyped_commit.hash == commit_b
     assert typed_commit.hash == commit_a
+
+
+def test_include_all_false_excludes_untyped(repo: GitRepo) -> None:
+    """Test that untyped commits are excluded from sections when include_all=False (default).
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.commit("feat: Feature A")
+    repo.commit("Random commit message without convention")
+    repo.commit("fix: Fix B")
+    repo.commit("Another random message")
+    repo.tag("1.0.0")
+
+    changelog = Changelog(repo.path, convention=AngularConvention, include_all=False)
+
+    assert len(changelog.versions_list) == 1
+    version = changelog.versions_list[0]
+
+    # Empty string ("") should NOT be in sections when include_all=False
+    assert "" not in changelog.sections
+
+    # Only conventional commits should be in the rendered sections
+    sections_dict = version.sections_dict
+    # Should only have sections for typed commits (feat, fix, and chore from initial commit)
+    assert "Features" in sections_dict
+    assert "Bug Fixes" in sections_dict
+    assert "Chore" in sections_dict
+
+    # The untyped commits are captured but not rendered (empty string not in sections)
+    # So they won't appear in the changelog output
+
+
+def test_include_all_true_includes_untyped(repo: GitRepo) -> None:
+    """Test that untyped commits are included in sections when include_all=True.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.commit("feat: Feature A")
+    commit_b = repo.commit("Random commit message without convention")
+    repo.commit("fix: Fix C")
+    commit_d = repo.commit("Another random message")
+    repo.tag("1.0.0")
+
+    changelog = Changelog(repo.path, convention=AngularConvention, include_all=True)
+
+    assert len(changelog.versions_list) == 1
+    version = changelog.versions_list[0]
+
+    # Empty string ("") SHOULD be in sections when include_all=True
+    assert "" in changelog.sections
+
+    # All sections should be present
+    sections_dict = version.sections_dict
+    assert "Features" in sections_dict
+    assert "Bug Fixes" in sections_dict
+    assert "Chore" in sections_dict  # From initial commit
+    assert "" in sections_dict  # Untyped section
+
+    # Check that untyped section contains the non-conventional commits
+    untyped_section = sections_dict[""]
+    assert len(untyped_section.commits) == 2
+    untyped_hashes = [commit.hash for commit in untyped_section.commits]
+    assert commit_b in untyped_hashes
+    assert commit_d in untyped_hashes
+
+
+def test_include_all_with_sections_parameter(repo: GitRepo) -> None:
+    """Test that include_all works correctly with explicit sections parameter.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.commit("feat: Feature A")
+    commit_b = repo.commit("Random commit message")
+    repo.commit("fix: Fix C")
+    repo.tag("1.0.0")
+
+    # Specify only feat and fix sections, but with include_all=True
+    changelog = Changelog(
+        repo.path,
+        convention=AngularConvention,
+        sections=["feat", "fix"],
+        include_all=True,
+    )
+
+    # Empty string should be added at the end
+    assert "" in changelog.sections
+    # The specified sections should be present
+    assert "Features" in [s for s in changelog.sections if s]
+    assert "Bug Fixes" in [s for s in changelog.sections if s]
+
+    version = changelog.versions_list[0]
+    sections_dict = version.sections_dict
+
+    # Untyped section should be present
+    assert "" in sections_dict
+    untyped_section = sections_dict[""]
+    assert len(untyped_section.commits) == 1
+    assert untyped_section.commits[0].hash == commit_b
 
 
 def test_sections_all_expands_to_all_types(repo: GitRepo) -> None:
@@ -383,7 +509,9 @@ def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
         repo: GitRepo to a temporary repository.
     """
     repo.tag("1.0.0")
-    changelog = Changelog(repo.path, convention=AngularConvention, sections=["feat", "fix"])
+    changelog = Changelog(
+        repo.path, convention=AngularConvention, sections=["feat", "fix"]
+    )
 
     # Should map to full section names.
     assert changelog.sections == ["Features", "Bug Fixes"]
