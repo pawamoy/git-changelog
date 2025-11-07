@@ -286,9 +286,13 @@ class Changelog:
         """The commit convention to use."""
 
         # Set sections.
-        sections = (
-            [self.convention.TYPES[section] for section in sections] if sections else self.convention.DEFAULT_RENDER
-        )
+        if sections and ":all:" in sections:
+            # Expand :all: to all available section types
+            sections = list(self.convention.TYPES.values())
+        elif sections:
+            sections = [self.convention.TYPES[section] for section in sections]
+        else:
+            sections = self.convention.DEFAULT_RENDER
         self.sections = sections
         """The sections to include in the changelog."""
 
