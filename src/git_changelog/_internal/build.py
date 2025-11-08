@@ -287,7 +287,7 @@ class Changelog:
 
         # Set sections.
         if sections and ":all:" in sections:
-            # Expand :all: to all available section types
+            # Expand :all: to all available section types.
             sections = list(self.convention.TYPES.values())
         elif sections:
             sections = [self.convention.TYPES[section] for section in sections]
