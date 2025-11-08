@@ -357,7 +357,7 @@ def test_sections_all_expands_to_all_types(repo: GitRepo) -> None:
     repo.tag("1.0.0")
     changelog = Changelog(repo.path, convention=AngularConvention, sections=[":all:"])
 
-    # AngularConvention.TYPES contains all available section types
+    # AngularConvention.TYPES contains all available section types.
     expected_sections = list(AngularConvention.TYPES.values())
     assert changelog.sections == expected_sections
 
@@ -371,7 +371,7 @@ def test_sections_all_with_basic_convention(repo: GitRepo) -> None:
     repo.tag("1.0.0")
     changelog = Changelog(repo.path, convention=BasicConvention, sections=[":all:"])
 
-    # BasicConvention.TYPES contains all available section types
+    # BasicConvention.TYPES contains all available section types.
     expected_sections = list(BasicConvention.TYPES.values())
     assert changelog.sections == expected_sections
 
@@ -385,5 +385,5 @@ def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
     repo.tag("1.0.0")
     changelog = Changelog(repo.path, convention=AngularConvention, sections=["feat", "fix"])
 
-    # Should map to full section names
+    # Should map to full section names.
     assert changelog.sections == ["Features", "Bug Fixes"]
