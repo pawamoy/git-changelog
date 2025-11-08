@@ -347,6 +347,7 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="SECTIONS",
         dest="sections",
         help="A comma-separated list of sections to render. "
+        "Use `:all:` to include all available sections for the selected convention. "
         "See the available sections for each supported convention in the description. "
         "Default: unset (None).",
     )

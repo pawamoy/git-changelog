@@ -92,6 +92,21 @@ def test_passing_repository_and_sections(tmp_path: Path, args: tuple[str]) -> No
     assert parsed_settings["convention"] == "angular"
 
 
+def test_sections_all_parameter(tmp_path: Path) -> None:
+    """Test that :all: is passed through correctly from CLI.
+
+    Parameters:
+        tmp_path: A temporary path to write the changelog into.
+    """
+    ch = tmp_path.joinpath("ch.md")
+    parsed_settings = parse_settings([".", "-s", ":all:", "-o", ch.as_posix(), "-c", "angular"])
+
+    assert parsed_settings["output"] == str(ch.as_posix())
+    assert parsed_settings["sections"] == [":all:"]
+    assert parsed_settings["repository"] == "."
+    assert parsed_settings["convention"] == "angular"
+
+
 @pytest.mark.parametrize("is_pyproject", [True, False, None])
 @pytest.mark.parametrize(
     ("sections", "sections_value"),

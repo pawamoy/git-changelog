@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 
 import pytest
 
-from git_changelog import AngularConvention, Changelog
+from git_changelog import AngularConvention, BasicConvention, Changelog
 
 if TYPE_CHECKING:
     from git_changelog import Version
@@ -346,3 +346,44 @@ def test_untyped_commits(repo: GitRepo) -> None:
     (typed_commit,) = typed.commits
     assert untyped_commit.hash == commit_b
     assert typed_commit.hash == commit_a
+
+
+def test_sections_all_expands_to_all_types(repo: GitRepo) -> None:
+    """Test that :all: expands to all available section types for the convention.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.tag("1.0.0")
+    changelog = Changelog(repo.path, convention=AngularConvention, sections=[":all:"])
+
+    # AngularConvention.TYPES contains all available section types.
+    expected_sections = list(AngularConvention.TYPES.values())
+    assert changelog.sections == expected_sections
+
+
+def test_sections_all_with_basic_convention(repo: GitRepo) -> None:
+    """Test that :all: works with BasicConvention.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.tag("1.0.0")
+    changelog = Changelog(repo.path, convention=BasicConvention, sections=[":all:"])
+
+    # BasicConvention.TYPES contains all available section types.
+    expected_sections = list(BasicConvention.TYPES.values())
+    assert changelog.sections == expected_sections
+
+
+def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
+    """Test that explicit section list still works as before.
+
+    Parameters:
+        repo: GitRepo to a temporary repository.
+    """
+    repo.tag("1.0.0")
+    changelog = Changelog(repo.path, convention=AngularConvention, sections=["feat", "fix"])
+
+    # Should map to full section names.
+    assert changelog.sections == ["Features", "Bug Fixes"]

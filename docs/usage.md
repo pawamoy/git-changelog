@@ -47,6 +47,12 @@ and choose the sections to render, and their order
 git-changelog -B auto -Tio CHANGELOG.md -c angular -s build,deps,fix,feat,refactor
 ```
 
+Or include all available sections for the convention:
+
+```bash
+git-changelog -B auto -Tio CHANGELOG.md -c angular -s :all:
+```
+
 Generate a changelog using a custom template,
 and parsing provider-specific references (GitHub/GitLab/Bitbucket):
 
@@ -272,6 +278,17 @@ git-changelog --sections add,fix,remove,doc
 # with the angular/karma/conventionalcommit convention
 git-changelog --sections build,deps,feat,fix,refactor
 ```
+
+You can also use the special value `:all:` to include all available sections
+for the selected convention:
+
+```bash
+# include all sections for the angular convention
+git-changelog --convention angular --sections :all:
+```
+
+This is particularly useful when you want to see all commit types in your changelog
+without having to list them explicitly.
 
 See the previous paragraphs to get the list of available sections
 for each commit message convetions.
