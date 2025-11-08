@@ -305,7 +305,7 @@ class Changelog:
         elif sections:
             sections = [self.convention.TYPES[section] for section in sections]
         else:
-            sections = self.convention.DEFAULT_RENDER
+            sections = list(self.convention.DEFAULT_RENDER)
 
         # Add empty string section if include_all is True, to render untyped commits.
         if include_all and "" not in sections:
@@ -558,17 +558,6 @@ class Changelog:
                 try:
                     self.version_bumper(version)
                 except ValueError as error:
-                    raise ValueError(f"{error}; typo in bumping strategy? Check the CLI help and our docs") from error
-                last_version.planned_tag = version
-            # Update URLs.
-            if self.provider:
-                last_version.url = self.provider.get_tag_url(tag=last_version.planned_tag)
-                last_version.compare_url = self.provider.get_compare_url(
-                    base=last_version.previous_version.tag
-                    if last_version.previous_version
-                    else last_version.commits[-1].hash,
-                    target=last_version.planned_tag,
-                )
                     raise ValueError(f"{error}; typo in bumping strategy? Check the CLI help and our docs") from error
                 last_version.planned_tag = version
             # Update URLs.

@@ -227,9 +227,7 @@ def _assert_version(
 ) -> None:
     assert expected_tag in (version.tag, version.planned_tag)
     if expected_prev_tag:
-        assert version.previous_version is not None, (
-            f"Expected previous version '{expected_prev_tag}', but was None"
-        )
+        assert version.previous_version is not None, f"Expected previous version '{expected_prev_tag}', but was None"
         assert version.previous_version.tag == expected_prev_tag
     else:
         assert version.previous_version is None
@@ -353,7 +351,7 @@ def test_untyped_commits(repo: GitRepo) -> None:
     """
     commit_a = repo.first_hash
     commit_b = repo.commit(
-        "this commit is untyped and therefore does not have a section!"
+        "this commit is untyped and therefore does not have a section!",
     )
     repo.tag("1.0.0")
     changelog = Changelog(repo.path, convention=AngularConvention)
@@ -510,7 +508,9 @@ def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
     """
     repo.tag("1.0.0")
     changelog = Changelog(
-        repo.path, convention=AngularConvention, sections=["feat", "fix"]
+        repo.path,
+        convention=AngularConvention,
+        sections=["feat", "fix"],
     )
 
     # Should map to full section names.
