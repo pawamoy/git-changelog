@@ -390,18 +390,18 @@ def test_include_all_false_excludes_untyped(repo: GitRepo) -> None:
     assert len(changelog.versions_list) == 1
     version = changelog.versions_list[0]
 
-    # Empty string ("") should NOT be in sections when include_all=False
+    # Empty string ("") should NOT be in sections when include_all=False.
     assert "" not in changelog.sections
 
-    # Only conventional commits should be in the rendered sections
+    # Only conventional commits should be in the rendered sections.
     sections_dict = version.sections_dict
-    # Should only have sections for typed commits (feat, fix, and chore from initial commit)
+    # Should only have sections for typed commits (feat, fix, and chore from initial commit).
     assert "Features" in sections_dict
     assert "Bug Fixes" in sections_dict
     assert "Chore" in sections_dict
 
-    # The untyped commits are captured but not rendered (empty string not in sections)
-    # So they won't appear in the changelog output
+    # The untyped commits are captured but not rendered (empty string not in sections),
+    # so they won't appear in the changelog output.
 
 
 def test_include_all_true_includes_untyped(repo: GitRepo) -> None:
@@ -421,17 +421,17 @@ def test_include_all_true_includes_untyped(repo: GitRepo) -> None:
     assert len(changelog.versions_list) == 1
     version = changelog.versions_list[0]
 
-    # Empty string ("") SHOULD be in sections when include_all=True
+    # Empty string ("") SHOULD be in sections when include_all=True.
     assert "" in changelog.sections
 
-    # All sections should be present
+    # All sections should be present.
     sections_dict = version.sections_dict
     assert "Features" in sections_dict
     assert "Bug Fixes" in sections_dict
     assert "Chore" in sections_dict  # From initial commit
     assert "" in sections_dict  # Untyped section
 
-    # Check that untyped section contains the non-conventional commits
+    # Check that untyped section contains the non-conventional commits.
     untyped_section = sections_dict[""]
     assert len(untyped_section.commits) == 2
     untyped_hashes = [commit.hash for commit in untyped_section.commits]
@@ -450,7 +450,7 @@ def test_include_all_with_sections_parameter(repo: GitRepo) -> None:
     repo.commit("fix: Fix C")
     repo.tag("1.0.0")
 
-    # Specify only feat and fix sections, but with include_all=True
+    # Specify only feat and fix sections, but with include_all=True.
     changelog = Changelog(
         repo.path,
         convention=AngularConvention,
@@ -458,16 +458,16 @@ def test_include_all_with_sections_parameter(repo: GitRepo) -> None:
         include_all=True,
     )
 
-    # Empty string should be added at the end
+    # Empty string should be added at the end.
     assert "" in changelog.sections
-    # The specified sections should be present
+    # The specified sections should be present.
     assert "Features" in [s for s in changelog.sections if s]
     assert "Bug Fixes" in [s for s in changelog.sections if s]
 
     version = changelog.versions_list[0]
     sections_dict = version.sections_dict
 
-    # Untyped section should be present
+    # Untyped section should be present.
     assert "" in sections_dict
     untyped_section = sections_dict[""]
     assert len(untyped_section.commits) == 1
