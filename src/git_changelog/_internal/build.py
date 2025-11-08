@@ -309,7 +309,7 @@ class Changelog:
 
         # Add empty string section if include_all is True, to render untyped commits.
         if include_all and "" not in sections:
-            sections = [*list(sections), ""]
+            sections.append("")
         self.sections = sections
         """The sections to include in the changelog."""
 
