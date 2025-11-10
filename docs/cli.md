@@ -33,6 +33,7 @@ option_to_docs = {
     "convention": "#choose-the-commit-message-convention",
     "filter_commits": "#filter-commits",
     "in_place": "#update-changelog-in-place",
+    "include_all": "#include-non-conventional-commits",
     "input": "#output-release-notes",
     "marker_line": "#update-changelog-in-place",
     "omit_empty_versions": "#",

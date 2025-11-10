@@ -17,8 +17,19 @@ from git_changelog._internal.commit import (
     CommitConvention,
     ConventionalCommitConvention,
 )
-from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
-from git_changelog._internal.versioning import ParsedVersion, bump_pep440, bump_semver, parse_pep440, parse_semver
+from git_changelog._internal.providers import (
+    Bitbucket,
+    GitHub,
+    GitLab,
+    ProviderRefParser,
+)
+from git_changelog._internal.versioning import (
+    ParsedVersion,
+    bump_pep440,
+    bump_semver,
+    parse_pep440,
+    parse_semver,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -220,6 +231,7 @@ class Changelog:
         bump: str | None = None,
         zerover: bool = True,
         filter_commits: str | None = None,
+        include_all: bool = False,
         versioning: Literal["semver", "pep440"] = "semver",
     ):
         """Initialization method.
@@ -235,6 +247,7 @@ class Changelog:
             bump: Whether to try and bump to a given version.
             zerover: Keep major version at zero, even for breaking changes.
             filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
+            include_all: Whether to include commits without a recognized type.
         """
         self.repository: str | Path = repository
         """The repository (directory) for which to build the changelog."""
@@ -292,7 +305,11 @@ class Changelog:
         elif sections:
             sections = [self.convention.TYPES[section] for section in sections]
         else:
-            sections = self.convention.DEFAULT_RENDER
+            sections = list(self.convention.DEFAULT_RENDER)
+
+        # Add empty string section if include_all is True, to render untyped commits.
+        if include_all and "" not in sections:
+            sections.append("")
         self.sections = sections
         """The sections to include in the changelog."""
 
