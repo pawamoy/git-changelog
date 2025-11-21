@@ -769,9 +769,9 @@ def build_and_render(
     bump: str | None = None,
     zerover: bool = True,  # noqa: FBT001,FBT002
     filter_commits: str | None = None,
-    include_all: bool = False,  # noqa: FBT001,FBT002
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    include_all: bool = False,  # noqa: FBT001,FBT002
     **kwargs: Any,  # noqa: ARG001
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
