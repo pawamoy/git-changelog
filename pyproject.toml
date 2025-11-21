@@ -97,6 +97,7 @@ ci = [
     "ruff>=0.12",
     "pytest>=8.4",
     "pytest-cov>=6.2",
+    "pytest-gitconfig>=0.7",
     "pytest-randomly>=3.16",
     "pytest-xdist>=3.8",
     "mypy>=1.17",

@@ -31,8 +31,6 @@ class GitRepo:
         self.path = repo
         self.path.mkdir(parents=True, exist_ok=True)
         self.git("init", "-b", "main")
-        self.git("config", "user.name", "dummy")
-        self.git("config", "user.email", "dummy@example.com")
         self.git("remote", "add", "origin", "git@github.com:example/example")
         self.first_hash = self.commit("chore: Initial repository creation")
 
