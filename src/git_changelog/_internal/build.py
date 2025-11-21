@@ -542,15 +542,20 @@ class Changelog:
             version, *plus = version.split("+")
             if version == "auto":
                 # Guess the next version number based on last version and recent commits.
-                version = "patch"
+                version = ""
                 for commit in last_version.commits:
                     if commit.convention["is_major"]:
                         version = "major"
                         break
                     if commit.convention["is_minor"]:
                         version = "minor"
-            version = "+".join((version, *plus))
-            if version in self.version_bumper.strategies:
+                    elif commit.convention["is_patch"] and version == "":
+                        version = "patch"
+            version = "+".join((version, *plus)) if version != "" else ""
+            if version == "":
+                # Do not bump version.
+                last_version.planned_tag = None
+            elif version in self.version_bumper.strategies:
                 # Bump version.
                 last_version.planned_tag = self.version_bumper(last_tag, version, zerover=self.zerover)
             else:
@@ -561,7 +566,7 @@ class Changelog:
                     raise ValueError(f"{error}; typo in bumping strategy? Check the CLI help and our docs") from error
                 last_version.planned_tag = version
             # Update URLs.
-            if self.provider:
+            if last_version.planned_tag and self.provider:
                 last_version.url = self.provider.get_tag_url(tag=last_version.planned_tag)
                 last_version.compare_url = self.provider.get_compare_url(
                     base=last_version.previous_version.tag

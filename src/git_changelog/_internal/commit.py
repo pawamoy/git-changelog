@@ -554,7 +554,7 @@ class ConventionalCommitConvention(AngularConvention):
         message = "\n".join([commit.subject, *commit.body])
         is_major = self.is_major(message) or subject.get("breaking") == "!"
         is_minor = not is_major and self.is_minor(subject["type"])
-        is_patch = not any((is_major, is_minor))
+        is_patch = self.is_patch(subject["type"])
 
         return {
             "type": subject["type"],
@@ -564,3 +564,14 @@ class ConventionalCommitConvention(AngularConvention):
             "is_minor": is_minor,
             "is_patch": is_patch,
         }
+
+    def is_patch(self, commit_type: str) -> bool:
+        """Tell if this commit is worth a patch bump.
+
+        Parameters:
+            commit_type: The commit type.
+
+        Returns:
+            Whether it's a patch commit.
+        """
+        return commit_type == self.TYPES["fix"]
