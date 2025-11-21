@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.7.0](https://github.com/pawamoy/git-changelog/releases/tag/2.7.0) - 2025-11-21
+
+<small>[Compare with 2.6.3](https://github.com/pawamoy/git-changelog/compare/2.6.3...2.7.0)</small>
+
+### Features
+
+- Add `--include-all` option to include non-conventional commits ([15bcad7](https://github.com/pawamoy/git-changelog/commit/15bcad73cc328ef7572515f599826fcf9bb2f4ad) by Werner Robitza). [PR-107](https://github.com/pawamoy/git-changelog/pull/107), Co-Authored-By: Claude <noreply@anthropic.com>, Co-authored-by: Timothée Mazzucotelli <dev@pawamoy.fr>
+- Add `:all:` special value for `--sections` option ([4ba1293](https://github.com/pawamoy/git-changelog/commit/4ba12931e60561fa7be58afa31a175ccfb8bf9eb) by Werner Robitza). [Discussion-98](https://github.com/pawamoy/git-changelog/discussions/98), [PR-106](https://github.com/pawamoy/git-changelog/pull/106)
+
+### Code Refactoring
+
+- Always specify encoding when reading/writing files ([8d3aacb](https://github.com/pawamoy/git-changelog/commit/8d3aacbc4e35be961727e68955cc434279369907) by Timothée Mazzucotelli).
+
 ## [2.6.3](https://github.com/pawamoy/git-changelog/releases/tag/2.6.3) - 2025-09-18
 
 <small>[Compare with 2.6.2](https://github.com/pawamoy/git-changelog/compare/2.6.2...2.6.3)</small>
