@@ -157,6 +157,7 @@ def test_config_reading(
             tomli_w.dumps(
                 config_content if not is_pyproject else {"tool": {"git-changelog": config_content}},
             ),
+            encoding="utf8",
         )
 
         settings = read_config(tmp_path / config_fname) if config_fname == "custom-file.toml" else read_config()
@@ -184,6 +185,7 @@ def test_settings_warning(
         if value is not None:
             (tmp_path / ".git-changelog.toml").write_text(
                 tomli_w.dumps({"bump_latest": value}),
+                encoding="utf8",
             )
         else:
             args = ["--bump-latest"]
@@ -251,10 +253,14 @@ def test_jinja_context(repo: GitRepo) -> None:
             k3 = "v3"
             """,
         ),
+        encoding="utf8",
     )
 
     template = repo.path.joinpath(".custom_template.md.jinja")
-    template.write_text("{% for key, val in jinja_context.items() %}{{ key }} = {{ val }}\n{% endfor %}")
+    template.write_text(
+        "{% for key, val in jinja_context.items() %}{{ key }} = {{ val }}\n{% endfor %}",
+        encoding="utf8",
+    )
 
     exit_code = main(
         [
@@ -343,6 +349,7 @@ def test_include_all_config_option(tmp_path: Path) -> None:
         # Test include-all = true in config file.
         (tmp_path / ".git-changelog.toml").write_text(
             tomli_w.dumps({"include-all": True}),
+            encoding="utf8",
         )
         settings = read_config()
         assert settings["include_all"] is True
@@ -350,6 +357,7 @@ def test_include_all_config_option(tmp_path: Path) -> None:
         # Test include-all = false in config file.
         (tmp_path / ".git-changelog.toml").write_text(
             tomli_w.dumps({"include-all": False}),
+            encoding="utf8",
         )
         settings = read_config()
         assert settings["include_all"] is False

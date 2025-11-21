@@ -94,7 +94,7 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
         template="keepachangelog",
         in_place=True,
     )
-    rendered = output.read_text()
+    rendered = output.read_text(encoding="utf8")
     assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
     assert "Unreleased" not in rendered
     assert latest_tag in rendered
@@ -123,7 +123,7 @@ def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
     latest_tag = "1.2.0"
     assert latest_tag in rendered
 
-    rendered = output.read_text()
+    rendered = output.read_text(encoding="utf8")
     # The latest tag should appear exactly three times in the changelog
     assert rendered.count(latest_tag) == 3
 
@@ -138,7 +138,7 @@ def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
             in_place=True,
         )
 
-    rendered = output.read_text()
+    rendered = output.read_text(encoding="utf8")
     # The latest tag should still appear exactly three times in the changelog
     assert rendered.count(latest_tag) == 3
 

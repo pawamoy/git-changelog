@@ -35,7 +35,7 @@ def get_custom_template(path: str | Path) -> Template:
     Returns:
         The Jinja template.
     """
-    return JINJA_ENV.from_string(Path(path).read_text())
+    return JINJA_ENV.from_string(Path(path).read_text(encoding="utf8"))
 
 
 def get_template(name: str) -> Template:
@@ -47,7 +47,7 @@ def get_template(name: str) -> Template:
     Returns:
         The Jinja template.
     """
-    return JINJA_ENV.from_string(TEMPLATES_PATH.joinpath(f"{name}.md.jinja").read_text())
+    return JINJA_ENV.from_string(TEMPLATES_PATH.joinpath(f"{name}.md.jinja").read_text(encoding="utf8"))
 
 
 configure_env(JINJA_ENV)

@@ -27,6 +27,6 @@ def test_getting_release_notes(tmp_path: Path) -> None:
         "Contents 1.0",
     ]
     changelog = tmp_path.joinpath("changelog.md")
-    changelog.write_text("\n\n".join(changelog_lines))
+    changelog.write_text("\n\n".join(changelog_lines), encoding="utf8")
     expected = "\n\n".join(changelog_lines[3:5])
     assert get_release_notes(input_file=changelog) == expected
