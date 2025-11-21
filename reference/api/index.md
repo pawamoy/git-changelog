@@ -132,6 +132,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "convention": "basic",
     "filter_commits": None,
     "in_place": False,
+    "include_all": False,
     "input": DEFAULT_CHANGELOG_FILE,
     "marker_line": DEFAULT_MARKER_LINE,
     "omit_empty_versions": False,
@@ -1030,6 +1031,7 @@ Changelog(
     bump: str | None = None,
     zerover: bool = True,
     filter_commits: str | None = None,
+    include_all: bool = False,
     versioning: Literal["semver", "pep440"] = "semver",
 )
 ```
@@ -1048,6 +1050,7 @@ Parameters:
 - **`bump`** (`str | None`, default: `None` ) – Whether to try and bump to a given version.
 - **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
 - **`filter_commits`** (`str | None`, default: `None` ) – The Git revision-range used to filter commits in git-log (e.g: v1.0.1..).
+- **`include_all`** (`bool`, default: `False` ) – Whether to include commits without a recognized type.
 
 Methods:
 
@@ -1095,6 +1098,7 @@ def __init__(
     bump: str | None = None,
     zerover: bool = True,
     filter_commits: str | None = None,
+    include_all: bool = False,
     versioning: Literal["semver", "pep440"] = "semver",
 ):
     """Initialization method.
@@ -1110,6 +1114,7 @@ def __init__(
         bump: Whether to try and bump to a given version.
         zerover: Keep major version at zero, even for breaking changes.
         filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
+        include_all: Whether to include commits without a recognized type.
     """
     self.repository: str | Path = repository
     """The repository (directory) for which to build the changelog."""
@@ -1161,9 +1166,17 @@ def __init__(
     """The commit convention to use."""
 
     # Set sections.
-    sections = (
-        [self.convention.TYPES[section] for section in sections] if sections else self.convention.DEFAULT_RENDER
-    )
+    if sections and ":all:" in sections:
+        # Expand :all: to all available section types.
+        sections = list(self.convention.TYPES.values())
+    elif sections:
+        sections = [self.convention.TYPES[section] for section in sections]
+    else:
+        sections = list(self.convention.DEFAULT_RENDER)
+
+    # Add empty string section if include_all is True, to render untyped commits.
+    if include_all and "" not in sections:
+        sections.append("")
     self.sections = sections
     """The sections to include in the changelog."""
 
@@ -5400,7 +5413,9 @@ The previous version.
 ### sections_dict
 
 ```
-sections_dict: dict[str, Section] = {(type): _OLsQIxfor section in (sections_list)}
+sections_dict: dict[str, Section] = {
+    (type): section for section in (sections_list)
+}
 ```
 
 The version sections (dict).
@@ -5593,6 +5608,7 @@ build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    include_all: bool = False,
     **kwargs: Any,
 ) -> tuple[Changelog, str]
 ```
@@ -5619,6 +5635,7 @@ Parameters:
 - **`bump`** (`str | None`, default: `None` ) – Whether to try and bump to a given version.
 - **`zerover`** (`bool`, default: `True` ) – Keep major version at zero, even for breaking changes.
 - **`filter_commits`** (`str | None`, default: `None` ) – The Git revision-range used to filter commits in git-log.
+- **`include_all`** (`bool`, default: `False` ) – Whether to include commits without a recognized type.
 - **`jinja_context`** (`dict[str, Any] | None`, default: `None` ) – Key/value pairs passed to the Jinja template.
 - **`versioning`** (`Literal['pep440', 'semver']`, default: `'semver'` ) – Versioning scheme to use when grouping commits and bumping versions.
 - **`**kwargs`** (`Any`, default: `{}` ) – Swallowing kwargs to allow passing all settings at once.
@@ -5654,6 +5671,7 @@ def build_and_render(
     filter_commits: str | None = None,
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
+    include_all: bool = False,  # noqa: FBT001,FBT002
     **kwargs: Any,  # noqa: ARG001
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
@@ -5679,6 +5697,7 @@ def build_and_render(
         bump: Whether to try and bump to a given version.
         zerover: Keep major version at zero, even for breaking changes.
         filter_commits: The Git revision-range used to filter commits in git-log.
+        include_all: Whether to include commits without a recognized type.
         jinja_context: Key/value pairs passed to the Jinja template.
         versioning: Versioning scheme to use when grouping commits and bumping versions.
         **kwargs: Swallowing kwargs to allow passing all settings at once.
@@ -5701,6 +5720,7 @@ def build_and_render(
         bump=bump,
         zerover=zerover,
         filter_commits=filter_commits,
+        include_all=include_all,
         versioning=versioning,
     )
     rendered = render(
@@ -5814,7 +5834,7 @@ def get_custom_template(path: str | Path) -> Template:
     Returns:
         The Jinja template.
     """
-    return JINJA_ENV.from_string(Path(path).read_text())
+    return JINJA_ENV.from_string(Path(path).read_text(encoding="utf8"))
 ```
 
 ## get_parser
@@ -6030,8 +6050,18 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="SECTIONS",
         dest="sections",
         help="A comma-separated list of sections to render. "
+        "Use `:all:` to include all available sections for the selected convention. "
         "See the available sections for each supported convention in the description. "
         "Default: unset (None).",
+    )
+    parser.add_argument(
+        "-a",
+        "--include-all",
+        action="store_true",
+        dest="include_all",
+        help="Include all commits, even those without a recognized type. "
+        "These commits will be rendered in a 'Misc' section at the end of each version. "
+        "Default: unset (false).",
     )
     parser.add_argument(
         "-t",
@@ -6189,7 +6219,7 @@ def get_template(name: str) -> Template:
     Returns:
         The Jinja template.
     """
-    return JINJA_ENV.from_string(TEMPLATES_PATH.joinpath(f"{name}.md.jinja").read_text())
+    return JINJA_ENV.from_string(TEMPLATES_PATH.joinpath(f"{name}.md.jinja").read_text(encoding="utf8"))
 ```
 
 ## get_version

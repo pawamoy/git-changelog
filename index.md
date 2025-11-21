@@ -44,3 +44,5 @@ Simply run `git-changelog` in your repository to output a changelog on standard 
 ## Alternatives
 
 - [git-cliff](https://github.com/orhun/git-cliff): A highly customizable Changelog Generator that follows Conventional Commit specifications.
+
+## Sponsors
