@@ -74,3 +74,8 @@ To show the different options and their descriptions, use `git-changelog -h`.
 ## Alternatives
 
 - [git-cliff](https://github.com/orhun/git-cliff): A highly customizable Changelog Generator that follows Conventional Commit specifications.
+
+## Sponsors
+
+<!-- sponsors-start -->
+<!-- sponsors-end -->

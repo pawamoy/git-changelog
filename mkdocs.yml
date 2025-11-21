@@ -145,10 +145,7 @@ plugins:
     type: timeago
 - minify:
     minify_html: !ENV [DEPLOY, false]
-- group:
-    enabled: !ENV [MATERIAL_INSIDERS, false]
-    plugins:
-    - typeset
+- typeset
 
 extra:
   social:
