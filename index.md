@@ -46,3 +46,11 @@ Simply run `git-changelog` in your repository to output a changelog on standard 
 - [git-cliff](https://github.com/orhun/git-cliff): A highly customizable Changelog Generator that follows Conventional Commit specifications.
 
 ## Sponsors
+
+**Silver sponsors**
+
+**Bronze sponsors**
+
+______________________________________________________________________
+
+*And 7 more private sponsor(s).*

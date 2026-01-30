@@ -1168,7 +1168,7 @@ def __init__(
     # Set sections.
     if sections and ":all:" in sections:
         # Expand :all: to all available section types.
-        sections = list(self.convention.TYPES.values())
+        sections = list(dict.fromkeys(self.convention.TYPES.values()))
     elif sections:
         sections = [self.convention.TYPES[section] for section in sections]
     else:
@@ -3683,7 +3683,7 @@ def bump_post(self) -> PEP440Version:
 
 ```
 bump_pre(
-    pre: Literal["a", "b", "c", "rc"] | None = None,
+    pre: Literal["a", "b", "rc"] | None = None,
 ) -> PEP440Version
 ```
 
@@ -3691,7 +3691,7 @@ Bump pre-release.
 
 Parameters:
 
-- **`pre`** (`Literal['a', 'b', 'c', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
+- **`pre`** (`Literal['a', 'b', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
 
 Examples:
 
@@ -3739,7 +3739,7 @@ Returns:
 Source code in `src/git_changelog/_internal/versioning.py`
 
 ```
-def bump_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+def bump_pre(self, pre: Literal["a", "b", "rc"] | None = None) -> PEP440Version:
     """Bump pre-release.
 
     Parameters:
@@ -3789,8 +3789,8 @@ def bump_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Ver
         raise ValueError(
             f"Cannot bump from release to {kind + ' ' if kind else ''}pre-release (use `dent_{kind or 'pre'}`)",
         )
-    current_pre: Literal["a", "b", "c", "rc"]
-    current_pre, number = self.pre  # type: ignore[assignment]
+    current_pre: Literal["a", "b", "rc"]
+    current_pre, number = self.pre
     if pre is None:
         pre = current_pre
     if pre == current_pre:
@@ -4154,7 +4154,7 @@ def dent_dev(self) -> PEP440Version:
 
 ```
 dent_pre(
-    pre: Literal["a", "b", "c", "rc"] | None = None,
+    pre: Literal["a", "b", "rc"] | None = None,
 ) -> PEP440Version
 ```
 
@@ -4164,7 +4164,7 @@ This method dents a release down to an alpha, beta or candidate pre-release.
 
 Parameters:
 
-- **`pre`** (`Literal['a', 'b', 'c', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
+- **`pre`** (`Literal['a', 'b', 'rc'] | None`, default: `None` ) – Kind of pre-release to bump. a means alpha b means beta c or rc means (release) candidate
 
 Examples:
 
@@ -4194,7 +4194,7 @@ Returns:
 Source code in `src/git_changelog/_internal/versioning.py`
 
 ```
-def dent_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+def dent_pre(self, pre: Literal["a", "b", "rc"] | None = None) -> PEP440Version:
     """Dent to pre-release.
 
     This method dents a release down to an alpha, beta or candidate pre-release.
@@ -4240,7 +4240,7 @@ def dent_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Ver
 from_parts(
     epoch: int | None = None,
     release: tuple[int, ...] | None = None,
-    pre: tuple[str, int] | None = None,
+    pre: tuple[Literal["a", "b", "rc"], int] | None = None,
     post: int | None = None,
     dev: int | None = None,
 ) -> PEP440Version
@@ -4252,7 +4252,7 @@ Parameters:
 
 - **`epoch`** (`int | None`, default: `None` ) – Version's epoch number.
 - **`release`** (`tuple[int, ...] | None`, default: `None` ) – Version's release numbers.
-- **`pre`** (`tuple[str, int] | None`, default: `None` ) – Version's prerelease kind and number.
+- **`pre`** (`tuple[Literal['a', 'b', 'rc'], int] | None`, default: `None` ) – Version's prerelease kind and number.
 - **`post`** (`int | None`, default: `None` ) – Version's post number.
 - **`dev`** (`int | None`, default: `None` ) – Version's dev number.
 
@@ -4268,7 +4268,7 @@ def from_parts(
     cls,
     epoch: int | None = None,
     release: tuple[int, ...] | None = None,
-    pre: tuple[str, int] | None = None,
+    pre: tuple[Literal["a", "b", "rc"], int] | None = None,
     post: int | None = None,
     dev: int | None = None,
 ) -> PEP440Version:
@@ -4286,30 +4286,16 @@ def from_parts(
     """
     # Since the original class only allows instantiating a version
     # by passing a string, we first create a dummy version "1"
-    # and then re-assign its internal `_version` with the real one.
-    version = cls("1")
-    version._version = packaging_version._Version(
+    # and then use __replace__ to set the real version parts.
+    return replace(
+        cls("1"),
         epoch=epoch or 0,
         release=release or (),
         pre=pre,
-        post=None if post is None else ("post", post),
-        dev=None if dev is None else ("dev", dev),
+        post=post,
+        dev=dev,
         local=None,
     )
-
-    # We also have to update its `_key` attribute.
-    # This is a hack and I would prefer that such functionality
-    # is exposed directly in the original class.
-    version._key = packaging_version._cmpkey(
-        version._version.epoch,
-        version._version.release,
-        version._version.pre,
-        version._version.post,
-        version._version.dev,
-        version._version.local,
-    )
-
-    return version
 ```
 
 ## ParsedVersion
