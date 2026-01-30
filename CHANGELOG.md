@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.7.1](https://github.com/pawamoy/git-changelog/releases/tag/2.7.1) - 2026-01-30
+
+<small>[Compare with 2.7.0](https://github.com/pawamoy/git-changelog/compare/2.7.0...2.7.1)</small>
+
+### Build
+
+- Depend on packaging 26 ([8fef14d](https://github.com/pawamoy/git-changelog/commit/8fef14d5c20b11d7e74d753e293afa25c25122f5) by Timothée Mazzucotelli).
+
+### Bug Fixes
+
+- Don't crash on packaging 26 ([97f58fa](https://github.com/pawamoy/git-changelog/commit/97f58fa154834a7cf6dcffab39b84c22259f6941) by Timothée Mazzucotelli).
+
+### Code Refactoring
+
+- Stop using deprecated `_version` attribute on `packaging.Version` instances ([7bfaa86](https://github.com/pawamoy/git-changelog/commit/7bfaa863e622397345573d499f7c69b880b6cddf) by Timothée Mazzucotelli).
+
 ## [2.7.0](https://github.com/pawamoy/git-changelog/releases/tag/2.7.0) - 2025-11-21
 
 <small>[Compare with 2.6.3](https://github.com/pawamoy/git-changelog/compare/2.6.3...2.7.0)</small>
