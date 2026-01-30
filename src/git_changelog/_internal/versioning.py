@@ -147,18 +147,6 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
             local=None,
         )
 
-        # We also have to update its `_key` attribute.
-        # This is a hack and I would prefer that such functionality
-        # is exposed directly in the original class.
-        version._key = packaging_version._cmpkey(
-            version._version.epoch,
-            version._version.release,
-            version._version.pre,
-            version._version.post,
-            version._version.dev,
-            version._version.local,
-        )
-
         return version
 
     def bump_epoch(self) -> PEP440Version:
