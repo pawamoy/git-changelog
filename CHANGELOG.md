@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Bug Fixes
 
 - Don't crash on packaging 26 ([97f58fa](https://github.com/pawamoy/git-changelog/commit/97f58fa154834a7cf6dcffab39b84c22259f6941) by Timothée Mazzucotelli).
+- Remove duplicate section keys ([27f185a](https://github.com/pawamoy/git-changelog/commit/27f185ac2a8fdb954ae5748d6ba791e42acd35d4) by Werner Robitza). [PR-111](https://github.com/pawamoy/git-changelog/pull/111)
 
 ### Code Refactoring
 
