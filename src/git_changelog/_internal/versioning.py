@@ -2,10 +2,24 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Any, Literal, Protocol
 
 import semver
 from packaging import version as packaging_version
+
+# YORE: EOL 3.13: Replace block with line 2.
+if sys.version_info >= (3, 13):
+    from copy import replace
+else:
+
+    def replace(obj: Any, /, **changes: Any) -> Any:
+        cls = obj.__class__
+        func = getattr(cls, "__replace__", None)
+        if func is None:
+            raise TypeError(f"replace() does not support {cls.__name__} objects")
+        return func(obj, **changes)
+
 
 SemVerStrategy = Literal[
     "major",
@@ -118,7 +132,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
         cls,
         epoch: int | None = None,
         release: tuple[int, ...] | None = None,
-        pre: tuple[str, int] | None = None,
+        pre: tuple[Literal["a", "b", "rc"], int] | None = None,
         post: int | None = None,
         dev: int | None = None,
     ) -> PEP440Version:
@@ -136,18 +150,16 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
         """
         # Since the original class only allows instantiating a version
         # by passing a string, we first create a dummy version "1"
-        # and then re-assign its internal `_version` with the real one.
-        version = cls("1")
-        version._version = packaging_version._Version(
+        # and then use __replace__ to set the real version parts.
+        return replace(
+            cls("1"),
             epoch=epoch or 0,
             release=release or (),
             pre=pre,
-            post=None if post is None else ("post", post),
-            dev=None if dev is None else ("dev", dev),
+            post=post,
+            dev=dev,
             local=None,
         )
-
-        return version
 
     def bump_epoch(self) -> PEP440Version:
         """Bump epoch.
@@ -324,7 +336,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
         """
         return self.bump_release(level=2, trim=trim)
 
-    def bump_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+    def bump_pre(self, pre: Literal["a", "b", "rc"] | None = None) -> PEP440Version:
         """Bump pre-release.
 
         Parameters:
@@ -374,8 +386,8 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
             raise ValueError(
                 f"Cannot bump from release to {kind + ' ' if kind else ''}pre-release (use `dent_{kind or 'pre'}`)",
             )
-        current_pre: Literal["a", "b", "c", "rc"]
-        current_pre, number = self.pre  # type: ignore[assignment]
+        current_pre: Literal["a", "b", "rc"]
+        current_pre, number = self.pre
         if pre is None:
             pre = current_pre
         if pre == current_pre:
@@ -497,7 +509,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
             dev=self.dev + 1,
         )
 
-    def dent_pre(self, pre: Literal["a", "b", "c", "rc"] | None = None) -> PEP440Version:
+    def dent_pre(self, pre: Literal["a", "b", "rc"] | None = None) -> PEP440Version:
         """Dent to pre-release.
 
         This method dents a release down to an alpha, beta or candidate pre-release.
