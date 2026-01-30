@@ -482,7 +482,7 @@ def test_sections_all_expands_to_all_types(repo: GitRepo) -> None:
     changelog = Changelog(repo.path, convention=AngularConvention, sections=[":all:"])
 
     # AngularConvention.TYPES contains all available section types.
-    expected_sections = list(AngularConvention.TYPES.values())
+    expected_sections = list(dict.fromkeys(AngularConvention.TYPES.values()))
     assert changelog.sections == expected_sections
 
 
