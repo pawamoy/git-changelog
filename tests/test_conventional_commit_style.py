@@ -155,3 +155,21 @@ def test_conventional_convention_fix_with_scope() -> None:
     assert not commit_dict["is_major"]
     assert not commit_dict["is_minor"]
     assert commit_dict["is_patch"]
+
+
+def test_conventional_convention_no_bump() -> None:
+    """Non bumping commit is correctly identified."""
+    subject = "ci: this is a CI commit"
+    commit = Commit(
+        commit_hash="aaaaaaa",
+        subject=subject,
+        author_date="1574340645",
+        committer_date="1574340645",
+    )
+    convention = ConventionalCommitConvention()
+    commit_dict = convention.parse_commit(commit)
+    assert commit_dict["type"] == "Continuous Integration"
+    assert commit_dict["scope"] is None
+    assert not commit_dict["is_major"]
+    assert not commit_dict["is_minor"]
+    assert not commit_dict["is_patch"]
