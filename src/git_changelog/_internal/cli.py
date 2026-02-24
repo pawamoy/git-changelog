@@ -723,15 +723,18 @@ def render(
         )
 
         # Find marker line(s) in current changelog.
-        marker = lines.index(marker_line)
-        try:
-            marker2 = lines[marker + 1 :].index(marker_line)
-        except ValueError:
-            # Apply new entries at marker line.
-            lines[marker] = rendered
+        if marker_line == ":prepend:":
+            lines.insert(0, rendered)
         else:
-            # Apply new entries between marker lines.
-            lines[marker : marker + marker2 + 2] = [rendered]
+            marker = lines.index(marker_line)
+            try:
+                marker2 = lines[marker + 1 :].index(marker_line)
+            except ValueError:
+                # Apply new entries at marker line.
+                lines[marker] = rendered
+            else:
+                # Apply new entries between marker lines.
+                lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
         with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
