@@ -290,6 +290,8 @@ def get_parser() -> argparse.ArgumentParser:
         "If two marker lines are present in the changelog, "
         "the contents between those two lines will be overwritten "
         "(useful to update an 'Unreleased' entry for example). "
+        "The special value `:prepend:` can be used to insert new "
+        "entries at the beginning of the changelog. "
         f"Default: `{DEFAULT_MARKER_LINE}`.",
     )
     parser.add_argument(
@@ -653,6 +655,8 @@ def render(
         output: Output/changelog file.
         version_regex: Regular expression to match versions in an existing changelog file.
         marker_line: Marker line used to insert contents in an existing changelog.
+            The special value `:prepend:` can be used to insert new
+            entries at the beginning of the changelog.
         bump_latest: Deprecated, use --bump=auto instead.
             Whether to try and bump the latest version to guess the new one.
         bump: Whether to try and bump to a given version.
@@ -793,6 +797,8 @@ def build_and_render(
         output: Output/changelog file.
         version_regex: Regular expression to match versions in an existing changelog file.
         marker_line: Marker line used to insert contents in an existing changelog.
+            The special value `:prepend:` can be used to insert new
+            entries at the beginning of the changelog.
         bump_latest: Deprecated, use --bump=auto instead.
             Whether to try and bump the latest version to guess the new one.
         omit_empty_versions: Whether to omit empty versions from the output.
@@ -853,6 +859,8 @@ def get_release_notes(
         input_file: The changelog to read from.
         version_regex: A regular expression to match version entries.
         marker_line: The insertion marker line in the changelog.
+            The special value `:prepend:` can be used to insert new
+            entries at the beginning of the changelog.
 
     Returns:
         The latest changelog entry.
@@ -892,6 +900,8 @@ def output_release_notes(
         input_file: The changelog to read from.
         version_regex: A regular expression to match version entries.
         marker_line: The insertion marker line in the changelog.
+            The special value `:prepend:` can be used to insert new
+            entries at the beginning of the changelog.
         output_file: Where to print/write the release notes.
     """
     output_file = output_file or sys.stdout
