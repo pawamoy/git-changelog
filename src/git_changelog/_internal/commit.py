@@ -147,10 +147,10 @@ class Commit:
             commit_hash: The commit hash.
             author_name: The author name.
             author_email: The author email.
-            author_date: The authoring date (datetime or UTC timestamp).
+            author_date: The authoring date (datetime, UTC timestamp with optional timezone offset).
             committer_name: The committer name.
             committer_email: The committer email.
-            committer_date: The committing date (datetime or UTC timestamp).
+            committer_date: The committing date (datetime, UTC timestamp with optional timezone offset).
             refs: The commit refs.
             subject: The commit message subject.
             body: The commit message body.
@@ -158,13 +158,17 @@ class Commit:
             parse_trailers: Whether to parse Git trailers.
         """
         if not author_date:
-            author_date = datetime.now()  # noqa: DTZ005
+            author_date = datetime.now().astimezone()
         elif isinstance(author_date, str):
-            author_date = datetime.fromtimestamp(float(author_date), tz=timezone.utc)
+            epoch, _, offset = author_date.partition(" ")
+            tz = datetime.strptime(offset, "%z").tzinfo if offset else timezone.utc
+            author_date = datetime.fromtimestamp(float(epoch), tz=tz)
         if not committer_date:
-            committer_date = datetime.now()  # noqa: DTZ005
+            committer_date = datetime.now().astimezone()
         elif isinstance(committer_date, str):
-            committer_date = datetime.fromtimestamp(float(committer_date), tz=timezone.utc)
+            epoch, _, offset = committer_date.partition(" ")
+            tz = datetime.strptime(offset, "%z").tzinfo if offset else timezone.utc
+            committer_date = datetime.fromtimestamp(float(epoch), tz=tz)
 
         self.hash: str = commit_hash
         """The commit hash."""
