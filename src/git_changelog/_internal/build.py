@@ -16,6 +16,7 @@ from git_changelog._internal.commit import (
     Commit,
     CommitConvention,
     ConventionalCommitConvention,
+    LinuxConvention,
 )
 from git_changelog._internal.providers import (
     Bitbucket,
@@ -237,6 +238,7 @@ class Changelog:
         "basic": BasicConvention,
         "angular": AngularConvention,
         "conventional": ConventionalCommitConvention,
+        "linux": LinuxConvention,
     }
     """Available commit message conventions."""
 

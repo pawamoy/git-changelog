@@ -33,6 +33,7 @@ from git_changelog._internal.commit import (
     Commit,
     CommitConvention,
     ConventionalCommitConvention,
+    LinuxConvention,
 )
 from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser, Ref, RefDef, RefRe
 from git_changelog._internal.templates import (
@@ -78,6 +79,7 @@ __all__: list[str] = [
     "ConventionalCommitConvention",
     "GitHub",
     "GitLab",
+    "LinuxConvention",
     "PEP440Bumper",
     "PEP440Strategy",
     "PEP440Version",

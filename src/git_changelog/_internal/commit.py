@@ -568,3 +568,19 @@ class ConventionalCommitConvention(AngularConvention):
             "is_minor": is_minor,
             "is_patch": is_patch,
         }
+
+
+class LinuxConvention(BasicConvention):
+    """Linux commit message convention."""
+
+    def parse_type(self, commit_subject: str) -> str:
+        """Parse the type of the commit given its subject.
+
+        Parameters:
+            commit_subject: The commit message subject.
+
+        Returns:
+            The commit type.
+        """
+        # Linux commit message are prefixed by "subsystem:" name.
+        return super().parse_type(commit_subject.partition(":")[2])
