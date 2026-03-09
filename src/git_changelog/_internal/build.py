@@ -101,7 +101,7 @@ class Version:
     def __init__(
         self,
         tag: str = "",
-        date: datetime.date | None = None,
+        date: datetime.date | datetime.datetime | None = None,
         sections: list[Section] | None = None,
         commits: list[Commit] | None = None,
         url: str = "",
@@ -119,7 +119,7 @@ class Version:
         """
         self.tag = tag
         """The version tag."""
-        self.date = date
+        self._date = date
         """The version date."""
 
         self.sections_list: list[Section] = sections or []
@@ -138,6 +138,29 @@ class Version:
         """The next version."""
         self.planned_tag: str | None = None
         """The planned version tag."""
+
+    @property
+    def date(self) -> datetime.date | None:
+        """Return version date."""
+        if isinstance(self._date, datetime.datetime):
+            return self._date.date()
+        if isinstance(self._date, datetime.date):
+            return self._date
+        return None
+
+    @property
+    def timestamp(self) -> datetime.datetime | None:
+        """Return version timestamp."""
+        if isinstance(self._date, datetime.datetime):
+            return self._date
+        if isinstance(self._date, datetime.date):
+            return datetime.datetime(
+                year=self._date.year,
+                month=self._date.month,
+                day=self._date.day,
+                tzinfo=datetime.timezone.utc,
+            )
+        return None
 
     @property
     def typed_sections(self) -> list[Section]:
@@ -393,14 +416,14 @@ class Changelog:
         """
         if self.filter_commits:
             try:
-                return self.run_git("log", "--date=unix", "--format=" + self.FORMAT, self.filter_commits)
+                return self.run_git("log", "--date=raw", "--format=" + self.FORMAT, self.filter_commits)
             except CalledProcessError as e:
                 raise ValueError(
                     f"An error ocurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
                 ) from e
 
         # No revision-range provided. Call normally
-        return self.run_git("log", "--date=unix", "--format=" + self.FORMAT)
+        return self.run_git("log", "--date=raw", "--format=" + self.FORMAT)
 
     def parse_commits(self) -> list[Commit]:
         """Parse the output of 'git log' into a list of commits.
@@ -501,7 +524,7 @@ class Changelog:
         return versions_list, versions_dict
 
     def _create_version(self, commit: Commit) -> Version:
-        date = commit.committer_date.date() if commit.version else datetime.date.today()  # noqa: DTZ011
+        date = commit.committer_date if commit.version else datetime.datetime.now().astimezone()
         version = Version(tag=commit.version, date=date)
         if self.provider:
             version.url = self.provider.get_tag_url(tag=commit.version)
