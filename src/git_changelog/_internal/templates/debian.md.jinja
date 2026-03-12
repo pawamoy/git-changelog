@@ -1,0 +1,22 @@
+{%- macro deb_version(version) -%}
+{% if version.tag or version.planned_tag %}
+{{- (version.tag or version.planned_tag).lstrip("v") }}{{ jinja_context.debian_version_suffix -}}
+{% else %}
+{{- version.previous_version.tag.lstrip("v") }}+{{ version.date.strftime("%Y%m%d") -}}{{ jinja_context.debian_version_suffix -}}
+{% endif %}
+{%- endmacro -%}
+
+{%- macro deb_distribution(version) -%}
+{%- if version.tag or version.planned_tag -%}{{- jinja_context.debian_distribution or "unstable" -}}{%- else -%}UNRELEASED{%- endif -%}
+{%- endmacro -%}
+
+{%- for version in changelog.versions_list -%}
+{{ jinja_context.debian_package_name or "debian-package-name" }} ({{ deb_version(version)}}) {{ deb_distribution(version) }}; urgency=medium
+{% for commit in version.commits | sort(attribute="author_date") | unique(attribute="subject") %}
+  * {{ commit.subject }}
+{%- endfor %}
+
+{% set last_commit = version.commits | sort(attribute="author_date", reverse=True) | first -%}
+{{ " -- "}}{{ last_commit.author_name }} <{{ last_commit.author_email }}>  {{ version.timestamp.strftime("%a, %d %b %Y %H:%M:%S %z") }}
+
+{% endfor %}
