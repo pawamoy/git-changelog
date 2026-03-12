@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.8.1](https://github.com/pawamoy/git-changelog/releases/tag/2.8.1) - 2026-03-12
+
+<small>[Compare with 2.8.0](https://github.com/pawamoy/git-changelog/compare/2.8.0...2.8.1)</small>
+
+### Bug Fixes
+
+- Correctly use default version-regex and marker-line when printing release notes ([86b6811](https://github.com/pawamoy/git-changelog/commit/86b6811ca464128e4598e6d101578835c53abfc0) by Timothée Mazzucotelli).
+
 ## [2.8.0](https://github.com/pawamoy/git-changelog/releases/tag/2.8.0) - 2026-03-12
 
 <small>[Compare with 2.7.1](https://github.com/pawamoy/git-changelog/compare/2.7.1...2.8.0)</small>
