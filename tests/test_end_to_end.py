@@ -102,6 +102,49 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
+def test_rendering_debian_prepend(repo: GitRepo, tmp_path: Path) -> None:
+    """Render changelog in-place.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog")
+    _, rendered = build_and_render(
+        str(repo.path),
+        convention="angular",
+        bump=None,
+        output=output.as_posix(),
+        template="debian",
+        jinja_context={
+            "debian_package_name": "my-pkg-name",
+            "debian_version_suffix": "+dfsg-1",
+        },
+    )
+    assert re.match(r"my-pkg-name \(1.1.0\+\d+\+dfsg-1\) UNRELEASED;", rendered)
+    latest_tag = "91.6.14"
+    assert latest_tag not in rendered
+    repo.git("tag", latest_tag)
+    build_and_render(
+        str(repo.path),
+        convention="angular",
+        bump="auto",
+        output=output.as_posix(),
+        template="debian",
+        in_place=True,
+        jinja_context={
+            "debian_package_name": "my-pkg-name",
+            "debian_version_suffix": "+dfsg-2",
+        },
+    )
+    rendered = output.read_text(encoding="utf8")
+    assert "UNRELEASED" not in rendered
+    assert re.match(r"my-pkg-name \(91.6.14\+dfsg-2\) unstable;", rendered)
+    assert latest_tag in rendered
+    repo.git("tag", "-d", latest_tag)
+
+
+@pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
 def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place, and check for duplicate entries.
 

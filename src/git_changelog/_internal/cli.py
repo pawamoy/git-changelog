@@ -64,6 +64,9 @@ DEFAULT_CONFIG_FILES = [
 ]
 """Default configuration files read by git-changelog."""
 
+_DEFAULT_DEBIAN_MARKER_LINE = _MARKER_LINE_PREPEND
+_DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w-]+ \((?:\d+:)?(?P<version>.+?)(?:-\d+)?(?:\+[^)]*|~[^)]*)?\)(?!.*UNRELEASED)"
+
 DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,
     # YORE: Bump 3: Remove line.
@@ -73,7 +76,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "in_place": False,
     "include_all": False,
     "input": DEFAULT_CHANGELOG_FILE,
-    "marker_line": DEFAULT_MARKER_LINE,
+    "marker_line": None,
     "omit_empty_versions": False,
     "output": sys.stdout,
     "parse_refs": False,
@@ -85,7 +88,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "sections": None,
     "template": "keepachangelog",
     "jinja_context": {},
-    "version_regex": DEFAULT_VERSION_REGEX,
+    "version_regex": None,
     "versioning": DEFAULT_VERSIONING,
     "zerover": True,
 }
@@ -365,7 +368,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-t",
         "--template",
-        choices=Templates(("angular", "keepachangelog")),
+        choices=Templates(("angular", "keepachangelog", "debian")),
         metavar="TEMPLATE",
         dest="template",
         help="The Jinja2 template to use. Prefix it with `path:` to specify the path "
@@ -636,8 +639,8 @@ def render(
     template: str,
     in_place: bool = False,  # noqa: FBT001,FBT002
     output: str | TextIO | None = None,
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
+    version_regex: str | None = None,
+    marker_line: str | None = None,
     # YORE: Bump 3: Remove line.
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     bump: str | None = None,
@@ -695,9 +698,10 @@ def render(
             lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
-        if template in {"angular", "keepachangelog"}:
-            version_regex = DEFAULT_VERSION_REGEX
-            marker_line = DEFAULT_MARKER_LINE
+        if version_regex is None:
+            version_regex = _DEFAULT_DEBIAN_VERSION_REGEX if template == "debian" else DEFAULT_VERSION_REGEX
+        if marker_line is None:
+            marker_line = _DEFAULT_DEBIAN_MARKER_LINE if template == "debian" else DEFAULT_MARKER_LINE
 
         # Only keep new entries (missing from changelog).
         last_released, last_released_line = _latest(lines, re.compile(version_regex))
@@ -765,8 +769,8 @@ def build_and_render(
     sections: list[str] | None = None,
     in_place: bool = False,  # noqa: FBT001,FBT002
     output: str | TextIO | None = None,
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
+    version_regex: str | None = None,
+    marker_line: str | None = None,
     # YORE: Bump 3: Remove line.
     bump_latest: bool = False,  # noqa: FBT001,FBT002
     omit_empty_versions: bool = False,  # noqa: FBT001,FBT002

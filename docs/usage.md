@@ -336,9 +336,9 @@ git-changelog --sections feat,fix --include-all
 
 [(--template)](cli.md#template)
 
-*git-changelog* provides two built-in templates: `keepachangelog` and `angular`.
-Both are very similar, they just differ with the formatting a bit.
-We stronly recommend the `keepachangelog` format.
+*git-changelog* provides three built-in templates: `keepachangelog`, `angular`, and `debian`.
+`keepachangelog` and `angular` are very similar, they just differ with the formatting a bit.
+We strongly recommend the `keepachangelog` format.
 
 Use the `-t`, `--template` option to specify the template to use:
 
@@ -356,6 +356,46 @@ Prefix the value passed to the `--template` option with `path:` to use a custom 
 ```bash
 git-changelog --template path:mytemplate.md
 ```
+
+### Debian template
+
+The `debian` template generates a changelog file following the
+[Debian changelog format][debian-changelog-format], suitable for use in Debian packaging.
+
+```bash
+git-changelog --template debian
+```
+
+When using the `debian` template, the `--marker-line` and `--version-regex` options are
+automatically adjusted to match the Debian changelog format, unless explicitly overridden.
+
+The `debian` template supports the following extra [Jinja context](#extra-jinja-context) variables,
+passed via the `-j`, `--jinja-context` CLI option or the `jinja_context` configuration option:
+
+Variable                  | Description                                                              |
+--------------------------|--------------------------------------------------------------------------|
+`debian_package_name`     | The Debian source package name                                           |
+`debian_version_suffix`   | A version suffix to append to each version number. e.g.: `-1`            |
+
+Example CLI usage:
+
+```bash
+git-changelog --template debian \
+  -j debian_package_name="my-package" \
+  -j debian_version_suffix="-1"
+```
+
+Example configuration in a TOML file:
+
+```toml
+template = "debian"
+
+[jinja_context]
+debian_package_name = "my-package"
+debian_version_suffix = "-1"
+```
+
+This would produce version entries like `my-package (1.2.3-1) unstable; urgency=medium` in the generated Debian changelog.
 
 ### Writing a changelog template
 
@@ -966,3 +1006,4 @@ and `--marker-line`.
 [pep440-post]: https://peps.python.org/pep-0440/#post-releases
 [pep440-dev]: https://peps.python.org/pep-0440/#developmental-releases
 [pep440-release]: https://peps.python.org/pep-0440/#final-releases
+[debian-changelog-format]: https://www.debian.org/doc/debian-policy/ch-source.html#debian-changelog-debian-changelog
