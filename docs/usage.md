@@ -842,7 +842,7 @@ git-changelog --output CHANGELOG.md --in-place
 
 To achieve this, *git-changelog* searches for versions (entries)
 already written to the changelog with a regular expression.
-The verions that are not found in the changelog will be added at the top.
+The versions that are not found in the changelog will be added at the top.
 To know where to add them exactly, we search for a marker line in the changelog.
 This marker line is an HTML comment: it is not visible when the changelog
 is displayed in web pages.
@@ -877,6 +877,33 @@ those two lines, overwriting the previous contents.
 This is useful when you don't tell *git-changelog* to bump the latest version:
 you will have an "Unreleased" section that is overwritten and updated
 each time you update your changelog in-place.
+
+### Prepending without a marker
+
+If your changelog file does not contain any marker line, or if you simply want
+new entries to be unconditionally prepended at the very top of the file,
+you can use the special `:prepend:` token as the marker line value:
+
+```bash
+git-changelog --output CHANGELOG.md --in-place --marker-line ':prepend:'
+```
+
+When `:prepend:` is used, *git-changelog* will skip the marker lookup entirely
+and insert new entries directly at the beginning of the file, before any existing content.
+This is particularly useful for changelog files that have no marker line and that you do
+not want to modify (e.g.: debian/changelog)
+
+Example configuration in a TOML file:
+
+```toml
+in-place = true
+output = "CHANGELOG.md"
+marker-line = ":prepend:"
+```
+
+> **Note:** When using `:prepend:`, *git-changelog* still filters out versions
+> already present in the file (using the version regular expression),
+> so existing entries will not be duplicated.
 
 ## Output release notes
 

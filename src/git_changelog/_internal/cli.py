@@ -43,6 +43,7 @@ else:
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+_MARKER_LINE_PREPEND = ":prepend:"
 
 DEFAULT_VERSIONING = "semver"
 """Default versioning strategy."""
@@ -424,12 +425,12 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _latest(lines: list[str], regex: Pattern) -> str | None:
-    for line in lines:
+def _latest(lines: list[str], regex: Pattern) -> tuple[str | None, int]:
+    for idx, line in enumerate(lines):
         match = regex.search(line)
         if match:
-            return match.groupdict()["version"]
-    return None
+            return match.groupdict()["version"], idx
+    return None, 0
 
 
 def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
@@ -699,7 +700,7 @@ def render(
             marker_line = DEFAULT_MARKER_LINE
 
         # Only keep new entries (missing from changelog).
-        last_released = _latest(lines, re.compile(version_regex))
+        last_released, last_released_line = _latest(lines, re.compile(version_regex))
         if last_released:
             # Check if the latest version is already in the changelog.
             if last_released in [
@@ -723,15 +724,19 @@ def render(
         )
 
         # Find marker line(s) in current changelog.
-        marker = lines.index(marker_line)
-        try:
-            marker2 = lines[marker + 1 :].index(marker_line)
-        except ValueError:
-            # Apply new entries at marker line.
-            lines[marker] = rendered
+        if marker_line == ":prepend:":
+            # With prepend mode, take account of last_released_line to replace unreleased changelog.
+            lines[0:last_released_line] = [rendered]
         else:
-            # Apply new entries between marker lines.
-            lines[marker : marker + marker2 + 2] = [rendered]
+            marker = lines.index(marker_line)
+            try:
+                marker2 = lines[marker + 1 :].index(marker_line)
+            except ValueError:
+                # Apply new entries at marker line.
+                lines[marker] = rendered
+            else:
+                # Apply new entries between marker lines.
+                lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
         with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
