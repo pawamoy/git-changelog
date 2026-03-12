@@ -28805,9 +28805,7 @@ Whether to try and bump the latest version to guess the new one.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/git_changelog/_internal/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">912</span>
-<span class="normal">913</span>
-<span class="normal">914</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">914</span>
 <span class="normal">915</span>
 <span class="normal">916</span>
 <span class="normal">917</span>
@@ -28842,7 +28840,9 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="normal">946</span>
 <span class="normal">947</span>
 <span class="normal">948</span>
-<span class="normal">949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">949</span>
+<span class="normal">950</span>
+<span class="normal">951</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the main program.</span>
 
 <span class="sd">    This function is executed when you type `git-changelog` or `python -m git_changelog`.</span>
@@ -28896,18 +28896,8 @@ Whether to try and bump the latest version to guess the new one.</p>
 <a href="#git_changelog.output_release_notes" class="headerlink" title="Permanent link">¤</a></h2>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">output_release_notes</span><span class="p">(</span>
     <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;input_file&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(input_file)">input_file</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;CHANGELOG.md&quot;</span><span class="p">,</span>
-    <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;version_regex&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(version_regex)">version_regex</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-attribute&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-attribute-name&quot;&gt;DEFAULT_VERSION_REGEX&lt;/span&gt;
-
-
-  &lt;span class=&quot;doc doc-labels&quot;&gt;
-      &lt;small class=&quot;doc doc-label doc-label-module-attribute&quot;&gt;&lt;code&gt;module-attribute&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="./#git_changelog.DEFAULT_VERSION_REGEX">DEFAULT_VERSION_REGEX</a></span><span class="p">,</span>
-    <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;marker_line&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(marker_line)">marker_line</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-attribute&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-attribute-name&quot;&gt;DEFAULT_MARKER_LINE&lt;/span&gt;
-
-
-  &lt;span class=&quot;doc doc-labels&quot;&gt;
-      &lt;small class=&quot;doc doc-label doc-label-module-attribute&quot;&gt;&lt;code&gt;module-attribute&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="./#git_changelog.DEFAULT_MARKER_LINE">DEFAULT_MARKER_LINE</a></span><span class="p">,</span>
+    <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;version_regex&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(version_regex)">version_regex</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;marker_line&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(marker_line)">marker_line</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n"><a class="autorefs autorefs-internal" title="&lt;b&gt;&lt;code&gt;output_file&lt;/code&gt;&lt;/b&gt;" href="./#git_changelog.output_release_notes(output_file)">output_file</a></span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="typing.TextIO" href="https://docs.python.org/3/library/typing.html#typing.TextIO">TextIO</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
@@ -28932,13 +28922,8 @@ Whether to try and bump the latest version to guess the new one.</p>
         </li>
         <li class="doc-section-item field-body">
 <h3 id="git_changelog.output_release_notes(version_regex)" class="doc doc-heading doc-heading-parameter">              <b><code>version_regex</code></b>
-<a href="#git_changelog.output_release_notes(version_regex)" class="headerlink" title="Permanent link">¤</a></h3>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
-                  <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-attribute&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-attribute-name&quot;&gt;DEFAULT_VERSION_REGEX&lt;/span&gt;
-
-
-  &lt;span class=&quot;doc doc-labels&quot;&gt;
-      &lt;small class=&quot;doc doc-label doc-label-module-attribute&quot;&gt;&lt;code&gt;module-attribute&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="./#git_changelog.DEFAULT_VERSION_REGEX">DEFAULT_VERSION_REGEX</a></code>
+<a href="#git_changelog.output_release_notes(version_regex)" class="headerlink" title="Permanent link">¤</a></h3>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
 )
           –
           <div class="doc-md-description">
@@ -28947,13 +28932,8 @@ Whether to try and bump the latest version to guess the new one.</p>
         </li>
         <li class="doc-section-item field-body">
 <h3 id="git_changelog.output_release_notes(marker_line)" class="doc doc-heading doc-heading-parameter">              <b><code>marker_line</code></b>
-<a href="#git_changelog.output_release_notes(marker_line)" class="headerlink" title="Permanent link">¤</a></h3>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
-                  <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-attribute&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-attribute-name&quot;&gt;DEFAULT_MARKER_LINE&lt;/span&gt;
-
-
-  &lt;span class=&quot;doc doc-labels&quot;&gt;
-      &lt;small class=&quot;doc doc-label doc-label-module-attribute&quot;&gt;&lt;code&gt;module-attribute&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="./#git_changelog.DEFAULT_MARKER_LINE">DEFAULT_MARKER_LINE</a></code>
+<a href="#git_changelog.output_release_notes(marker_line)" class="headerlink" title="Permanent link">¤</a></h3>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
 )
           –
           <div class="doc-md-description">
@@ -28998,10 +28978,12 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="normal">906</span>
 <span class="normal">907</span>
 <span class="normal">908</span>
-<span class="normal">909</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">output_release_notes</span><span class="p">(</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">output_release_notes</span><span class="p">(</span>
     <span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CHANGELOG.md&quot;</span><span class="p">,</span>
-    <span class="n">version_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_VERSION_REGEX</span><span class="p">,</span>
-    <span class="n">marker_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_MARKER_LINE</span><span class="p">,</span>
+    <span class="n">version_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">marker_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">TextIO</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print release notes from existing changelog.</span>
@@ -29014,6 +28996,8 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="sd">        marker_line: The insertion marker line in the changelog.</span>
 <span class="sd">        output_file: Where to print/write the release notes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">version_regex</span> <span class="o">=</span> <span class="n">version_regex</span> <span class="ow">or</span> <span class="n">DEFAULT_VERSION_REGEX</span>
+    <span class="n">marker_line</span> <span class="o">=</span> <span class="n">marker_line</span> <span class="ow">or</span> <span class="n">DEFAULT_MARKER_LINE</span>
     <span class="n">output_file</span> <span class="o">=</span> <span class="n">output_file</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
     <span class="n">release_notes</span> <span class="o">=</span> <span class="n">get_release_notes</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">version_regex</span><span class="p">,</span> <span class="n">marker_line</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
