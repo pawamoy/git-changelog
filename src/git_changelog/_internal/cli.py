@@ -95,7 +95,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 """Default settings for the CLI."""
 
 
-class Templates(tuple):  # (subclassing tuple)
+class Templates(tuple):  # noqa: SLOT001
     """Helper to pick a template on the command line."""
 
     def __contains__(self, item: object) -> bool:
@@ -462,7 +462,7 @@ def read_config(
         return project_config
 
     for filename in config_file if isinstance(config_file, (list, tuple)) else [config_file]:
-        _path = Path(filename)
+        _path = Path(filename)  # ty:ignore[invalid-argument-type]
 
         if not _path.exists():
             continue
@@ -694,7 +694,7 @@ def render(
     # Render new entries in-place.
     if in_place:
         # Read current changelog lines.
-        with open(output, encoding="utf8") as changelog_file:  # type: ignore[arg-type]
+        with open(output, encoding="utf8") as changelog_file:  # ty:ignore[invalid-argument-type]
             lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
@@ -743,7 +743,7 @@ def render(
                 lines[marker : marker + marker2 + 2] = [rendered]
 
         # Write back updated changelog lines.
-        with open(output, "w", encoding="utf8") as changelog_file:  # type: ignore[arg-type]
+        with open(output, "w", encoding="utf8") as changelog_file:  # ty:ignore[no-matching-overload]
             changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # Overwrite output file.
@@ -754,7 +754,7 @@ def render(
         if output is sys.stdout:
             sys.stdout.write(rendered)
         else:
-            with open(output, "w", encoding="utf8") as stream:  # type: ignore[arg-type]
+            with open(output, "w", encoding="utf8") as stream:  # ty:ignore[no-matching-overload]
                 stream.write(rendered)
 
     return rendered
@@ -903,9 +903,9 @@ def output_release_notes(
     output_file = output_file or sys.stdout
     release_notes = get_release_notes(input_file, version_regex, marker_line)
     try:
-        output_file.write(release_notes)  # type: ignore[union-attr]
+        output_file.write(release_notes)  # ty:ignore[unresolved-attribute]
     except AttributeError:
-        with open(output_file, "w") as file:  # type: ignore[arg-type]
+        with open(output_file, "w") as file:  # ty:ignore[no-matching-overload]
             file.write(release_notes)
 
 

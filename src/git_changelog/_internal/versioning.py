@@ -100,20 +100,20 @@ class ParsedVersion(Protocol):  # noqa: PLW1641
         ...
 
 
-class SemVerVersion(semver.Version, ParsedVersion):  # type: ignore[misc]
+class SemVerVersion(semver.Version, ParsedVersion):
     """SemVer version."""
 
     def bump_major(self) -> SemVerVersion:
         """Bump the major version."""
-        return SemVerVersion(*super().bump_major())  # type: ignore[misc]
+        return SemVerVersion(*super().bump_major())  # ty:ignore[not-iterable]
 
     def bump_minor(self) -> SemVerVersion:
         """Bump the minor version."""
-        return SemVerVersion(*super().bump_minor())  # type: ignore[misc]
+        return SemVerVersion(*super().bump_minor())  # ty:ignore[not-iterable]
 
     def bump_patch(self) -> SemVerVersion:
         """Bump the patch version."""
-        return SemVerVersion(*super().bump_patch())  # type: ignore[misc]
+        return SemVerVersion(*super().bump_patch())  # ty:ignore[not-iterable]
 
     def bump_release(self) -> SemVerVersion:
         """Bump from a pre-release to the same, regular release.
@@ -124,7 +124,7 @@ class SemVerVersion(semver.Version, ParsedVersion):  # type: ignore[misc]
         return SemVerVersion(self.major, self.minor, self.patch)
 
 
-class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[misc]
+class PEP440Version(packaging_version.Version, ParsedVersion):
     """PEP 440 version."""
 
     @classmethod
@@ -382,7 +382,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # type: ignore[m
             Version with same epoch, same release, bumped pre-release and the right parts reset to 0 or nothing.
         """
         if self.pre is None:
-            kind = _release_kind.get(pre, "")  # type: ignore[arg-type]
+            kind = _release_kind.get(pre, "")  # ty:ignore[no-matching-overload]
             raise ValueError(
                 f"Cannot bump from release to {kind + ' ' if kind else ''}pre-release (use `dent_{kind or 'pre'}`)",
             )
@@ -679,7 +679,7 @@ class VersionBumper:
         self.strategies = strategies
         """The supported bumping strategies."""
 
-    def __call__(self, version: str, strategy: str = ..., **kwargs: Any) -> str:
+    def __call__(self, version: str, strategy: str, **kwargs: Any) -> str:
         """Bump a version.
 
         Parameters:
@@ -699,7 +699,7 @@ class PEP440Bumper(VersionBumper):
     initial: str = "0.0.0"
     """The initial version."""
 
-    def __call__(  # type: ignore[override]
+    def __call__(  # ty:ignore[invalid-method-override]
         self,
         version: str,
         strategy: PEP440Strategy = "micro",
@@ -776,7 +776,7 @@ class SemVerBumper(VersionBumper):
     initial: str = "0.0.0"
     """The initial version."""
 
-    def __call__(  # type: ignore[override]
+    def __call__(  # ty:ignore[invalid-method-override]
         self,
         version: str,
         strategy: SemVerStrategy = "patch",
@@ -810,7 +810,7 @@ class SemVerBumper(VersionBumper):
         return prefix + str(semver_version)
 
 
-bump_pep440 = PEP440Bumper(PEP440Strategy.__args__)  # type: ignore[attr-defined]
+bump_pep440 = PEP440Bumper(PEP440Strategy.__args__)
 """Bump a PEP 440 version."""
-bump_semver = SemVerBumper(SemVerStrategy.__args__)  # type: ignore[attr-defined]
+bump_semver = SemVerBumper(SemVerStrategy.__args__)
 """Bump a SemVer version."""

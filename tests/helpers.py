@@ -102,7 +102,7 @@ class GitRepo:
     @contextmanager
     def enter(self) -> Iterator[None]:
         """Context manager to enter the repository directory."""
-        old_cwd = os.getcwd()
+        old_cwd = os.getcwd()  # noqa: PTH109
         os.chdir(self.path)
         try:
             yield

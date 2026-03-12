@@ -178,7 +178,7 @@ class GitHub(ProviderRefParser):
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
         ),
         "commits": RefDef(
@@ -189,7 +189,7 @@ class GitHub(ProviderRefParser):
                     commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length),
                     ba=RefRe.BA,
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/commit/{ref}",
         ),
@@ -200,11 +200,11 @@ class GitHub(ProviderRefParser):
                     np=RefRe.NP,
                     commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length),
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/compare/{ref}",
         ),
-        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
+        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.IGNORECASE), url_string="{base_url}/{ref}"),
     }
     """The reference definitions for the provider."""
 
@@ -240,45 +240,45 @@ class GitLab(ProviderRefParser):
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
         ),
         "merge_requests": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"!"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"!"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/merge_requests/{ref}",
         ),
         "snippets": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"\$"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"\$"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/snippets/{ref}",
         ),
         "labels_ids": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"~"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"~"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",  # no label_id param?
         ),
         "labels_one_word": RefDef(
             regex=re.compile(  # also matches label IDs
                 RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"~"),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
         ),
         "labels_multi_word": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"~"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"~"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/issues?label_name[]={ref}",
         ),
         "milestones_ids": RefDef(
             regex=re.compile(  # also matches milestones IDs
                 RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol=r"%"),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/milestones/{ref}",
         ),
         "milestones_one_word": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"%"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ONE_WORD.format(symbol=r"%"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
         ),
         "milestones_multi_word": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"%"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.MULTI_WORD.format(symbol=r"%"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/milestones",  # cannot guess ID
         ),
         "commits": RefDef(
@@ -289,7 +289,7 @@ class GitLab(ProviderRefParser):
                     commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length),
                     ba=RefRe.BA,
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/commit/{ref}",
         ),
@@ -300,11 +300,11 @@ class GitLab(ProviderRefParser):
                     np=RefRe.NP,
                     commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length),
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/compare/{ref}",
         ),
-        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.I), url_string="{base_url}/{ref}"),
+        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.IGNORECASE), url_string="{base_url}/{ref}"),
     }
     """The reference definitions for the provider."""
 
@@ -342,11 +342,11 @@ class Bitbucket(ProviderRefParser):
 
     REF: ClassVar[dict[str, RefDef]] = {
         "issues": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?issue\\s*" + RefRe.ID.format(symbol="#"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?issue\\s*" + RefRe.ID.format(symbol="#"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/issues/{ref}",
         ),
         "merge_requests": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.NP + "?pull request\\s*" + RefRe.ID.format(symbol=r"#"), re.I),
+            regex=re.compile(RefRe.BB + RefRe.NP + "?pull request\\s*" + RefRe.ID.format(symbol=r"#"), re.IGNORECASE),
             url_string="{base_url}/{namespace}/{project}/pull-request/{ref}",
         ),
         "commits": RefDef(
@@ -357,7 +357,7 @@ class Bitbucket(ProviderRefParser):
                     commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length),
                     ba=RefRe.BA,
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/commits/{ref}",
         ),
@@ -368,12 +368,12 @@ class Bitbucket(ProviderRefParser):
                     np=RefRe.NP,
                     commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length),
                 ),
-                re.I,
+                re.IGNORECASE,
             ),
             url_string="{base_url}/{namespace}/{project}/branches/compare/{ref}#diff",
         ),
         "mentions": RefDef(
-            regex=re.compile(RefRe.BB + RefRe.MENTION, re.I),
+            regex=re.compile(RefRe.BB + RefRe.MENTION, re.IGNORECASE),
             url_string="{base_url}/{ref}",
         ),
     }

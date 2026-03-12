@@ -98,7 +98,7 @@ def test_semver_bump_major_zerover(version: str, bumped: str) -> None:
 def test_semver_bump_unknown_part() -> None:
     """Bump unknown part of a SemVer version."""
     with pytest.raises(ValueError, match="Invalid strategy unknown"):
-        bump_semver("1.0.0", "unknown")  # type: ignore[arg-type]
+        bump_semver("1.0.0", "unknown")  # ty:ignore[invalid-argument-type]
 
 
 @pytest.mark.parametrize(
@@ -286,7 +286,7 @@ def test_pep440_bump_error(part: PEP440Strategy, version: str) -> None:
 def test_pep440_bump_unknown_part() -> None:
     """Bump unknown part of a PEP 440 version."""
     with pytest.raises(ValueError, match="Invalid strategy unknown"):
-        bump_pep440("1", "unknown")  # type: ignore[arg-type]
+        bump_pep440("1", "unknown")  # ty:ignore[invalid-argument-type]
 
 
 @pytest.mark.parametrize(

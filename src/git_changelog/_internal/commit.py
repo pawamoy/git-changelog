@@ -10,7 +10,7 @@ from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timezone
 from re import Pattern
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, SupportsIndex, overload
+from typing import TYPE_CHECKING, Any, ClassVar, SupportsIndex, overload
 
 if sys.version_info < (3, 13):
     from typing_extensions import deprecated
@@ -18,7 +18,7 @@ else:
     from warnings import deprecated
 
 if TYPE_CHECKING:
-    from collections.abc import ItemsView, Iterable, KeysView, ValuesView
+    from collections.abc import Callable, ItemsView, Iterable, KeysView, ValuesView
 
     from git_changelog._internal.providers import ProviderRefParser, Ref
     from git_changelog._internal.versioning import ParsedVersion
@@ -49,7 +49,7 @@ class _Trailers(list[tuple[str, str]]):
     def _dict(self) -> dict[str, str]:
         return dict(iter(self))
 
-    def __contains__(self, key: str | tuple[str, str]) -> bool:  # type: ignore[override]
+    def __contains__(self, key: str | tuple[str, str]) -> bool:  # ty:ignore[invalid-method-override]
         if isinstance(key, str):
             warnings.warn(
                 "Checking membership of a string in trailers will stop being supported in version 3.",
@@ -114,9 +114,9 @@ class _Trailers(list[tuple[str, str]]):
                 DeprecationWarning,
                 stacklevel=2,
             )
-            self.append((key, value))  # type: ignore[arg-type]
+            self.append((key, value))  # ty:ignore[invalid-argument-type]
             return
-        super().__setitem__(key, value)  # type: ignore[assignment,index]
+        super().__setitem__(key, value)  # ty:ignore[no-matching-overload]
 
 
 class Commit:
@@ -357,11 +357,11 @@ class BasicConvention(CommitConvention):
     }
     """The commit message types."""
 
-    TYPE_REGEX: ClassVar[Pattern] = re.compile(rf"^(?P<type>({'|'.join(TYPES.keys())}))", re.I)
+    TYPE_REGEX: ClassVar[Pattern] = re.compile(rf"^(?P<type>({'|'.join(TYPES.keys())}))", re.IGNORECASE)
     """The commit message type regex."""
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
-        re.I | re.MULTILINE,
+        re.IGNORECASE | re.MULTILINE,
     )
     """The commit message breaking change regex."""
     DEFAULT_RENDER: ClassVar[list[str]] = [
@@ -458,7 +458,7 @@ class AngularConvention(CommitConvention):
     """The commit message subject regex."""
     BREAK_REGEX: ClassVar[Pattern] = re.compile(
         r"^break(s|ing changes?)?[ :].+$",
-        re.I | re.MULTILINE,
+        re.IGNORECASE | re.MULTILINE,
     )
     """The commit message breaking change regex."""
     DEFAULT_RENDER: ClassVar[list[str]] = [

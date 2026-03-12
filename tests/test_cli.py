@@ -35,7 +35,7 @@ else:
 
     @contextmanager
     def chdir(path: str) -> Iterator[None]:
-        old_wd = os.getcwd()
+        old_wd = os.getcwd()  # noqa: PTH109
         os.chdir(path)
         try:
             yield

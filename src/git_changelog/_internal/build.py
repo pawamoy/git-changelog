@@ -7,7 +7,7 @@ import os
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
-from typing import TYPE_CHECKING, ClassVar, Literal, Union
+from typing import TYPE_CHECKING, ClassVar, Literal
 from urllib.parse import urlsplit, urlunsplit
 
 from git_changelog._internal.commit import (
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
     from git_changelog._internal.versioning import SemVerVersion
 
-ConventionType = Union[str, CommitConvention, type[CommitConvention]]
+ConventionType = str | CommitConvention | type[CommitConvention]
 """The type of convention used for commits."""
 
 
@@ -206,7 +206,7 @@ class Version:
         """
         self.commits.append(commit)
         commit.version = self.tag or "HEAD"
-        commit_type: str = commit.convention.get("type")  # type: ignore[assignment]
+        commit_type: str = commit.convention.get("type")  # ty:ignore[invalid-assignment]
         if commit_type not in self.sections_dict:
             section = Section(section_type=commit_type)
             self.sections_list.append(section)
@@ -396,8 +396,7 @@ class Changelog:
         git_url = self.run_git("config", "--default", "", "--get", remote).rstrip("\n")
         if git_url.startswith("git@"):
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
-        if git_url.endswith(".git"):
-            git_url = git_url[:-4]
+        git_url = git_url.removesuffix(".git")
 
         # Remove credentials from the URL.
         if git_url.startswith(("http://", "https://")):
@@ -513,7 +512,7 @@ class Changelog:
                 next_commit = next_commits.pop(0)
                 if next_commit.tag:
                     parsed_version, _ = self.version_parser(next_commit.tag)
-                    if not previous_parsed_version or parsed_version > previous_parsed_version:
+                    if not previous_parsed_version or parsed_version > previous_parsed_version:  # ty:ignore[unsupported-operator]
                         previous_parsed_version = parsed_version
                         previous_versions[version.tag] = next_commit.tag
                 elif not next_commit.version:
@@ -575,7 +574,7 @@ class Changelog:
             version = "+".join((version, *plus))
             if version in self.version_bumper.strategies:
                 # Bump version.
-                last_version.planned_tag = self.version_bumper(last_tag, version, zerover=self.zerover)
+                last_version.planned_tag = self.version_bumper(last_tag, version, zerover=self.zerover)  # ty:ignore[invalid-argument-type]
             else:
                 # user specified version
                 try:
