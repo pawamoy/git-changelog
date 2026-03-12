@@ -50,7 +50,7 @@ def _yield_public_objects(
                 if modules:
                     yield member
                 yield from _yield_public_objects(
-                    member,
+                    member,  # ty: ignore[invalid-argument-type]
                     modules=modules,
                     modulelevel=modulelevel,
                     inherited=inherited,
@@ -62,7 +62,7 @@ def _yield_public_objects(
                 continue
             if member.is_class and not modulelevel:
                 yield from _yield_public_objects(
-                    member,
+                    member,  # ty: ignore[invalid-argument-type]
                     modules=modules,
                     modulelevel=False,
                     inherited=inherited,
@@ -91,7 +91,7 @@ def _fixture_public_objects(public_api: griffe.Module) -> list[griffe.Object | g
 def _fixture_inventory() -> Inventory:
     inventory_file = Path(__file__).parent.parent / "site" / "objects.inv"
     if not inventory_file.exists():
-        pytest.skip("The objects inventory is not available.")  # ty: ignore[call-non-callable]
+        pytest.skip("The objects inventory is not available.")
     with inventory_file.open("rb") as file:
         return Inventory.parse_sphinx(file)
 
@@ -141,7 +141,7 @@ def test_api_matches_inventory(inventory: Inventory, public_objects: list[griffe
         for obj in public_objects
         if obj.name not in ignore_names and obj.path not in inventory
     ]
-    msg = "Objects not in the inventory (try running `make run mkdocs build`):\n{paths}"
+    msg = "Objects not in the inventory (try running `make run zensical build --clean`):\n{paths}"
     assert not not_in_inventory, msg.format(paths="\n".join(sorted(not_in_inventory)))
 
 
@@ -163,7 +163,7 @@ def test_inventory_matches_api(
             obj = loader.modules_collection[item.name]
             if obj.path not in public_api_paths and not any(path in public_api_paths for path in obj.aliases):
                 not_in_api.append(item.name)
-    msg = "Inventory objects not in public API (try running `make run mkdocs build`):\n{paths}"
+    msg = "Inventory objects not in public API (try running `make run zensical build --clean`):\n{paths}"
     assert not not_in_api, msg.format(paths="\n".join(sorted(not_in_api)))
 
 

@@ -1,34 +1,14 @@
-target-version = "py39"
+target-version = "py310"
 line-length = 120
+output-format = "concise"
 
 [lint]
 exclude = [
     "tests/fixtures/*.py",
 ]
-select = [
-    "A", "ANN", "ARG",
-    "B", "BLE",
-    "C", "C4",
-    "COM",
-    "D", "DTZ",
-    "E", "ERA", "EXE",
-    "F", "FBT",
-    "G",
-    "I", "ICN", "INP", "ISC",
-    "N",
-    "PGH", "PIE", "PL", "PLC", "PLE", "PLR", "PLW", "PT", "PYI",
-    "Q",
-    "RUF", "RSE", "RET",
-    "S", "SIM", "SLF",
-    "T", "T10", "T20", "TCH", "TID", "TRY",
-    "UP",
-    "W",
-    "YTT",
-]
+select = ["ALL"]
 ignore = [
     "A001",  # Variable is shadowing a Python builtin
-    "ANN101",  # Missing type annotation for self
-    "ANN102",  # Missing type annotation for cls
     "ANN204",  # Missing return type annotation for special method __str__
     "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
     "ARG005",  # Unused lambda argument
@@ -36,13 +16,18 @@ ignore = [
     "D105",  # Missing docstring in magic method
     "D417",  # Missing argument description in the docstring
     "E501",  # Line too long
+    "EM101",  # String literal when raising exception
+    "EM102",  # f-string when raising exception
     "ERA001",  # Commented out code
+    "FIX",  # TODO, FIXME, etc.
     "G004",  # Logging statement uses f-string
     "PLR0911",  # Too many return statements
     "PLR0912",  # Too many branches
     "PLR0913",  # Too many arguments to function call
     "PLR0915",  # Too many statements
     "SLF001", # Private member accessed
+    "TD002",  # Missing author in TODO
+    "TD003",  # Missing issue link for TODO
     "TRY003",  # Avoid specifying long messages outside the exception class
     "UP032",  # Use f-string instead of `format` call
 ]

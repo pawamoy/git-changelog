@@ -25,7 +25,7 @@ WINDOWS = os.name == "nt"
 PTY = not WINDOWS and not CI
 MULTIRUN = os.environ.get("MULTIRUN", "0") == "1"
 PY_VERSION = f"{sys.version_info.major}{sys.version_info.minor}"
-PY_DEV = "314"
+PY_DEV = "315"
 
 
 def pyprefix(title: str) -> str:
@@ -38,7 +38,7 @@ def pyprefix(title: str) -> str:
 def _get_changelog_version() -> str:
     changelog_version_re = re.compile(r"^## \[(\d+\.\d+\.\d+)\].*$")
     with Path(__file__).parent.joinpath("CHANGELOG.md").open("r", encoding="utf8") as file:
-        return next(filter(bool, map(changelog_version_re.match, file))).group(1)  # type: ignore[union-attr]
+        return next(filter(bool, map(changelog_version_re.match, file))).group(1)  # ty: ignore[invalid-argument-type]
 
 
 @duty
@@ -61,7 +61,7 @@ def check(ctx: Context) -> None:
 def check_quality(ctx: Context) -> None:
     """Check the code quality."""
     ctx.run(
-        tools.ruff.check(*PY_SRC_LIST, config="config/ruff.toml"),
+        tools.ruff.check(*PY_SRC_LIST, config="config/ruff.toml", color=True),
         title=pyprefix("Checking code quality"),
     )
 
@@ -69,10 +69,8 @@ def check_quality(ctx: Context) -> None:
 @duty(nofail=PY_VERSION == PY_DEV)
 def check_docs(ctx: Context) -> None:
     """Check if the documentation builds correctly."""
-    Path("htmlcov").mkdir(parents=True, exist_ok=True)
-    Path("htmlcov/index.html").touch(exist_ok=True)
     ctx.run(
-        tools.mkdocs.build(strict=True, verbose=True),
+        tools.zensical.build(strict=True),
         title=pyprefix("Building documentation"),
     )
 
@@ -80,9 +78,14 @@ def check_docs(ctx: Context) -> None:
 @duty(nofail=PY_VERSION == PY_DEV)
 def check_types(ctx: Context) -> None:
     """Check that the code is correctly typed."""
-    os.environ["FORCE_COLOR"] = "1"
+    py = f"{sys.version_info.major}.{sys.version_info.minor}"
     ctx.run(
-        tools.mypy(*PY_SRC_LIST, config_file="config/mypy.ini"),
+        tools.ty.check(
+            *PY_SRC_LIST,
+            config_file="config/ty.toml",
+            color=True,
+            python_version=py,
+        ),
         title=pyprefix("Type-checking"),
     )
 
@@ -106,7 +109,7 @@ def docs(ctx: Context, *cli_args: str, host: str = "127.0.0.1", port: int = 8000
         port: The port to serve the docs on.
     """
     ctx.run(
-        tools.mkdocs.serve(dev_addr=f"{host}:{port}").add_args(*cli_args),
+        tools.zensical.serve(dev_addr=f"{host}:{port}").add_args(*cli_args),
         title="Serving documentation",
         capture=False,
     )
@@ -115,8 +118,21 @@ def docs(ctx: Context, *cli_args: str, host: str = "127.0.0.1", port: int = 8000
 @duty
 def docs_deploy(ctx: Context) -> None:
     """Deploy the documentation to GitHub pages."""
-    os.environ["DEPLOY"] = "true"
-    ctx.run(tools.mkdocs.gh_deploy(force=True), title="Deploying documentation")
+    from ghp_import import ghp_import  # noqa: PLC0415
+
+    ctx.run(tools.zensical.build(), title="Building documentation site")
+    ctx.run(
+        ghp_import,
+        kwargs={
+            "srcdir": "site",
+            "mesg": "chore: Update documentation",
+            "push": True,
+            "force": True,
+        },
+        title="Deploying site to GitHub Pages",
+        command="ghp-import site -fpm 'chore: Update documentation'",
+        pty=PTY,
+    )
 
 
 @duty
@@ -133,8 +149,8 @@ def format(ctx: Context) -> None:
 def build(ctx: Context) -> None:
     """Build source and wheel distributions."""
     ctx.run(
-        tools.build(),
-        title="Building source and wheel distributions",
+        ["uv", "build"],
+        title="Building distributions",
         pty=PTY,
     )
 
@@ -144,10 +160,10 @@ def publish(ctx: Context) -> None:
     """Publish source and wheel distributions to PyPI."""
     if not Path("dist").exists():
         ctx.run("false", title="No distribution files found")
-    dists = [str(dist) for dist in Path("dist").iterdir()]
+    dists = [str(dist) for dist in Path("dist").iterdir() if dist.suffix in (".gz", ".whl")]
     ctx.run(
         tools.twine.upload(*dists, skip_existing=True),
-        title="Publishing source and wheel distributions to PyPI",
+        title="Publishing distributions to PyPI",
         pty=PTY,
     )
 

@@ -20,6 +20,5 @@ uv.lock
 # cache
 .cache/
 .pytest_cache/
-.mypy_cache/
 .ruff_cache/
 __pycache__/

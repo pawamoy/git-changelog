@@ -117,8 +117,8 @@ def clean() -> None:
     for path in paths_to_clean:
         shutil.rmtree(path, ignore_errors=True)
 
-    cache_dirs = {".cache", ".pytest_cache", ".mypy_cache", ".ruff_cache", "__pycache__"}
-    for dirpath in Path(".").rglob("*/"):
+    cache_dirs = {".cache", ".pytest_cache", ".ruff_cache", "__pycache__"}
+    for dirpath in Path().rglob("*/"):
         if dirpath.parts[0] not in (".venv", ".venvs") and dirpath.name in cache_dirs:
             shutil.rmtree(dirpath, ignore_errors=True)
 
@@ -151,7 +151,7 @@ def main() -> int:
                 ),
                 flush=True,
             )
-            if os.path.exists(".venv"):
+            if Path(".venv").exists():
                 print("\nAvailable tasks", flush=True)
                 run("default", "duty", "--list")
         return 0
@@ -163,28 +163,28 @@ def main() -> int:
             if not args:
                 print("make: run: missing command", file=sys.stderr)
                 return 1
-            run("default", *args)  # ty: ignore[missing-argument]
+            run("default", *args)
             return 0
 
         if cmd == "multirun":
             if not args:
                 print("make: run: missing command", file=sys.stderr)
                 return 1
-            multirun(*args)  # ty: ignore[missing-argument]
+            multirun(*args)
             return 0
 
         if cmd == "allrun":
             if not args:
                 print("make: run: missing command", file=sys.stderr)
                 return 1
-            allrun(*args)  # ty: ignore[missing-argument]
+            allrun(*args)
             return 0
 
         if cmd.startswith("3."):
             if not args:
                 print("make: run: missing command", file=sys.stderr)
                 return 1
-            run(cmd, *args)  # ty: ignore[missing-argument]
+            run(cmd, *args)
             return 0
 
         opts = []
