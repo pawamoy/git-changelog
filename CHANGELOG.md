@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.8.0](https://github.com/pawamoy/git-changelog/releases/tag/2.8.0) - 2026-03-12
+
+<small>[Compare with 2.7.1](https://github.com/pawamoy/git-changelog/compare/2.7.1...2.8.0)</small>
+
+### Features
+
+- Add Debian changelog template ([c990e7a](https://github.com/pawamoy/git-changelog/commit/c990e7a79740e426455cab5c4df94537d986f2c1) by Patrik Dufresne).
+- Add special marker-line `:prepend:` ([214cbb8](https://github.com/pawamoy/git-changelog/commit/214cbb86adf766cbb26c78159fce4dc0cc8fb775) by Patrik Dufresne).
+
+### Bug Fixes
+
+- Keep timezone information from Git commit ([5b2763a](https://github.com/pawamoy/git-changelog/commit/5b2763af34a34c2c345d4728c31a13f2a8fcf096) by Patrik Dufresne). [Issue-117](https://github.com/pawamoy/git-changelog/issues/117)
+
 ## [2.7.1](https://github.com/pawamoy/git-changelog/releases/tag/2.7.1) - 2026-01-30
 
 <small>[Compare with 2.7.0](https://github.com/pawamoy/git-changelog/compare/2.7.0...2.7.1)</small>
