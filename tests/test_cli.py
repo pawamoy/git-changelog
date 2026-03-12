@@ -378,6 +378,7 @@ def test_include_all_config_option(tmp_path: Path) -> None:
     ],
 )
 def test_debian_version_regex(line: str, version: str) -> None:
+    """Test that the Debian version regex matches the expected version string."""
     pattern = re.compile(_DEFAULT_DEBIAN_VERSION_REGEX)
     m = pattern.match(line)
     if version is None:
@@ -385,3 +386,9 @@ def test_debian_version_regex(line: str, version: str) -> None:
     else:
         assert m is not None
         assert m.group("version") == version
+
+
+def test_outputting_release_notes() -> None:
+    """Test that the CLI option to output release notes works as expected."""
+    # We make sure that default loaded settings are valid.
+    assert main(["--release-notes"]) == 0

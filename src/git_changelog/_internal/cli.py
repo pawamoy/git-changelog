@@ -886,8 +886,8 @@ def get_release_notes(
 
 def output_release_notes(
     input_file: str = "CHANGELOG.md",
-    version_regex: str = DEFAULT_VERSION_REGEX,
-    marker_line: str = DEFAULT_MARKER_LINE,
+    version_regex: str | None = None,
+    marker_line: str | None = None,
     output_file: str | TextIO | None = None,
 ) -> None:
     """Print release notes from existing changelog.
@@ -900,6 +900,8 @@ def output_release_notes(
         marker_line: The insertion marker line in the changelog.
         output_file: Where to print/write the release notes.
     """
+    version_regex = version_regex or DEFAULT_VERSION_REGEX
+    marker_line = marker_line or DEFAULT_MARKER_LINE
     output_file = output_file or sys.stdout
     release_notes = get_release_notes(input_file, version_regex, marker_line)
     try:
