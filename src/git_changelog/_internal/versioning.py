@@ -387,7 +387,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):
                 f"Cannot bump from release to {kind + ' ' if kind else ''}pre-release (use `dent_{kind or 'pre'}`)",
             )
         current_pre: Literal["a", "b", "rc"]
-        current_pre, number = self.pre
+        current_pre, number = self.pre  # ty:ignore[invalid-assignment]
         if pre is None:
             pre = current_pre
         if pre == current_pre:
@@ -471,7 +471,12 @@ class PEP440Version(packaging_version.Version, ParsedVersion):
             Version with same epoch, same release, same pre-release, bumped post-release and the right parts reset to 0 or nothing.
         """
         post = 0 if self.post is None else self.post + 1
-        return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=self.pre, post=post)
+        return PEP440Version.from_parts(
+            epoch=self.epoch,
+            release=self.release,
+            pre=self.pre,  # ty:ignore[invalid-argument-type]
+            post=post,
+        )
 
     def bump_dev(self) -> PEP440Version:
         """Bump dev-release.
@@ -504,7 +509,7 @@ class PEP440Version(packaging_version.Version, ParsedVersion):
         return PEP440Version.from_parts(
             epoch=self.epoch,
             release=self.release,
-            pre=self.pre,
+            pre=self.pre,  # ty:ignore[invalid-argument-type]
             post=self.post,
             dev=self.dev + 1,
         )
@@ -624,7 +629,13 @@ class PEP440Version(packaging_version.Version, ParsedVersion):
         """
         if self.dev is not None:
             raise ValueError("Cannot dent dev-releases")
-        return PEP440Version.from_parts(epoch=self.epoch, release=self.release, pre=self.pre, post=self.post, dev=0)
+        return PEP440Version.from_parts(
+            epoch=self.epoch,
+            release=self.release,
+            pre=self.pre,  # ty:ignore[invalid-argument-type]
+            post=self.post,
+            dev=0,
+        )
 
 
 def version_prefix(version: str) -> tuple[str, str]:
