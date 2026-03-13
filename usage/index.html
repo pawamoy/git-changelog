@@ -682,6 +682,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#linux-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#angularkarma-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1143,6 +1154,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#linux-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#angularkarma-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1530,6 +1552,18 @@ it is added to the corresponding section:</p>
 </tr>
 </tbody>
 </table>
+<h3 id="linux-convention">Linux convention<a class="headerlink" href="#linux-convention" title="Permanent link">¤</a></h3>
+<p>The Linux convention is based on the <a class="autorefs autorefs-internal" title="Basic convention" href="./#basic-convention">basic convention</a>,
+but commit message summaries may optionally be prefixed by a <strong>component</strong> followed by a colon and a space:</p>
+<div class="highlight"><pre><span></span><code>[component: ]&lt;type&gt; &lt;description&gt;
+</code></pre></div>
+<p>This convention is based off the <a href="https://git-scm.com/docs/SubmittingPatches#describe-changes">Linux kernel commit message convention</a> used to submit patches to the kernel.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code>ui: fix sidebar navigation
+core: add support for new hardware
+scheduler: change behavior
+ci: fix pipeline for arm64
+</code></pre></div>
 <h3 id="angularkarma-convention">Angular/Karma convention<a class="headerlink" href="#angularkarma-convention" title="Permanent link">¤</a></h3>
 <p>The Angular/Karma convention initiated the <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/">Conventional Commit specification</a>.
 It expects the following format for commit messages:</p>
