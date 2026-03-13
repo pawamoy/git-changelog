@@ -223,7 +223,7 @@ Type     | Section
 
 ### Linux convention
 
-The Linux convention is based on the [basic convention](basic-convention),
+The Linux convention is based on the [basic convention][basic-convention],
 but commit message summaries may optionally be prefixed by a **component** followed by a colon and a space:
 
 ```text
