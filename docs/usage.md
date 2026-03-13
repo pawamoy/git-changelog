@@ -230,7 +230,7 @@ but commit message summaries may optionally be prefixed by a **component** follo
 [component: ]<type> <description>
 ```
 
-This convention is based off the [Linux kernel commit message convention](linux-convention) used to submit patches to the kernel.
+This convention is based off the [Linux kernel commit message convention][linux-convention] used to submit patches to the kernel.
 
 For example:
 
