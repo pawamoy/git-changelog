@@ -30,6 +30,7 @@ from git_changelog._internal.commit import (
     BasicConvention,
     CommitConvention,
     ConventionalCommitConvention,
+    LinuxConvention,
 )
 from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
 from git_changelog._internal.versioning import bump_pep440, bump_semver
@@ -183,6 +184,7 @@ def get_parser() -> argparse.ArgumentParser:
             {BasicConvention._format_sections_help()}
             {AngularConvention._format_sections_help()}
             {ConventionalCommitConvention._format_sections_help()}
+            {LinuxConvention._format_sections_help()}
             """,
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
