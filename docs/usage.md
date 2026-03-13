@@ -221,6 +221,26 @@ Type     | Section
 `merge`  | Merged
 `doc`    | Documented
 
+### Linux convention
+
+The Linux convention is based on the [basic convention](basic-convention),
+but commit message summaries may optionally be prefixed by a **component** followed by a colon and a space:
+
+```text
+[component: ]<type> <description>
+```
+
+This convention is based off the [Linux kernel commit message convention](linux-convention) used to submit patches to the kernel.
+
+For example:
+
+```text
+ui: fix sidebar navigation
+core: add support for new hardware
+scheduler: change behavior
+ci: fix pipeline for arm64
+```
+
 ### Angular/Karma convention
 
 The Angular/Karma convention initiated the [Conventional Commit specification][conventional-commit].
@@ -1007,3 +1027,4 @@ and `--marker-line`.
 [pep440-dev]: https://peps.python.org/pep-0440/#developmental-releases
 [pep440-release]: https://peps.python.org/pep-0440/#final-releases
 [debian-changelog-format]: https://www.debian.org/doc/debian-policy/ch-source.html#debian-changelog-debian-changelog
+[linux-convention]: https://git-scm.com/docs/SubmittingPatches#describe-changes

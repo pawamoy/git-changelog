@@ -582,5 +582,7 @@ class LinuxConvention(BasicConvention):
         Returns:
             The commit type.
         """
-        # Linux commit message are prefixed by "subsystem:" name.
-        return super().parse_type(commit_subject.partition(":")[2])
+        # Linux commit message are prefixed by "subsystem: " name.
+        if ":" in commit_subject:
+            commit_subject = commit_subject.split(":", 1)[1].lstrip()
+        return super().parse_type(commit_subject)
