@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.0](https://github.com/pawamoy/git-changelog/releases/tag/2.9.0) - 2026-03-13
+
+<small>[Compare with 2.8.1](https://github.com/pawamoy/git-changelog/compare/2.8.1...2.9.0)</small>
+
+### Features
+
+- Add Linux commit message convention ([4e19299](https://github.com/pawamoy/git-changelog/commit/4e192992f704d0320f431b71895f0ae267c498fb) by Patrik Dufresne). [Issue-116](https://github.com/pawamoy/git-changelog/issues/116), [PR-118](https://github.com/pawamoy/git-changelog/pull/118)
+
 ## [2.8.1](https://github.com/pawamoy/git-changelog/releases/tag/2.8.1) - 2026-03-12
 
 <small>[Compare with 2.8.0](https://github.com/pawamoy/git-changelog/compare/2.8.0...2.8.1)</small>
