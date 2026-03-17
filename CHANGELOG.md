@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.1](https://github.com/pawamoy/git-changelog/releases/tag/2.9.1) - 2026-03-17
+
+<small>[Compare with 2.9.0](https://github.com/pawamoy/git-changelog/compare/2.9.0...2.9.1)</small>
+
+### Bug Fixes
+
+- Change Debian version regex to be more permissive ([2e2fd9c](https://github.com/pawamoy/git-changelog/commit/2e2fd9c4956207137f958651e0d39b3fed08efc3) by Patrik Dufresne). [PR-119](https://github.com/pawamoy/git-changelog/pull/119), Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>
+
 ## [2.9.0](https://github.com/pawamoy/git-changelog/releases/tag/2.9.0) - 2026-03-13
 
 <small>[Compare with 2.8.1](https://github.com/pawamoy/git-changelog/compare/2.8.1...2.9.0)</small>
