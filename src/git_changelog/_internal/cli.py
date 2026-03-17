@@ -66,7 +66,7 @@ DEFAULT_CONFIG_FILES = [
 """Default configuration files read by git-changelog."""
 
 _DEFAULT_DEBIAN_MARKER_LINE = _MARKER_LINE_PREPEND
-_DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w-]+ \((?:\d+:)?(?P<version>.+?)(?:-\d+)?(?:\+[^)]*|~[^)]*)?\)(?!.*UNRELEASED)"
+_DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w-]+ \((?:\d+:)?(?P<version>[^-+~)]+)(?!.*UNRELEASED)"
 
 DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,

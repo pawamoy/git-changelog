@@ -368,13 +368,14 @@ def test_include_all_config_option(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("line", "version"),
     [
-        ("minarca-server (4.2.0~dev) UNRELEASED; urgency=medium", None),
-        ("minarca-server (4.2.0~dev) stable; urgency=medium", "4.2.0"),
-        ("minarca-server (4.2.0) stable; urgency=medium", "4.2.0"),
-        ("minarca-server (4.2.0-1) stable; urgency=medium", "4.2.0"),
-        ("minarca-server (4.2.0+dfsg-1) stable; urgency=medium", "4.2.0"),
-        ("minarca-server (4.2.0-alpha1-1) stable; urgency=medium", "4.2.0-alpha1"),
-        ("minarca-server (1:4.2.0-1) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0~dev) UNRELEASED; urgency=medium", None),
+        ("my-pkg-name (4.2.0~dev) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0-1) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0+dfsg-1) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0-alpha1-1) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (1:4.2.0-1) stable; urgency=medium", "4.2.0"),
+        ("my-pkg-name (4.2.0-0progress8.99u1) stable; urgency=medium", "4.2.0"),
     ],
 )
 def test_debian_version_regex(line: str, version: str) -> None:
