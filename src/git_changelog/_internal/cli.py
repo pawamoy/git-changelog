@@ -54,7 +54,7 @@ DEFAULT_MARKER_LINE = "<!-- insertion marker -->"
 """Default marker line for finding insertion points."""
 DEFAULT_CHANGELOG_FILE = "CHANGELOG.md"
 """Default changelog file name."""
-CONVENTIONS = ("angular", "conventional", "basic")
+CONVENTIONS = sorted(Changelog.CONVENTION)
 """Available commit message conventions."""
 DEFAULT_CONFIG_FILES = [
     "pyproject.toml",

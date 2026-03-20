@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 import tomli_w
 
-from git_changelog import DEFAULT_SETTINGS, get_version, main, parse_settings, read_config
+from git_changelog import CONVENTIONS, DEFAULT_SETTINGS, get_version, main, parse_settings, read_config
 from git_changelog._internal import debug
 from git_changelog._internal.cli import _DEFAULT_DEBIAN_VERSION_REGEX
 
@@ -393,3 +393,10 @@ def test_outputting_release_notes() -> None:
     """Test that the CLI option to output release notes works as expected."""
     # We make sure that default loaded settings are valid.
     assert main(["--release-notes"]) == 0
+
+
+@pytest.mark.parametrize("convention", CONVENTIONS)
+def test_selecting_convention(convention: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that the CLI option to select a convention works as expected."""
+    monkeypatch.setattr("git_changelog._internal.cli.build_and_render", lambda *args, **kwargs: None)
+    assert main(["-c", convention]) == 0
