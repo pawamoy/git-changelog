@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.3](https://github.com/pawamoy/git-changelog/releases/tag/2.9.3) - 2026-03-26
+
+<small>[Compare with 2.9.2](https://github.com/pawamoy/git-changelog/compare/2.9.2...2.9.3)</small>
+
+### Bug Fixes
+
+- Change Debian template to wrap long commit message ([4f44a92](https://github.com/pawamoy/git-changelog/commit/4f44a928a5652388f251874cc16babffcda02d87) by Patrik Dufresne). Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>, [Issue-121](https://github.com/pawamoy/git-changelog/pull/121)
+
 ## [2.9.2](https://github.com/pawamoy/git-changelog/releases/tag/2.9.2) - 2026-03-20
 
 <small>[Compare with 2.9.1](https://github.com/pawamoy/git-changelog/compare/2.9.1...2.9.2)</small>
