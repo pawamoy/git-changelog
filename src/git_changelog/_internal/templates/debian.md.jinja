@@ -13,7 +13,7 @@
 {%- for version in changelog.versions_list -%}
 {{ jinja_context.debian_package_name or "debian-package-name" }} ({{ deb_version(version)}}) {{ deb_distribution(version) }}; urgency=medium
 {% for commit in version.commits | sort(attribute="author_date") | unique(attribute="subject") %}
-  * {{ commit.subject }}
+{{ ('  * ' + commit.subject) | wordwrap(80, break_long_words=False, wrapstring="\n    ") }}
 {%- endfor %}
 
 {% set last_commit = version.commits | sort(attribute="author_date", reverse=True) | first -%}
