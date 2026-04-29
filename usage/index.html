@@ -1766,7 +1766,7 @@ it is added to the corresponding section:</p>
 </tbody>
 </table>
 <h3 id="linux-convention">Linux convention<a class="headerlink" href="#linux-convention" title="Permanent link">¤</a></h3>
-<p>The Linux convention is based on the <a class="autorefs autorefs-internal" title="Basic convention" href="./#basic-convention">basic convention</a>,
+<p>The Linux convention is based on the [basic convention][basic-convention],
 but commit message summaries may optionally be prefixed by a <strong>component</strong> followed by a colon and a space:</p>
 <div class="highlight"><pre><span></span><code>[component: ]&lt;type&gt; &lt;description&gt;
 </code></pre></div>
@@ -1962,14 +1962,14 @@ we recommend using our <a href="https://github.com/pawamoy/git-changelog/tree/ma
 as a starting point.</p>
 <p>From there, simply modify the different Jinja macros:</p>
 <ul>
-<li><code>render_commit()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Commit&lt;/span&gt;" href="../reference/api/#git_changelog.Commit">Commit</a> object</li>
-<li><code>render_section()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Section&lt;/span&gt;" href="../reference/api/#git_changelog.Section">Section</a> object</li>
-<li><code>render_version()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Version&lt;/span&gt;" href="../reference/api/#git_changelog.Version">Version</a> object</li>
+<li><code>render_commit()</code>, which accepts a [Commit][git_changelog.Commit] object</li>
+<li><code>render_section()</code>, which accepts a [Section][git_changelog.Section] object</li>
+<li><code>render_version()</code>, which accepts a [Version][git_changelog.Version] object</li>
 </ul>
 <p>Then, also update the template at the end, to change the changelog's header
 or add a changelog footer for example.</p>
 <p>The variables available in the template are <code>changelog</code>,
-which is a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Changelog&lt;/span&gt;" href="../reference/api/#git_changelog.Changelog">Changelog</a> instance,
+which is a [Changelog][git_changelog.Changelog] instance,
 and <code>in_place</code>, which is a boolean, and tells whether the changelog
 is being updated in-place.</p>
 <div class="admonition question">
@@ -2378,22 +2378,22 @@ Try it out:
 
 <div class="pyodide">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-1--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-41--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
 </div>
-<div><pre id="exec-1--editor" class="pyodide-editor">from git_changelog import bump_pep440
+<div><pre id="exec-41--editor" class="pyodide-editor">from git_changelog import bump_pep440
 
 # "auto" strategies are not directly supported by this function
 print(bump_pep440("1.2.3", "minor+alpha"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-1--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-41--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
 </div>
-<pre><code id="exec-1--output" class="pyodide-output"></code></pre>
+<pre><code id="exec-41--output" class="pyodide-output"></code></pre>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     setupPyodide(
-        'exec-1--',
+        'exec-41--',
         install=['git-changelog'],
         themeLight='tomorrow',
         themeDark='tomorrow_night',
@@ -2461,8 +2461,10 @@ on its right to 0.</p>
 </tr>
 </tbody>
 </table>
-<p>Try it out:</p>
-<p>
+<!--
+Try it out:
+
+
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.16.0/ace.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
@@ -2471,22 +2473,22 @@ on its right to 0.</p>
 
 <div class="pyodide">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-2--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-42--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
 </div>
-<div><pre id="exec-2--editor" class="pyodide-editor">from git_changelog.versioning import bump_semver
+<div><pre id="exec-42--editor" class="pyodide-editor">from git_changelog import bump_semver
 
 # the "auto" strategy is not directly supported by this function
 print(bump_semver("1.2.3", "minor"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-2--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-42--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
 </div>
-<pre><code id="exec-2--output" class="pyodide-output"></code></pre>
+<pre><code id="exec-42--output" class="pyodide-output"></code></pre>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     setupPyodide(
-        'exec-2--',
+        'exec-42--',
         install=['git-changelog'],
         themeLight='tomorrow',
         themeDark='tomorrow_night',
@@ -2496,7 +2498,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     );
 });
 </script>
-</p>
+
+-->
+
 <p>The <code>v</code> prefix will be preserved when bumping a version: <code>v1.0.0</code> -&gt; <code>v2.0.0</code>.</p>
 <p>The bumping strategies for SemVer will prevent you from bumping from any version to a lower one.
 It does not support bump pre-release metadata or build metadata
@@ -2572,16 +2576,20 @@ not just on GitHub, GitLab or Bitbucket, and without pre/post-processing.</p>
 If the value is an URL, a link is created with the token as title.
 If not, the trailer is written as is.</p>
 <p>Example of how the previous trailers are rendered:</p>
-<p>```md exec="1" source="material-block"
-- Fix atrocious bug (<a href="https://github.com/super/repo/commit/aafa7793ec02a">aafa779</a> by John Doe).
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>Fix atrocious bug ([aafa779](https://github.com/super/repo/commit/aafa7793ec02a) by John Doe).
+    [<span class="nt">Fixes issue #14</span>](<span class="na">https://github.com/super/repo/issues/14</span>),
+    [<span class="nt">Follow-up of PR #7</span>](<span class="na">https://github.com/super/repo/pull/7</span>),
+    [<span class="nt">Part of epic #5</span>](<span class="na">https://agile-software.com/super/project/epics/5</span>)
+</code></pre></div>
+<ul>
+<li>Fix atrocious bug (<a href="https://github.com/super/repo/commit/aafa7793ec02a">aafa779</a> by John Doe).
     <a href="https://github.com/super/repo/issues/14">Fixes issue #14</a>,
     <a href="https://github.com/super/repo/pull/7">Follow-up of PR #7</a>,
-    <a href="https://agile-software.com/super/project/epics/5">Part of epic #5</a>
-<div class="highlight"><pre><span></span><code>To enable Git trailers parsing, use the `-T` or `--trailers` CLI option:
-
-```bash
-git-changelog --trailers
-</code></pre></div></p>
+    <a href="https://agile-software.com/super/project/epics/5">Part of epic #5</a></li>
+</ul>
+<p>To enable Git trailers parsing, use the <code>-T</code> or <code>--trailers</code> CLI option:</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--trailers
+</code></pre></div>
 <h2 id="update-changelog-in-place">Update changelog in place<a class="headerlink" href="#update-changelog-in-place" title="Permanent link">¤</a></h2>
 <p><a href="../reference/cli/#in_place">(--in-place)</a><br>
 <a href="../reference/cli/#marker_line">(--marker-line)</a><br>
@@ -2645,11 +2653,12 @@ not want to modify (e.g.: debian/changelog)</p>
 <span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;CHANGELOG.md&quot;</span>
 <span class="n">marker-line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;:prepend:&quot;</span>
 </code></pre></div>
-<blockquote>
-<p><strong>Note:</strong> When using <code>:prepend:</code>, <em>git-changelog</em> still filters out versions
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using <code>:prepend:</code>, <em>git-changelog</em> still filters out versions
 already present in the file (using the version regular expression),
 so existing entries will not be duplicated.</p>
-</blockquote>
+</div>
 <h2 id="output-release-notes">Output release notes<a class="headerlink" href="#output-release-notes" title="Permanent link">¤</a></h2>
 <p><a href="../reference/cli/#input">(--input)</a><br>
 <a href="../reference/cli/#release_notes">(--release-notes)</a></p>
