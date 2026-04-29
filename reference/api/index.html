@@ -29567,11 +29567,7 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="normal">879</span>
 <span class="normal">880</span>
 <span class="normal">881</span>
-<span class="normal">882</span>
-<span class="normal">883</span>
-<span class="normal">884</span>
-<span class="normal">885</span>
-<span class="normal">886</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_release_notes</span><span class="p">(</span>
+<span class="normal">882</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_release_notes</span><span class="p">(</span>
     <span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;CHANGELOG.md&quot;</span><span class="p">,</span>
     <span class="n">version_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_VERSION_REGEX</span><span class="p">,</span>
     <span class="n">marker_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_MARKER_LINE</span><span class="p">,</span>
@@ -29589,20 +29585,16 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="sd">        The latest changelog entry.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">release_notes</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">found_marker</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">found_version</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">changelog</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">changelog</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># noqa: PLW2901</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">found_marker</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="n">marker_line</span><span class="p">:</span>
-                    <span class="n">found_marker</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">version_regex</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">found_version</span><span class="p">:</span>
                     <span class="k">break</span>
                 <span class="n">found_version</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">release_notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">release_notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">found_version</span><span class="p">:</span>
+                <span class="n">release_notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
     <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">release_notes</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">marker_line</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">marker_line</span><span class="p">)]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -29785,7 +29777,11 @@ Whether to try and bump the latest version to guess the new one.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/git_changelog/_internal/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">916</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span>
+<span class="normal">915</span>
+<span class="normal">916</span>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
@@ -29818,11 +29814,7 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="normal">946</span>
 <span class="normal">947</span>
 <span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
-<span class="normal">952</span>
-<span class="normal">953</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the main program.</span>
 
 <span class="sd">    This function is executed when you type `git-changelog` or `python -m git_changelog`.</span>
@@ -29936,7 +29928,11 @@ Whether to try and bump the latest version to guess the new one.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/git_changelog/_internal/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">889</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
 <span class="normal">890</span>
 <span class="normal">891</span>
 <span class="normal">892</span>
@@ -29956,11 +29952,7 @@ Whether to try and bump the latest version to guess the new one.</p>
 <span class="normal">906</span>
 <span class="normal">907</span>
 <span class="normal">908</span>
-<span class="normal">909</span>
-<span class="normal">910</span>
-<span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">output_release_notes</span><span class="p">(</span>
+<span class="normal">909</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">output_release_notes</span><span class="p">(</span>
     <span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CHANGELOG.md&quot;</span><span class="p">,</span>
     <span class="n">version_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">marker_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

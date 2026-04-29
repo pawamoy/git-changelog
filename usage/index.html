@@ -1766,7 +1766,7 @@ it is added to the corresponding section:</p>
 </tbody>
 </table>
 <h3 id="linux-convention">Linux convention<a class="headerlink" href="#linux-convention" title="Permanent link">¤</a></h3>
-<p>The Linux convention is based on the [basic convention][basic-convention],
+<p>The Linux convention is based on the <a class="autorefs autorefs-internal" title="Basic convention" href="./#basic-convention">basic convention</a>,
 but commit message summaries may optionally be prefixed by a <strong>component</strong> followed by a colon and a space:</p>
 <div class="highlight"><pre><span></span><code>[component: ]&lt;type&gt; &lt;description&gt;
 </code></pre></div>
@@ -1962,14 +1962,14 @@ we recommend using our <a href="https://github.com/pawamoy/git-changelog/tree/ma
 as a starting point.</p>
 <p>From there, simply modify the different Jinja macros:</p>
 <ul>
-<li><code>render_commit()</code>, which accepts a [Commit][git_changelog.Commit] object</li>
-<li><code>render_section()</code>, which accepts a [Section][git_changelog.Section] object</li>
-<li><code>render_version()</code>, which accepts a [Version][git_changelog.Version] object</li>
+<li><code>render_commit()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Commit&lt;/span&gt;" href="../reference/api/#git_changelog.Commit">Commit</a> object</li>
+<li><code>render_section()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Section&lt;/span&gt;" href="../reference/api/#git_changelog.Section">Section</a> object</li>
+<li><code>render_version()</code>, which accepts a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Version&lt;/span&gt;" href="../reference/api/#git_changelog.Version">Version</a> object</li>
 </ul>
 <p>Then, also update the template at the end, to change the changelog's header
 or add a changelog footer for example.</p>
 <p>The variables available in the template are <code>changelog</code>,
-which is a [Changelog][git_changelog.Changelog] instance,
+which is a <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;Changelog&lt;/span&gt;" href="../reference/api/#git_changelog.Changelog">Changelog</a> instance,
 and <code>in_place</code>, which is a boolean, and tells whether the changelog
 is being updated in-place.</p>
 <div class="admonition question">
@@ -2378,22 +2378,22 @@ Try it out:
 
 <div class="pyodide">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-41--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-1--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
 </div>
-<div><pre id="exec-41--editor" class="pyodide-editor">from git_changelog import bump_pep440
+<div><pre id="exec-1--editor" class="pyodide-editor">from git_changelog import bump_pep440
 
 # "auto" strategies are not directly supported by this function
 print(bump_pep440("1.2.3", "minor+alpha"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-41--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-1--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
 </div>
-<pre><code id="exec-41--output" class="pyodide-output"></code></pre>
+<pre><code id="exec-1--output" class="pyodide-output"></code></pre>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     setupPyodide(
-        'exec-41--',
+        'exec-1--',
         install=['git-changelog'],
         themeLight='tomorrow',
         themeDark='tomorrow_night',
@@ -2473,22 +2473,22 @@ Try it out:
 
 <div class="pyodide">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-42--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-2--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
 </div>
-<div><pre id="exec-42--editor" class="pyodide-editor">from git_changelog import bump_semver
+<div><pre id="exec-2--editor" class="pyodide-editor">from git_changelog import bump_semver
 
 # the "auto" strategy is not directly supported by this function
 print(bump_semver("1.2.3", "minor"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-42--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-2--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
 </div>
-<pre><code id="exec-42--output" class="pyodide-output"></code></pre>
+<pre><code id="exec-2--output" class="pyodide-output"></code></pre>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     setupPyodide(
-        'exec-42--',
+        'exec-2--',
         install=['git-changelog'],
         themeLight='tomorrow',
         themeDark='tomorrow_night',
