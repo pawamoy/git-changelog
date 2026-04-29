@@ -866,20 +866,16 @@ def get_release_notes(
         The latest changelog entry.
     """
     release_notes = []
-    found_marker = False
     found_version = False
     with open(input_file, encoding="utf8") as changelog:
         for line in changelog:
-            line = line.strip()  # noqa: PLW2901
-            if not found_marker:
-                if line == marker_line:
-                    found_marker = True
-                continue
             if re.search(version_regex, line):
                 if found_version:
                     break
                 found_version = True
-            release_notes.append(line)
+                release_notes.append(line.rstrip("\n"))
+            elif found_version:
+                release_notes.append(line.rstrip("\n"))
     result = "\n".join(release_notes).strip()
     if result.endswith(marker_line):
         result = result[: -len(marker_line)].strip()
