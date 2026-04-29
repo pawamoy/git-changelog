@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.4](https://github.com/pawamoy/git-changelog/releases/tag/2.9.4) - 2026-04-29
+
+<small>[Compare with 2.9.3](https://github.com/pawamoy/git-changelog/compare/2.9.3...2.9.4)</small>
+
+### Bug Fixes
+
+- Don't use marker line when getting release notes ([dab074b](https://github.com/pawamoy/git-changelog/commit/dab074bd9c8b358dc0921f7c6366ca4c911e59fc) by Timothée Mazzucotelli). [Issue-122](https://github.com/pawamoy/git-changelog/issues/122)
+
 ## [2.9.3](https://github.com/pawamoy/git-changelog/releases/tag/2.9.3) - 2026-03-26
 
 <small>[Compare with 2.9.2](https://github.com/pawamoy/git-changelog/compare/2.9.2...2.9.3)</small>
