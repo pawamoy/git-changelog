@@ -90,7 +90,7 @@ The following sections explain in more details all the features of *git-changelo
 
 ## Configuration files
 
-[(--config-file)](cli.md#config_file)
+[(--config-file)](reference/cli.md#config_file)
 
 Project-wise, permanent configuration of *git-changelog* is possible.
 By default, *git-changelog* will search for the existence a suitable configuration
@@ -166,7 +166,7 @@ zerover = true
 
 ## Output a changelog
 
-[(--output)](cli.md#output)
+[(--output)](reference/cli.md#output)
 
 To output a changelog for the current repository (current directory),
 simply run:
@@ -195,7 +195,7 @@ git-changelog --output CHANGELOG.md
 
 ## Choose the commit message convention
 
-[(--convention)](cli.md#convention)
+[(--convention)](reference/cli.md#convention)
 
 Different conventions, or styles, are supported by *git-changelog*.
 To select a different convention than the default one (basic, see below),
@@ -286,7 +286,7 @@ appears right before the colon in the message summary
 
 ## Choose the sections to render
 
-[(--sections)](cli.md#sections)
+[(--sections)](reference/cli.md#sections)
 
 Each commit message convention has a default set of sections
 that will be rendered in the output. The other sections will be ignored.
@@ -317,7 +317,7 @@ for each commit message convetions.
 
 ## Include non-conventional commits
 
-[(--include-all)](cli.md#include_all)
+[(--include-all)](reference/cli.md#include_all)
 
 By default, *git-changelog* only includes commits that match the configured
 commit message convention. Commits that don't follow the convention (e.g., random
@@ -354,7 +354,7 @@ git-changelog --sections feat,fix --include-all
 
 ## Choose a changelog template
 
-[(--template)](cli.md#template)
+[(--template)](reference/cli.md#template)
 
 *git-changelog* provides three built-in templates: `keepachangelog`, `angular`, and `debian`.
 `keepachangelog` and `angular` are very similar, they just differ with the formatting a bit.
@@ -481,7 +481,7 @@ is being updated in-place.
 
 ### Extra Jinja context
 
-[(--jinja-context)](cli.md#jinja_context)
+[(--jinja-context)](reference/cli.md#jinja_context)
 
 Your custom changelog templates can support user-provided extra Jinja context.
 This extra context is available in the `jinja_context` variable, which is a dictionary,
@@ -514,7 +514,7 @@ footer = "Copyright 2024 My Company"
 
 ## Filter commits
 
-[(--filter-commits)](cli.md#filter_commits)
+[(--filter-commits)](reference/cli.md#filter_commits)
 
 Sometimes it may be useful to use a limited set of commits, for example, if your
 project has migrated to SemVer recently and you want to ignore old non-conventional commits.
@@ -539,9 +539,9 @@ git-changelog --filter-commits "2c0dbb8.."
 
 ## Understand the relationship with SemVer
 
-[(--bump)](cli.md#bump)<br>
-[(--versioning)](cli.md#versioning)<br>
-[(--zerover)](cli.md#zerover)
+[(--bump)](reference/cli.md#bump)<br>
+[(--versioning)](reference/cli.md#versioning)<br>
+[(--zerover)](reference/cli.md#zerover)
 
 *Although git-changelog supports several [versioning schemes](#choose-a-versioning-scheme),
 SemVer plays a particular role when managing versions.*
@@ -632,9 +632,9 @@ from your configuration file.
 
 ## Choose a versioning scheme
 
-[(--bump)](cli.md#bump)<br>
-[(--versioning)](cli.md#versioning)<br>
-[(--zerover)](cli.md#zerover)
+[(--bump)](reference/cli.md#bump)<br>
+[(--versioning)](reference/cli.md#versioning)<br>
+[(--zerover)](reference/cli.md#zerover)
 
 *git-changelog* currently supports the following versioning schemes:
 
@@ -708,14 +708,16 @@ Strategy              | Example               | Description
 `beta+dev`            | `1b0` → `1b1.dev0`    | Bump current beta pre-release and set it to a dev-release.
 `candidate+dev`       | `1rc0` → `1rc1.dev0`  | Bump current candidate pre-release and set it to a dev-release.
 
+<!--
 Try it out:
 
 ```pyodide install="git-changelog"
-from git_changelog.versioning import bump_pep440
+from git_changelog import bump_pep440
 
 # "auto" strategies are not directly supported by this function
 print(bump_pep440("1.2.3", "minor+alpha"))
 ```
+-->
 
 The `v` prefix will be preserved when bumping a version: `v1` -> `v2`.
 
@@ -750,14 +752,16 @@ Strategy              | Example               | Description
 `patch`               | `1.1.1` → `1.1.2`     | Bump micro version.
 `release`             | `1.1.1-a2` → `1.1.1`  | Bump version to a final release (remove pre-release and build metadata).
 
+<!--
 Try it out:
 
 ```pyodide install="git-changelog"
-from git_changelog.versioning import bump_semver
+from git_changelog import bump_semver
 
 # the "auto" strategy is not directly supported by this function
 print(bump_semver("1.2.3", "minor"))
 ```
+-->
 
 The `v` prefix will be preserved when bumping a version: `v1.0.0` -> `v2.0.0`.
 
@@ -796,8 +800,8 @@ to find additional information.
 
 ### Provider-specific references
 
-[(--parse-refs)](cli.md#parse_refs)<br>
-[(--provider)](cli.md#provider)
+[(--parse-refs)](reference/cli.md#parse_refs)<br>
+[(--provider)](reference/cli.md#provider)
 
 *git-changelog* will detect when you are using GitHub, GitLab or Bitbucket
 by checking the `origin` remote configured in your local clone
@@ -830,7 +834,7 @@ so for these reasons we do not recommend them. Instead, we recommend using Git t
 
 ### Git trailers
 
-[(--trailers)](cli.md#parse_trailers)
+[(--trailers)](reference/cli.md#parse_trailers)
 
 Git has an [`interpret-trailers`][git-trailers] command
 that allows to add or parse trailers line to commit messages.
@@ -866,7 +870,7 @@ If not, the trailer is written as is.
 
 Example of how the previous trailers are rendered:
 
-```md exec="1" source="material-block"
+```md exec="1" source="above"
 - Fix atrocious bug ([aafa779](https://github.com/super/repo/commit/aafa7793ec02a) by John Doe).
     [Fixes issue #14](https://github.com/super/repo/issues/14),
     [Follow-up of PR #7](https://github.com/super/repo/pull/7),
@@ -881,9 +885,9 @@ git-changelog --trailers
 
 ## Update changelog in place
 
-[(--in-place)](cli.md#in_place)<br>
-[(--marker-line)](cli.md#marker_line)<br>
-[(--version-regex)](cli.md#version_regex)
+[(--in-place)](reference/cli.md#in_place)<br>
+[(--marker-line)](reference/cli.md#marker_line)<br>
+[(--version-regex)](reference/cli.md#version_regex)
 
 Writing the whole generated changelog to a file is nice,
 but sometimes you need to tweak the entries in your changelog
@@ -961,14 +965,14 @@ output = "CHANGELOG.md"
 marker-line = ":prepend:"
 ```
 
-> **Note:** When using `:prepend:`, *git-changelog* still filters out versions
-> already present in the file (using the version regular expression),
-> so existing entries will not be duplicated.
+NOTE: When using `:prepend:`, *git-changelog* still filters out versions
+already present in the file (using the version regular expression),
+so existing entries will not be duplicated.
 
 ## Output release notes
 
-[(--input)](cli.md#input)<br>
-[(--release-notes)](cli.md#release_notes)
+[(--input)](reference/cli.md#input)<br>
+[(--release-notes)](reference/cli.md#release_notes)
 
 Some platforms allow to announce releases with additional "release notes".
 *git-changelog* can help generating release notes too, by simply

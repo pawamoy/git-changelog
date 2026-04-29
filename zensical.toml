@@ -6,8 +6,8 @@ site_url = "https://pawamoy.github.io/git-changelog"
 repo_url = "https://github.com/pawamoy/git-changelog"
 repo_name = "pawamoy/git-changelog"
 copyright = "Copyright &copy; 2020 Timothée Mazzucotelli"
-extra_css = ["css/apidocs.css"]
-extra_javascript = ["js/feedback.js"]
+extra_css = ["css/apidocs.css", "css/pyodide.css"]
+extra_javascript = ["js/feedback.js", "js/pyodide.js"]
 nav = [
   { "Home" = [
     { "Overview" = "index.md" },
@@ -149,6 +149,16 @@ check_paths = true
 [[project.markdown_extensions.pymdownx.superfences.custom_fences]]
 name = "python"
 class = "python"
+validator = "markdown_exec.validator"
+format = "markdown_exec.formatter"
+[[project.markdown_extensions.pymdownx.superfences.custom_fences]]
+name = "pyodide"
+class = "pyodide"
+validator = "markdown_exec.validator"
+format = "markdown_exec.formatter"
+[[project.markdown_extensions.pymdownx.superfences.custom_fences]]
+name = "md"
+class = "md"
 validator = "markdown_exec.validator"
 format = "markdown_exec.formatter"
 [project.markdown_extensions.pymdownx.tabbed]
