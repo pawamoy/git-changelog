@@ -1009,7 +1009,7 @@ jobs:
 ```
 
 By default *git-changelog* will try to read release notes
-from a file named `CHANGELOG.md`. Use the `-i`, `--input`
+from a file named `CHANGELOG.md`. Use the `-I`, `--input`
 option to specify another file to read from.
 Other options can be used to help *git-changelog* retrieving
 the latest entry from your changelog: `--version-regex`
