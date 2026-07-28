@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.37">
+      <meta name="generator" content="zensical-0.0.51">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.62c9b9cc.min.css">
       
         
           
@@ -64,7 +64,7 @@
     
       <link rel="stylesheet" href="../css/pyodide.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
   
@@ -245,6 +245,21 @@
   
   
     
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="./.." class="md-tabs__link">
@@ -313,6 +328,15 @@
   
   
   
+    
+      
+      
+        
+      
+        
+      
+    
+    
     
     
       <li class="md-tabs__item">
@@ -439,8 +463,7 @@
   <span class="md-ellipsis">
     
   
-    Home
-  
+  Home
 
     
   </span>
@@ -461,8 +484,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Home
-  
+  Home
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
@@ -483,8 +505,7 @@
   <span class="md-ellipsis">
     
   
-    Changelog
-  
+  Changelog
 
     
   </span>
@@ -511,8 +532,7 @@
   <span class="md-ellipsis">
     
   
-    Credits
-  
+  Credits
 
     
   </span>
@@ -539,8 +559,7 @@
   <span class="md-ellipsis">
     
   
-    License
-  
+  License
 
     
   </span>
@@ -583,8 +602,7 @@
   <span class="md-ellipsis">
     
   
-    Usage
-  
+  Usage
 
     
   </span>
@@ -601,8 +619,7 @@
   <span class="md-ellipsis">
     
   
-    Usage
-  
+  Usage
 
     
   </span>
@@ -982,8 +999,7 @@
   <span class="md-ellipsis">
     
   
-    CLI reference
-  
+  CLI reference
 
     
   </span>
@@ -1009,8 +1025,7 @@
   <span class="md-ellipsis">
     
   
-    API reference
-  
+  API reference
 
     
   </span>
@@ -1058,8 +1073,7 @@
   <span class="md-ellipsis">
     
   
-    Development
-  
+  Development
 
     
   </span>
@@ -1074,8 +1088,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Development
-  
+  Development
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
@@ -1094,8 +1107,7 @@
   <span class="md-ellipsis">
     
   
-    Contributing
-  
+  Contributing
 
     
   </span>
@@ -1122,8 +1134,7 @@
   <span class="md-ellipsis">
     
   
-    Code of Conduct
-  
+  Code of Conduct
 
     
   </span>
@@ -1157,8 +1168,7 @@
   <span class="md-ellipsis">
     
   
-    Author's website
-  
+  Author's website
 
     
   </span>
@@ -1935,18 +1945,23 @@ passed via the <code>-j</code>, <code>--jinja-context</code> CLI option or the <
 <tbody>
 <tr>
 <td><code>debian_package_name</code></td>
-<td>The Debian source package name</td>
+<td>The Debian source package name. (Required)</td>
 </tr>
 <tr>
 <td><code>debian_version_suffix</code></td>
 <td>A version suffix to append to each version number. e.g.: <code>-1</code></td>
+</tr>
+<tr>
+<td><code>debian_distribution</code></td>
+<td>The targeted distribution codename. Default: <code>unstable</code> or <code>UNRELEASED</code> for untagged commit. e.g.: <code>trixie</code></td>
 </tr>
 </tbody>
 </table>
 <p>Example CLI usage:</p>
 <div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--template<span class="w"> </span>debian<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-j<span class="w"> </span><span class="nv">debian_package_name</span><span class="o">=</span><span class="s2">&quot;my-package&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-j<span class="w"> </span><span class="nv">debian_version_suffix</span><span class="o">=</span><span class="s2">&quot;-1&quot;</span>
+<span class="w">  </span>-j<span class="w"> </span><span class="nv">debian_version_suffix</span><span class="o">=</span><span class="s2">&quot;-1&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-j<span class="w"> </span><span class="nv">debian_distribution</span><span class="o">=</span><span class="s2">&quot;trixie&quot;</span>
 </code></pre></div>
 <p>Example configuration in a TOML file:</p>
 <div class="highlight"><pre><span></span><code><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;debian&quot;</span>
@@ -2370,39 +2385,19 @@ on its right to 0.</p>
 Try it out:
 
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.16.0/ace.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
-<link title="light" rel="alternate stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/tomorrow.min.css" disabled="disabled">
-<link title="dark" rel="alternate stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/tomorrow-night-blue.min.css" disabled="disabled">
-
-<div class="pyodide">
+<div class="pyodide" data-install="git-changelog" data-session="default" data-minlines="4" data-maxlines="4">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-1--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-1--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable">Run</span>
 </div>
 <div><pre id="exec-1--editor" class="pyodide-editor">from git_changelog import bump_pep440
 
 # "auto" strategies are not directly supported by this function
 print(bump_pep440("1.2.3", "minor+alpha"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-1--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-1--clear" class="pyodide-bar-item pyodide-clickable">Clear</span>
 </div>
 <pre><code id="exec-1--output" class="pyodide-output"></code></pre>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    setupPyodide(
-        'exec-1--',
-        install=['git-changelog'],
-        themeLight='tomorrow',
-        themeDark='tomorrow_night',
-        session='default',
-        minLines=4,
-        maxLines=4,
-    );
-});
-</script>
 
 -->
 
@@ -2465,39 +2460,19 @@ on its right to 0.</p>
 Try it out:
 
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.16.0/ace.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
-<link title="light" rel="alternate stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/tomorrow.min.css" disabled="disabled">
-<link title="dark" rel="alternate stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/tomorrow-night-blue.min.css" disabled="disabled">
-
-<div class="pyodide">
+<div class="pyodide" data-install="git-changelog" data-session="default" data-minlines="4" data-maxlines="4">
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-2--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7Z"></path></svg></span> Run</span>
+<span class="pyodide-bar-item">Editor (session: default)</span><span id="exec-2--run" title="Run: press Ctrl-Enter" class="pyodide-bar-item pyodide-clickable">Run</span>
 </div>
 <div><pre id="exec-2--editor" class="pyodide-editor">from git_changelog import bump_semver
 
 # the "auto" strategy is not directly supported by this function
 print(bump_semver("1.2.3", "minor"))</pre></div>
 <div class="pyodide-editor-bar">
-<span class="pyodide-bar-item">Output</span><span id="exec-2--clear" class="pyodide-bar-item pyodide-clickable"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.66l8.72-8.73c.79-.77.79-2.04 0-2.83l-4.85-4.85c-.39-.39-.91-.59-1.42-.59M17 18l-2 2h7v-2"></path></svg></span> Clear</span>
+<span class="pyodide-bar-item">Output</span><span id="exec-2--clear" class="pyodide-bar-item pyodide-clickable">Clear</span>
 </div>
 <pre><code id="exec-2--output" class="pyodide-output"></code></pre>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    setupPyodide(
-        'exec-2--',
-        install=['git-changelog'],
-        themeLight='tomorrow',
-        themeDark='tomorrow_night',
-        session='default',
-        minLines=4,
-        maxLines=4,
-    );
-});
-</script>
 
 -->
 
@@ -2693,7 +2668,7 @@ with the latest changelog entry as release notes.</p>
 <span class="w">        </span><span class="nt">body_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release-notes.md</span>
 </code></pre></div>
 <p>By default <em>git-changelog</em> will try to read release notes
-from a file named <code>CHANGELOG.md</code>. Use the <code>-i</code>, <code>--input</code>
+from a file named <code>CHANGELOG.md</code>. Use the <code>-I</code>, <code>--input</code>
 option to specify another file to read from.
 Other options can be used to help <em>git-changelog</em> retrieving
 the latest entry from your changelog: <code>--version-regex</code>
@@ -2980,10 +2955,10 @@ and <code>--marker-line</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"search":"../assets/javascripts/workers/search.b6b7e04f.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.dbc0afdc.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7f30b55.min.js"></script>
       
         <script src="../js/feedback.js"></script>
       
