@@ -7,7 +7,13 @@
 {%- endmacro -%}
 
 {%- macro deb_distribution(version) -%}
-{%- if version.tag or version.planned_tag -%}{{- jinja_context.debian_distribution or "unstable" -}}{%- else -%}UNRELEASED{%- endif -%}
+{%- if jinja_context.debian_distribution -%}
+{{- jinja_context.debian_distribution -}}
+{%- elif version.tag or version.planned_tag -%}
+unstable
+{%- else -%}
+UNRELEASED
+{%- endif -%}
 {%- endmacro -%}
 
 {%- for version in changelog.versions_list -%}

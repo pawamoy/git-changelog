@@ -392,17 +392,19 @@ automatically adjusted to match the Debian changelog format, unless explicitly o
 The `debian` template supports the following extra [Jinja context](#extra-jinja-context) variables,
 passed via the `-j`, `--jinja-context` CLI option or the `jinja_context` configuration option:
 
-Variable                  | Description                                                              |
---------------------------|--------------------------------------------------------------------------|
-`debian_package_name`     | The Debian source package name                                           |
-`debian_version_suffix`   | A version suffix to append to each version number. e.g.: `-1`            |
+Variable                  | Description                                                                                                   |
+--------------------------|---------------------------------------------------------------------------------------------------------------|
+`debian_package_name`     | The Debian source package name. (Required)                                                                    |
+`debian_version_suffix`   | A version suffix to append to each version number. e.g.: `-1`                                                 |
+`debian_distribution`     | The targeted distribution codename. Default: `unstable` or `UNRELEASED` for untagged commit. e.g.: `trixie`   |
 
 Example CLI usage:
 
 ```bash
 git-changelog --template debian \
   -j debian_package_name="my-package" \
-  -j debian_version_suffix="-1"
+  -j debian_version_suffix="-1" \
+  -j debian_distribution="trixie"
 ```
 
 Example configuration in a TOML file:
