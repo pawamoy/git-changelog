@@ -1,8 +1,10 @@
 {%- macro deb_version(version) -%}
 {% if version.tag or version.planned_tag %}
 {{- (version.tag or version.planned_tag).lstrip("v") }}{{ jinja_context.debian_version_suffix -}}
-{% else %}
+{% elif version.previous_version %}
 {{- version.previous_version.tag.lstrip("v") }}+{{ version.date.strftime("%Y%m%d") -}}{{ jinja_context.debian_version_suffix -}}
+{%- else -%}
+0.0.0+{{ version.date.strftime("%Y%m%d") -}}{{ jinja_context.debian_version_suffix -}}
 {% endif %}
 {%- endmacro -%}
 
