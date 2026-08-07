@@ -143,6 +143,7 @@ def test_rendering_debian_prepend(repo: GitRepo, tmp_path: Path) -> None:
     assert latest_tag in rendered
     repo.git("tag", "-d", latest_tag)
 
+
 @pytest.mark.parametrize("repo", [("",)], indirect=True)
 def test_rendering_debian_no_previous_version(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place.
@@ -164,6 +165,7 @@ def test_rendering_debian_no_previous_version(repo: GitRepo, tmp_path: Path) -> 
         },
     )
     assert re.match(r"my-pkg-name \(0.0.0\+\d+\+dfsg-1\) UNRELEASED;", rendered)
+
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
 def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
