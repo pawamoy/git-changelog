@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.6](https://github.com/pawamoy/git-changelog/releases/tag/2.9.6) - 2026-08-07
+
+<small>[Compare with 2.9.5](https://github.com/pawamoy/git-changelog/compare/2.9.5...2.9.6)</small>
+
+### Bug Fixes
+
+- Add Debian version fallback when no previous tag exists ([9747723](https://github.com/pawamoy/git-changelog/commit/97477233babd71d3ccc2972d74ecd132ed018728) by Patrik Dufresne). [PR-126](https://github.com/pawamoy/git-changelog/pull/126)
+
 ## [2.9.5](https://github.com/pawamoy/git-changelog/releases/tag/2.9.5) - 2026-07-29
 
 <small>[Compare with 2.9.4](https://github.com/pawamoy/git-changelog/compare/2.9.4...2.9.5)</small>
