@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.9.7](https://github.com/pawamoy/git-changelog/releases/tag/2.9.7) - 2026-08-20
+
+<small>[Compare with 2.9.6](https://github.com/pawamoy/git-changelog/compare/2.9.6...2.9.7)</small>
+
+### Bug Fixes
+
+- Create file if it doesn't exist when in-place is true ([0f05430](https://github.com/pawamoy/git-changelog/commit/0f05430fa2b7b52f4eaede8eda30a3fda34fa390) by Timothée Mazzucotelli). [Issue-127](https://github.com/pawamoy/git-changelog/issues/127)
+
 ## [2.9.6](https://github.com/pawamoy/git-changelog/releases/tag/2.9.6) - 2026-08-07
 
 <small>[Compare with 2.9.5](https://github.com/pawamoy/git-changelog/compare/2.9.5...2.9.6)</small>
