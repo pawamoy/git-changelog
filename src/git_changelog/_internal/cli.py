@@ -687,6 +687,11 @@ def render(  # noqa: PLR0917
     if in_place and output is sys.stdout:
         raise ValueError("Cannot write in-place to stdout")
 
+    # Nothing to update in-place when the changelog file doesn't exist yet:
+    # render the whole changelog instead, creating the file.
+    if in_place and isinstance(output, (str, Path)) and not Path(output).exists():
+        in_place = False
+
     # YORE: Bump 3: Remove block.
     if bump_latest:
         warnings.warn("`bump_latest=True` is deprecated in favor of `bump='auto'`", DeprecationWarning, stacklevel=1)

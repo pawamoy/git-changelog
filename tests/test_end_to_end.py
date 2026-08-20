@@ -102,6 +102,30 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
+def test_rendering_in_place_missing_file(repo: GitRepo, tmp_path: Path) -> None:
+    """Render changelog in-place into a file that doesn't exist yet.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog.md")
+    _, rendered = build_and_render(
+        str(repo.path),
+        convention="angular",
+        bump=None,
+        output=output.as_posix(),
+        template="keepachangelog",
+        in_place=True,
+    )
+    assert output.exists()
+    assert rendered == output.read_text(encoding="utf8")
+    # The full changelog was rendered, header and insertion marker included.
+    assert rendered.startswith("# Changelog")
+    assert len(re.findall("<!-- insertion marker -->", rendered)) == 2
+
+
+@pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
 def test_rendering_debian_prepend(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place.
 
