@@ -73,7 +73,7 @@ def render_parser(parser: argparse.ArgumentParser, title: str, heading_level: in
             opts = [f"`{opt}`" for opt in action.option_strings]
             docs = ""
             if action.dest in option_to_docs:
-                docs = f"[(docs)](../usage/{option_to_docs[action.dest]}){{ .doclink }}\n\n"
+                docs = f"[(docs)](usage/{option_to_docs[action.dest]}){{ .doclink }}\n\n"
             if not opts:
                 line = f"{'#' * (heading_level + 2)} `{action.dest}`\n\n{docs}- "
             else:
