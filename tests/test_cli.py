@@ -18,7 +18,7 @@ import tomli_w
 
 from git_changelog import CONVENTIONS, DEFAULT_SETTINGS, get_version, main, parse_settings, read_config
 from git_changelog._internal import debug
-from git_changelog._internal.cli import _DEFAULT_DEBIAN_VERSION_REGEX
+from git_changelog._internal.cli import _DEFAULT_DEBIAN_VERSION_REGEX, _DEFAULT_RPMBUILD_VERSION_REGEX
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -381,6 +381,27 @@ def test_include_all_config_option(tmp_path: Path) -> None:
 def test_debian_version_regex(line: str, version: str) -> None:
     """Test that the Debian version regex matches the expected version string."""
     pattern = re.compile(_DEFAULT_DEBIAN_VERSION_REGEX)
+    m = pattern.match(line)
+    if version is None:
+        assert m is None
+    else:
+        assert m is not None
+        assert m.group("version") == version
+
+@pytest.mark.parametrize(
+    ("line", "version"),
+    [
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 1.0-1", "1.0"),
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 1.0-1.fc40", "1.0"),
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 1:1.0-1", "1.0"),
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 1.2.3-1", "1.2.3"),
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 1.0a-1", "1.0a"),
+        ("* Wed Sep 17 2025 John Doe <john@example.com> - 2:1.0.rc1-3.fc40", "1.0.rc1"),
+    ],
+)
+def test_rpmbuild_version_regex(line: str, version: str) -> None:
+    """Test that the RPM version regex matches the expected version string."""
+    pattern = re.compile(_DEFAULT_RPMBUILD_VERSION_REGEX)
     m = pattern.match(line)
     if version is None:
         assert m is None

@@ -1,0 +1,26 @@
+{%- macro rpm_version(version) -%}
+{% if version.tag or version.planned_tag %}
+{{- (version.tag or version.planned_tag).lstrip("v") -}}
+{% elif version.previous_version %}
+{{- version.previous_version.tag.lstrip("v") }}+{{ version.date.strftime("%Y%m%d") -}}
+{%- else -%}
+0.0.0+{{ version.date.strftime("%Y%m%d") -}}
+{% endif %}
+{%- endmacro -%}
+
+{%- macro rpm_release(version) -%}
+{%- if jinja_context.rpm_release -%}
+{{- jinja_context.rpm_release -}}
+{%- else -%}
+1
+{%- endif -%}
+{%- endmacro -%}
+
+{% for version in changelog.versions_list -%}
+{%- if not loop.first %}{{ '\n' }}{% endif -%}
+{% set last_commit = version.commits | sort(attribute="author_date", reverse=True) | first -%}
+* {{ version.timestamp.strftime("%a %b %d %Y") }} {{ last_commit.author_name }} <{{ last_commit.author_email }}> - {{ rpm_version(version) }}-{{ rpm_release(version) }}
+{% for commit in version.commits | sort(attribute="author_date") | unique(attribute="subject") -%}
+{{ ('- ' + commit.subject) | wordwrap(80, break_long_words=False, wrapstring="\n  ") }}
+{% endfor -%}
+{% endfor -%}

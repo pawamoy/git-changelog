@@ -192,6 +192,45 @@ def test_rendering_debian_no_previous_version(repo: GitRepo, tmp_path: Path) -> 
 
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
+def test_rendering_rpmbuild_prepend(repo: GitRepo, tmp_path: Path) -> None:
+    """Render changelog in-place.
+
+    Parameters:
+        repo: Temporary Git repository (fixture).
+        tmp_path: A temporary path to write the changelog into.
+    """
+    output = tmp_path.joinpath("changelog")
+    _, rendered = build_and_render(
+        str(repo.path),
+        convention="angular",
+        bump=None,
+        output=output.as_posix(),
+        template="rpmbuild",
+        jinja_context={
+            "rpm_release": "1",
+        },
+    )
+    assert re.match(r"\* .* dummy <dummy@example.com> - 1.1.0\+\d+-1\n", rendered)
+    latest_tag = "91.6.14"
+    assert latest_tag not in rendered
+    repo.git("tag", latest_tag)
+    build_and_render(
+        str(repo.path),
+        convention="angular",
+        bump="auto",
+        output=output.as_posix(),
+        template="rpmbuild",
+        in_place=True,
+        jinja_context={
+            "rpm_release": "2",
+        },
+    )
+    rendered = output.read_text(encoding="utf8")
+    assert re.match(r"\* .* dummy <dummy@example.com> - 91.6.14-2\n", rendered)
+    assert latest_tag in rendered
+    repo.git("tag", "-d", latest_tag)
+
+@pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
 def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place, and check for duplicate entries.
 

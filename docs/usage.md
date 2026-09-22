@@ -419,6 +419,38 @@ debian_version_suffix = "-1"
 
 This would produce version entries like `my-package (1.2.3-1) unstable; urgency=medium` in the generated Debian changelog.
 
+### RPM template
+
+The `rpmbuild` template generates a changelog file following the
+[RPM changelog format][rpm-changelog-format], suitable for use in RPM packaging (spec files).
+
+```bash
+git-changelog --template rpmbuild --output "rpmbuild/SOURCES/changelog.txt"
+```
+
+Then in your spec file you may include something like this to derive the version and changelog.
+
+```
+%define version_str %(head -1 %{_sourcedir}/changelog.txt | awk '{print $NF}' | cut -d- -f1)
+%define release_str %(head -1 %{_sourcedir}/changelog.txt | awk '{print $NF}' | cut -d- -f2)
+...
+Version:        %{version_str}
+Release:        %{release_str}
+...
+%changelog
+%include %{_sourcedir}/changelog.txt
+```
+
+When using the `rpmbuild` template, the `--marker-line` and `--version-regex` options are
+automatically adjusted to match the RPM changelog format, unless explicitly overridden.
+
+The `rpmbuild` template supports the following extra [Jinja context](#extra-jinja-context) variable,
+passed via the `-j`, `--jinja-context` CLI option or the `jinja_context` configuration option:
+
+Variable        | Description                                                             |
+----------------|-------------------------------------------------------------------------|
+`rpm_release`   | The RPM release number, appended to each version number. Default: `1`   |
+
 ### Writing a changelog template
 
 To write your own changelog template,
@@ -1033,4 +1065,5 @@ and `--marker-line`.
 [pep440-dev]: https://peps.python.org/pep-0440/#developmental-releases
 [pep440-release]: https://peps.python.org/pep-0440/#final-releases
 [debian-changelog-format]: https://www.debian.org/doc/debian-policy/ch-source.html#debian-changelog-debian-changelog
+[rpm-changelog-format]: https://fedoraproject.org/wiki/PeterGordon/SpecFormattingGuidelines#RPM_ChangeLog_Entries
 [linux-convention]: https://git-scm.com/docs/SubmittingPatches#describe-changes

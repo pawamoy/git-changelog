@@ -68,6 +68,10 @@ DEFAULT_CONFIG_FILES = [
 _DEFAULT_DEBIAN_MARKER_LINE = _MARKER_LINE_PREPEND
 _DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w-]+ \((?:\d+:)?(?P<version>[^-+~)]+)(?!.*UNRELEASED)"
 
+_DEFAULT_RPMBUILD_MARKER_LINE = _MARKER_LINE_PREPEND
+_DEFAULT_RPMBUILD_VERSION_REGEX = r"^\* .* - (?:\d+:)?(?P<version>[^-+~)]+)-"
+
+
 DEFAULT_SETTINGS: dict[str, Any] = {
     "bump": None,
     # YORE: Bump 3: Remove line.
@@ -370,7 +374,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-t",
         "--template",
-        choices=Templates(("angular", "keepachangelog", "debian")),
+        choices=Templates(("angular", "keepachangelog", "debian", "rpmbuild")),
         metavar="TEMPLATE",
         dest="template",
         help="The Jinja2 template to use. Prefix it with `path:` to specify the path "
@@ -706,9 +710,19 @@ def render(  # noqa: PLR0917
 
         # Prepare version regex and marker line.
         if version_regex is None:
-            version_regex = _DEFAULT_DEBIAN_VERSION_REGEX if template == "debian" else DEFAULT_VERSION_REGEX
+            if template == "debian":
+                version_regex = _DEFAULT_DEBIAN_VERSION_REGEX
+            elif template == "rpmbuild":
+                version_regex = _DEFAULT_RPMBUILD_VERSION_REGEX
+            else:
+                version_regex = DEFAULT_VERSION_REGEX
         if marker_line is None:
-            marker_line = _DEFAULT_DEBIAN_MARKER_LINE if template == "debian" else DEFAULT_MARKER_LINE
+            if template == "debian":
+                marker_line = _DEFAULT_DEBIAN_MARKER_LINE
+            elif template == "rpmbuild":
+                marker_line = _DEFAULT_RPMBUILD_MARKER_LINE
+            else:
+                marker_line = DEFAULT_MARKER_LINE
 
         # Only keep new entries (missing from changelog).
         last_released, last_released_line = _latest(lines, re.compile(version_regex))
