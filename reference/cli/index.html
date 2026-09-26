@@ -916,6 +916,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#latest_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>latest_version</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#marker_line" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1533,6 +1544,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#latest_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>latest_version</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#marker_line" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1869,11 +1891,15 @@ by sections, depending on the commit convention you follow.</p>
 <h4 id="input"><code>input</code><a class="headerlink" href="#input" title="Permanent link">¤</a></h4>
 <p><a class="doclink" href="../../usage/#output-release-notes">(docs)</a></p>
 <ul>
-<li><code>-I</code>, <code>--input</code> <code>FILE</code>: Read from given file when creating release notes. Default: <code>CHANGELOG.md</code>.</li>
+<li><code>-I</code>, <code>--input</code> <code>FILE</code>: Read from given file when creating release notes or showing the latest version. Default: <code>CHANGELOG.md</code>.</li>
 </ul>
 <h4 id="jinja_context"><code>jinja_context</code><a class="headerlink" href="#jinja_context" title="Permanent link">¤</a></h4>
 <ul>
 <li><code>-j</code>, <code>--jinja-context</code> <code>KEY=VALUE</code>: Pass additional key/value pairs to the template. Option can be used multiple times. The key/value pairs are accessible as 'jinja_context' in the template.</li>
+</ul>
+<h4 id="latest_version"><code>latest_version</code><a class="headerlink" href="#latest_version" title="Permanent link">¤</a></h4>
+<ul>
+<li><code>--latest-version</code>: Show the latest version in the changelog and exit.</li>
 </ul>
 <h4 id="marker_line"><code>marker_line</code><a class="headerlink" href="#marker_line" title="Permanent link">¤</a></h4>
 <p><a class="doclink" href="../../usage/#update-changelog-in-place">(docs)</a></p>
@@ -1927,7 +1953,7 @@ by sections, depending on the commit convention you follow.</p>
 <h4 id="version_regex"><code>version_regex</code><a class="headerlink" href="#version_regex" title="Permanent link">¤</a></h4>
 <p><a class="doclink" href="../../usage/#update-changelog-in-place">(docs)</a></p>
 <ul>
-<li><code>-g</code>, <code>--version-regex</code> <code>REGEX</code>: A regular expression to match versions in the existing changelog (used to find the latest release) when writing in-place. The regular expression must be a Python regex with a <code>version</code> named group. Default: <code>^## \[(?P&lt;version&gt;v?[^\]]+)</code>.</li>
+<li><code>-g</code>, <code>--version-regex</code> <code>REGEX</code>: A regular expression to match versions in the existing changelog (used to find the latest release) when writing in-place or showing the latest version. The regular expression must be a Python regex with a <code>version</code> named group. Default: <code>^## \[(?P&lt;version&gt;v?[^\]]+)</code>.</li>
 </ul>
 <h4 id="versioning"><code>versioning</code><a class="headerlink" href="#versioning" title="Permanent link">¤</a></h4>
 <p><a class="doclink" href="../../usage/#choose-a-versioning-scheme">(docs)</a></p>

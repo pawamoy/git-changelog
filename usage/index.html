@@ -784,6 +784,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rpm-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        RPM template
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#writing-a-changelog-template" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -893,6 +904,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Show bumped version
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#show-latest-version-in-a-changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Show latest version in a changelog
       </span>
     </span>
   </a>
@@ -1362,6 +1384,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rpm-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        RPM template
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#writing-a-changelog-template" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1471,6 +1504,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Show bumped version
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#show-latest-version-in-a-changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Show latest version in a changelog
       </span>
     </span>
   </a>
@@ -1971,6 +2015,39 @@ passed via the <code>-j</code>, <code>--jinja-context</code> CLI option or the <
 <span class="n">debian_version_suffix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"-1"</span>
 </code></pre></div>
 <p>This would produce version entries like <code>my-package (1.2.3-1) unstable; urgency=medium</code> in the generated Debian changelog.</p>
+<h3 id="rpm-template">RPM template<a class="headerlink" href="#rpm-template" title="Permanent link">¤</a></h3>
+<p>The <code>rpmbuild</code> template generates a changelog file following the
+<a href="https://fedoraproject.org/wiki/PeterGordon/SpecFormattingGuidelines#RPM_ChangeLog_Entries">RPM changelog format</a>, suitable for use in RPM packaging (spec files).</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--template<span class="w"> </span>rpmbuild<span class="w"> </span>--output<span class="w"> </span><span class="s2">"rpmbuild/SOURCES/changelog.txt"</span>
+</code></pre></div>
+<p>Then in your spec file you may include something like this to derive the version and changelog.</p>
+<div class="highlight"><pre><span></span><code>%define version_str %(head -1 %{_sourcedir}/changelog.txt | awk '{print $NF}' | cut -d- -f1)
+%define release_str %(head -1 %{_sourcedir}/changelog.txt | awk '{print $NF}' | cut -d- -f2)
+...
+Version:        %{version_str}
+Release:        %{release_str}
+...
+%changelog
+%include %{_sourcedir}/changelog.txt
+</code></pre></div>
+<p>When using the <code>rpmbuild</code> template, the <code>--marker-line</code> and <code>--version-regex</code> options are
+automatically adjusted to match the RPM changelog format, unless explicitly overridden.</p>
+<p>The <code>rpmbuild</code> template supports the following extra <a href="#extra-jinja-context">Jinja context</a> variable,
+passed via the <code>-j</code>, <code>--jinja-context</code> CLI option or the <code>jinja_context</code> configuration option:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rpm_release</code></td>
+<td>The RPM release number, appended to each version number. Default: <code>1</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="writing-a-changelog-template">Writing a changelog template<a class="headerlink" href="#writing-a-changelog-template" title="Permanent link">¤</a></h3>
 <p>To write your own changelog template,
 we recommend using our <a href="https://github.com/pawamoy/git-changelog/tree/main/src/git_changelog/templates/keepachangelog.md.jinja">keepachangelog built-in template</a>
@@ -2496,6 +2573,11 @@ git-changelog<span class="w"> </span>--bump<span class="w"> </span><span class="
 
 git-changelog<span class="w"> </span>--bump<span class="w"> </span>major<span class="w"> </span>--bumped-version
 <span class="c1"># prints the next major version, e.g. 2.0.0</span>
+</code></pre></div>
+<h2 id="show-latest-version-in-a-changelog">Show latest version in a changelog<a class="headerlink" href="#show-latest-version-in-a-changelog" title="Permanent link">¤</a></h2>
+<p>Use <code>--latest-version</code> to print the first version found in the changelog. The command skips <code>Unreleased</code> entries. It reads <code>CHANGELOG.md</code> by default. Use <code>--input</code> to select another file and <code>--version-regex</code> to match a different format. The regex must have a named <code>version</code> group. The command exits with an error if it finds no version.</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--latest-version
+git-changelog<span class="w"> </span>--input<span class="w"> </span>releases.md<span class="w"> </span>--version-regex<span class="w"> </span><span class="s1">'^Version: (?P&lt;version&gt;.+)$'</span><span class="w"> </span>--latest-version
 </code></pre></div>
 <h2 id="parse-additional-information-in-commit-messages">Parse additional information in commit messages<a class="headerlink" href="#parse-additional-information-in-commit-messages" title="Permanent link">¤</a></h2>
 <p><em>git-changelog</em> is able to parse the body of commit messages
