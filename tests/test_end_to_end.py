@@ -230,6 +230,7 @@ def test_rendering_rpmbuild_prepend(repo: GitRepo, tmp_path: Path) -> None:
     assert latest_tag in rendered
     repo.git("tag", "-d", latest_tag)
 
+
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)
 def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
     """Render changelog in-place, and check for duplicate entries.

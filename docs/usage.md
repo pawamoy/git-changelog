@@ -827,6 +827,16 @@ git-changelog --bump major --bumped-version
 # prints the next major version, e.g. 2.0.0
 ```
 
+
+## Show latest version in a changelog
+
+Use `--latest-version` to print the first version found in the changelog. The command skips `Unreleased` entries. It reads `CHANGELOG.md` by default. Use `--input` to select another file and `--version-regex` to match a different format. The regex must have a named `version` group. The command exits with an error if it finds no version.
+
+```bash
+git-changelog --latest-version
+git-changelog --input releases.md --version-regex '^Version: (?P<version>.+)$' --latest-version
+```
+
 ## Parse additional information in commit messages
 
 *git-changelog* is able to parse the body of commit messages

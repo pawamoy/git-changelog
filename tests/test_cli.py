@@ -322,6 +322,102 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
     assert captured.out.strip() == "1.2.3"
 
 
+def test_latest_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Print the first version in the input changelog without building a changelog."""
+    changelog = tmp_path / "CHANGELOG.md"
+    changelog.write_text("# Changelog\n\n## [Unreleased]\n\n## [v2.0.0]\n\n## [v1.0.0]\n", encoding="utf8")
+
+    result = main(["--config-file", str(tmp_path / "conf.toml"), "--input", str(changelog), "--latest-version"])
+
+    captured = capsys.readouterr()
+    assert result == 0
+    assert captured.out == "v2.0.0\n"
+    assert captured.err == ""
+
+
+def test_latest_version_uses_configured_regex(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Use the configured regex to extract a version from a custom changelog."""
+    changelog = tmp_path / "releases.txt"
+    changelog.write_text("Release 3.2.1\nRelease 2.0.0\n", encoding="utf8")
+    config = tmp_path / "conf.toml"
+    config.write_text('version-regex = "^Release (?P<version>.+)$"\n', encoding="utf8")
+
+    result = main(["--config-file", str(config), "--input", str(changelog), "--latest-version"])
+
+    assert result == 0
+    assert capsys.readouterr().out == "3.2.1\n"
+
+
+def test_latest_version_cli_regex_overrides_config(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Use the CLI regex when it differs from the configured regex."""
+    changelog = tmp_path / "releases.txt"
+    changelog.write_text("Version: 4.0.0\n", encoding="utf8")
+    config = tmp_path / "conf.toml"
+    config.write_text('version-regex = "^Release (?P<version>.+)$"\n', encoding="utf8")
+
+    result = main(
+        [
+            "--config-file",
+            str(config),
+            "--input",
+            str(changelog),
+            "--version-regex",
+            r"^Version: (?P<version>.+)$",
+            "--latest-version",
+        ],
+    )
+
+    assert result == 0
+    assert capsys.readouterr().out == "4.0.0\n"
+
+
+@pytest.mark.parametrize(
+    ("template", "entry", "version"),
+    [
+        ("debian", "example (1:2.3.4-1) stable; urgency=medium", "2.3.4"),
+        ("rpmbuild", "* Wed Sep 17 2025 John Doe <john@example.com> - 1:2.3.4-1", "2.3.4"),
+    ],
+)
+def test_latest_version_uses_template_regex(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture,
+    template: str,
+    entry: str,
+    version: str,
+) -> None:
+    """Use the selected template's default regex when no regex is configured."""
+    changelog = tmp_path / "CHANGELOG.md"
+    changelog.write_text(f"{entry}\n", encoding="utf8")
+
+    result = main(
+        [
+            "--config-file",
+            str(tmp_path / "conf.toml"),
+            "--input",
+            str(changelog),
+            "--template",
+            template,
+            "--latest-version",
+        ],
+    )
+
+    assert result == 0
+    assert capsys.readouterr().out == f"{version}\n"
+
+
+def test_latest_version_without_match(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Report an error if the changelog has no version entry."""
+    changelog = tmp_path / "CHANGELOG.md"
+    changelog.write_text("# Changelog\n\n## [Unreleased]\n", encoding="utf8")
+
+    result = main(["--config-file", str(tmp_path / "conf.toml"), "--input", str(changelog), "--latest-version"])
+
+    captured = capsys.readouterr()
+    assert result == 1
+    assert captured.out == ""
+    assert "No version found in the changelog" in captured.err
+
+
 def test_include_all_cli_option(tmp_path: Path) -> None:
     """Test that --include-all CLI option is parsed correctly.
 
@@ -387,6 +483,7 @@ def test_debian_version_regex(line: str, version: str) -> None:
     else:
         assert m is not None
         assert m.group("version") == version
+
 
 @pytest.mark.parametrize(
     ("line", "version"),
