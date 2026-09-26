@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.10.0](https://github.com/pawamoy/git-changelog/releases/tag/2.10.0) - 2026-09-26
+
+<small>[Compare with 2.9.7](https://github.com/pawamoy/git-changelog/compare/2.9.7...2.10.0)</small>
+
+### Features
+
+- Add `--latest-version` flag to print latest version found in the changelog ([6730328](https://github.com/pawamoy/git-changelog/commit/6730328c830082f47c50c64e8150f776520a017b) by Timothée Mazzucotelli).
+- Add `rpmbuld` template ([de83c48](https://github.com/pawamoy/git-changelog/commit/de83c48f6452114df6294275d715d98dba9619f3) by Patrik Dufresne). [PR-130](https://github.com/pawamoy/git-changelog/pull/130), Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>
+
 ## [2.9.7](https://github.com/pawamoy/git-changelog/releases/tag/2.9.7) - 2026-08-20
 
 <small>[Compare with 2.9.6](https://github.com/pawamoy/git-changelog/compare/2.9.6...2.9.7)</small>
