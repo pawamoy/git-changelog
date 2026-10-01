@@ -393,6 +393,7 @@ class Bitbucket(ProviderRefParser):
     def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": f"{target}..{base}"})
 
+
 class Forgejo(ProviderRefParser):
     """A parser for the Forgejo references."""
 

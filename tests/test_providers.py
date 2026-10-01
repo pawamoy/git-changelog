@@ -49,32 +49,25 @@ def test_bitbucket_issue_parsing() -> None:
     for ref in bitbucket.REF:
         assert bitbucket.get_refs(ref, text)
 
+
 def test_forgejo_issue_parsing() -> None:
     """Forgejo issues are correctly parsed."""
     forgejo = git_changelog.Forgejo("pawamoy", "git-changelog")
     for ref in forgejo.REF:
         assert forgejo.get_refs(ref, text)
 
+
 def test_forgejo_urls() -> None:
     """Forgejo URLs are correctly built."""
     forgejo = git_changelog.Forgejo("pawamoy", "git-changelog")
 
-    assert (
-        forgejo.build_ref_url("issues", {"ref": "15"})
-        == "https://codeberg.org/pawamoy/git-changelog/issues/15"
-    )
+    assert forgejo.build_ref_url("issues", {"ref": "15"}) == "https://codeberg.org/pawamoy/git-changelog/issues/15"
     assert (
         forgejo.build_ref_url("commits", {"ref": "abcdef12"})
         == "https://codeberg.org/pawamoy/git-changelog/commit/abcdef12"
     )
-    assert (
-        forgejo.build_ref_url("mentions", {"ref": "foo"})
-        == "https://codeberg.org/foo"
-    )
-    assert (
-        forgejo.get_tag_url(tag="v1.0.0")
-        == "https://codeberg.org/pawamoy/git-changelog/src/tag/v1.0.0"
-    )
+    assert forgejo.build_ref_url("mentions", {"ref": "foo"}) == "https://codeberg.org/foo"
+    assert forgejo.get_tag_url(tag="v1.0.0") == "https://codeberg.org/pawamoy/git-changelog/src/tag/v1.0.0"
     assert (
         forgejo.get_compare_url(base="v1.0.0", target="v1.1.0")
         == "https://codeberg.org/pawamoy/git-changelog/compare/v1.0.0...v1.1.0"
