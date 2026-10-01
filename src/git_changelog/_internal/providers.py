@@ -392,3 +392,68 @@ class Bitbucket(ProviderRefParser):
 
     def get_compare_url(self, base: str, target: str) -> str:
         return self.build_ref_url("commits_ranges", {"ref": f"{target}..{base}"})
+
+class Forgejo(ProviderRefParser):
+    """A parser for the Forgejo references."""
+
+    url: str = "https://codeberg.org"
+    """The base URL for the provider."""
+    project_url: str = "{base_url}/{namespace}/{project}"
+    """The project URL for the provider."""
+    tag_url: str = "{base_url}/{namespace}/{project}/src/tag/{ref}"
+    """The tag URL for the provider."""
+
+    commit_min_length = 8
+    """The minimum length of a commit hash."""
+    commit_max_length = 40
+    """The maximum length of a commit hash."""
+
+    REF: ClassVar[dict[str, RefDef]] = {
+        "issues": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.IGNORECASE),
+            url_string="{base_url}/{namespace}/{project}/issues/{ref}",
+        ),
+        "merge_requests": RefDef(
+            regex=re.compile(RefRe.BB + RefRe.NP + "?" + RefRe.ID.format(symbol="#"), re.IGNORECASE),
+            url_string="{base_url}/{namespace}/{project}/pulls/{ref}",
+        ),
+        "commits": RefDef(
+            regex=re.compile(
+                RefRe.BB
+                + r"(?:{np}@)?{commit}{ba}".format(
+                    np=RefRe.NP,
+                    commit=RefRe.COMMIT.format(min=commit_min_length, max=commit_max_length),
+                    ba=RefRe.BA,
+                ),
+                re.IGNORECASE,
+            ),
+            url_string="{base_url}/{namespace}/{project}/commit/{ref}",
+        ),
+        "commits_ranges": RefDef(
+            regex=re.compile(
+                RefRe.BB
+                + r"(?:{np}@)?{commit_range}".format(
+                    np=RefRe.NP,
+                    commit_range=RefRe.COMMIT_RANGE.format(min=commit_min_length, max=commit_max_length),
+                ),
+                re.IGNORECASE,
+            ),
+            url_string="{base_url}/{namespace}/{project}/compare/{ref}",
+        ),
+        "mentions": RefDef(regex=re.compile(RefRe.BB + RefRe.MENTION, re.IGNORECASE), url_string="{base_url}/{ref}"),
+    }
+    """The reference definitions for the provider."""
+
+    def build_ref_url(self, ref_type: str, match_dict: dict[str, str]) -> str:
+        match_dict["base_url"] = self.url
+        if not match_dict.get("namespace"):
+            match_dict["namespace"] = self.namespace
+        if not match_dict.get("project"):
+            match_dict["project"] = self.project
+        return super().build_ref_url(ref_type, match_dict)
+
+    def get_tag_url(self, tag: str = "") -> str:
+        return self.tag_url.format(base_url=self.url, namespace=self.namespace, project=self.project, ref=tag)
+
+    def get_compare_url(self, base: str, target: str) -> str:
+        return self.build_ref_url("commits_ranges", {"ref": f"{base}...{target}"})

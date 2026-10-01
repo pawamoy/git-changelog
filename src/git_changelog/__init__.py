@@ -53,7 +53,7 @@ from git_changelog._internal.commit import (
     ConventionalCommitConvention,
     LinuxConvention,
 )
-from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser, Ref, RefDef, RefRe
+from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser, Ref, RefDef, RefRe
 from git_changelog._internal.templates import (
     JINJA_ENV,
     TEMPLATES_PATH,
@@ -95,6 +95,7 @@ __all__: list[str] = [
     "CommitConvention",
     "ConventionType",
     "ConventionalCommitConvention",
+    "Forgejo",
     "GitHub",
     "GitLab",
     "LinuxConvention",
