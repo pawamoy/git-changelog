@@ -159,7 +159,7 @@ class Version:
                 year=self._date.year,
                 month=self._date.month,
                 day=self._date.day,
-                tzinfo=datetime.timezone.utc,
+                tzinfo=datetime.UTC,
             )
         return None
 

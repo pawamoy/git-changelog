@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import tomllib
 import warnings
 from importlib import metadata
 from pathlib import Path
@@ -52,12 +53,6 @@ from git_changelog._internal.commit import (
 )
 from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser
 from git_changelog._internal.versioning import bump_pep440, bump_semver
-
-# YORE: EOL 3.10: Replace block with line 2.
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

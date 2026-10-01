@@ -8,7 +8,7 @@ import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import suppress
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from re import Pattern
 from typing import TYPE_CHECKING, Any, ClassVar, SupportsIndex, overload
 
@@ -161,13 +161,13 @@ class Commit:
             author_date = datetime.now().astimezone()
         elif isinstance(author_date, str):
             epoch, _, offset = author_date.partition(" ")
-            tz = datetime.strptime(offset, "%z").tzinfo if offset else timezone.utc
+            tz = datetime.strptime(offset, "%z").tzinfo if offset else UTC
             author_date = datetime.fromtimestamp(float(epoch), tz=tz)
         if not committer_date:
             committer_date = datetime.now().astimezone()
         elif isinstance(committer_date, str):
             epoch, _, offset = committer_date.partition(" ")
-            tz = datetime.strptime(offset, "%z").tzinfo if offset else timezone.utc
+            tz = datetime.strptime(offset, "%z").tzinfo if offset else UTC
             committer_date = datetime.fromtimestamp(float(epoch), tz=tz)
 
         self.hash: str = commit_hash

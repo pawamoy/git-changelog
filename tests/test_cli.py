@@ -25,9 +25,8 @@
 
 from __future__ import annotations
 
-import os
 import re
-import sys
+from contextlib import chdir
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any
 
@@ -39,26 +38,9 @@ from git_changelog._internal import debug
 from git_changelog._internal.cli import _DEFAULT_DEBIAN_VERSION_REGEX, _DEFAULT_RPMBUILD_VERSION_REGEX
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
     from pathlib import Path
 
     from tests.helpers import GitRepo
-
-
-# YORE: EOL 3.10: Replace block with line 2.
-if sys.version_info >= (3, 11):
-    from contextlib import chdir
-else:
-    from contextlib import contextmanager
-
-    @contextmanager
-    def chdir(path: str) -> Iterator[None]:
-        old_wd = os.getcwd()  # noqa: PTH109
-        os.chdir(path)
-        try:
-            yield
-        finally:
-            os.chdir(old_wd)
 
 
 # IMPORTANT: See top module comment.
