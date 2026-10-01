@@ -744,7 +744,7 @@ def render(  # noqa: PLR0917
     if in_place:
         # Read current changelog lines.
         with open(output, encoding="utf8") as changelog_file:  # ty:ignore[invalid-argument-type]
-            lines = changelog_file.read().splitlines()
+            lines = changelog_file.read().splitlines(keepends=True)
 
         # Prepare version regex and marker line.
         version_regex = _get_version_regex(version_regex, template)
@@ -771,23 +771,23 @@ def render(  # noqa: PLR0917
             )
 
         # Render new entries.
-        rendered = (
-            jinja_template.render(
-                changelog=changelog,
-                jinja_context=jinja_context,
-                in_place=True,
-            ).rstrip("\n")
-            + "\n"
+        rendered = jinja_template.render(
+            changelog=changelog,
+            jinja_context=jinja_context,
+            in_place=True,
         )
 
         # Find marker line(s) in current changelog.
         if marker_line == ":prepend:":
             # With prepend mode, take account of last_released_line to replace unreleased changelog.
-            lines[0:last_released_line] = [rendered]
+            if last_released:
+                lines[0:last_released_line] = [rendered]
+            else:
+                lines[0:] = [rendered]
         else:
-            marker = lines.index(marker_line)
+            marker = lines.index(marker_line + "\n")
             try:
-                marker2 = lines[marker + 1 :].index(marker_line)
+                marker2 = lines[marker + 1 :].index(marker_line + "\n")
             except ValueError:
                 # Apply new entries at marker line.
                 lines[marker] = rendered
@@ -797,7 +797,7 @@ def render(  # noqa: PLR0917
 
         # Write back updated changelog lines.
         with open(output, "w", encoding="utf8") as changelog_file:  # ty:ignore[no-matching-overload]
-            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
+            changelog_file.write("".join(lines))
 
     # Overwrite output file.
     else:
