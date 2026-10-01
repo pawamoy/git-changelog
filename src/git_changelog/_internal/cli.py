@@ -50,7 +50,7 @@ from git_changelog._internal.commit import (
     ConventionalCommitConvention,
     LinuxConvention,
 )
-from git_changelog._internal.providers import Bitbucket, GitHub, GitLab, ProviderRefParser
+from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser
 from git_changelog._internal.versioning import bump_pep440, bump_semver
 
 # YORE: EOL 3.10: Replace block with line 2.
@@ -165,6 +165,7 @@ providers: dict[str, type[ProviderRefParser]] = {
     "github": GitHub,
     "gitlab": GitLab,
     "bitbucket": Bitbucket,
+    "forgejo": Forgejo,
 }
 """Available version control providers."""
 

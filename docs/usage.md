@@ -847,6 +847,8 @@ to find additional information.
 [(--parse-refs)](reference/cli.md#parse_refs)<br>
 [(--provider)](reference/cli.md#provider)
 
+List of available provider: `bitbucket`, `forgejo`, `github` and `gitlab`.
+
 *git-changelog* will detect when you are using GitHub, GitLab or Bitbucket
 by checking the `origin` remote configured in your local clone
 (or the remote indicated by the value of the `GIT_CHANGELOG_REMOTE` environment variable).
