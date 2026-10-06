@@ -744,7 +744,7 @@ def render(  # noqa: PLR0917
     if in_place:
         # Read current changelog lines.
         with open(output, encoding="utf8") as changelog_file:  # ty:ignore[invalid-argument-type]
-            lines = changelog_file.read().splitlines(keepends=True)
+            lines = changelog_file.read().splitlines()
 
         # Prepare version regex and marker line.
         version_regex = _get_version_regex(version_regex, template)
@@ -771,23 +771,24 @@ def render(  # noqa: PLR0917
             )
 
         # Render new entries.
-        rendered = jinja_template.render(
-            changelog=changelog,
-            jinja_context=jinja_context,
-            in_place=True,
+        rendered = (
+            jinja_template.render(
+                changelog=changelog,
+                jinja_context=jinja_context,
+                in_place=True,
+            ).rstrip("\n")
+            + "\n"
         )
 
         # Find marker line(s) in current changelog.
         if marker_line == ":prepend:":
             # With prepend mode, take account of last_released_line to replace unreleased changelog.
-            if last_released:
-                lines[0:last_released_line] = [rendered]
-            else:
-                lines[0:] = [rendered]
+            end = last_released_line if last_released else len(lines)
+            lines[:end] = [rendered]
         else:
-            marker = lines.index(marker_line + "\n")
+            marker = lines.index(marker_line)
             try:
-                marker2 = lines[marker + 1 :].index(marker_line + "\n")
+                marker2 = lines[marker + 1 :].index(marker_line)
             except ValueError:
                 # Apply new entries at marker line.
                 lines[marker] = rendered
@@ -797,11 +798,11 @@ def render(  # noqa: PLR0917
 
         # Write back updated changelog lines.
         with open(output, "w", encoding="utf8") as changelog_file:  # ty:ignore[no-matching-overload]
-            changelog_file.write("".join(lines))
+            changelog_file.write("\n".join(lines).rstrip("\n") + "\n")
 
     # Overwrite output file.
     else:
-        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
+        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context).rstrip("\n") + "\n"
 
         # Write result in specified output.
         if output is sys.stdout:

@@ -26,6 +26,5 @@ UNRELEASED
 
 {% set last_commit = version.commits | sort(attribute="author_date", reverse=True) | first -%}
 {{ " -- "}}{{ last_commit.author_name }} <{{ last_commit.author_email }}>  {{ version.timestamp.strftime("%a, %d %b %Y %H:%M:%S %z") }}
-{%- if not loop.last or in_place %}
-{% endif %}
+
 {% endfor %}
