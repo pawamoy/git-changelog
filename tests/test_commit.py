@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import datetime
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -75,6 +75,6 @@ def test_tzinfo() -> None:
         author_date="1772727280 -0500",  # 2026-03-05 11:13:27 -0500
         committer_date="1772830826 -0500",  # 2026-03-06 16:00:26 -0500
     )
-    tz = datetime.timezone(datetime.timedelta(days=-1, seconds=68400))
-    assert commit.author_date == datetime.datetime(2026, 3, 5, 11, 14, 40, tzinfo=tz)
-    assert commit.committer_date == datetime.datetime(2026, 3, 6, 16, 0, 26, tzinfo=tz)
+    tz = timezone(timedelta(days=-1, seconds=68400))
+    assert commit.author_date == datetime(2026, 3, 5, 11, 14, 40, tzinfo=tz)
+    assert commit.committer_date == datetime(2026, 3, 6, 16, 0, 26, tzinfo=tz)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime  # noqa: ICN001
 import os
 import sys
 import warnings

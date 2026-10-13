@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
     from pathlib import Path
 
 
@@ -100,7 +100,7 @@ class GitRepo:
         return self.git("rev-parse", "HEAD").rstrip()
 
     @contextmanager
-    def enter(self) -> Iterator[None]:
+    def enter(self) -> Generator[None]:
         """Context manager to enter the repository directory."""
         old_cwd = os.getcwd()  # noqa: PTH109
         os.chdir(self.path)
