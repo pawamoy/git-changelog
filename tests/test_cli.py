@@ -322,6 +322,28 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
     assert captured.out.strip() == "1.2.3"
 
 
+def test_bumped_version_none(repo: GitRepo, capsys: pytest.CaptureFixture) -> None:
+    """The `--bumped-version` return None on latest."""
+    repo.tag('1.2.3')
+    main(
+        [
+            str(repo.path),
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "--bump",
+            "auto",
+            "--bumped-version",
+        ],
+    )
+    captured = capsys.readouterr()
+    # FIXME This is not expected.
+    # I would recommand to return exit code non-zero with an error message.
+    # OR
+    # I would return a bumped version.
+    # Returning "None" is not expected.
+    assert captured.out.strip() == "None"
+
+
 def test_latest_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
     """Print the first version in the input changelog without building a changelog."""
     changelog = tmp_path / "CHANGELOG.md"
