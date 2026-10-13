@@ -779,7 +779,8 @@ def render(  # noqa: PLR0917
         # Find marker line(s) in current changelog.
         if marker_line == ":prepend:":
             # With prepend mode, take account of last_released_line to replace unreleased changelog.
-            lines[0:last_released_line] = [rendered]
+            end = last_released_line if last_released else len(lines)
+            lines[:end] = [rendered]
         else:
             marker = lines.index(marker_line)
             try:
@@ -797,7 +798,7 @@ def render(  # noqa: PLR0917
 
     # Overwrite output file.
     else:
-        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context)
+        rendered = jinja_template.render(changelog=changelog, jinja_context=jinja_context).rstrip("\n") + "\n"
 
         # Write result in specified output.
         if output is sys.stdout:
