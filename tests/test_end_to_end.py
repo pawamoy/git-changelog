@@ -81,8 +81,12 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
         output=output.as_posix(),
         template="keepachangelog",
     )
-    assert len(re.findall("<!-- insertion marker -->", rendered)) == 2
-    assert "Unreleased" in rendered
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
+    assert len(re.findall("\n<!-- insertion marker -->\n", rendered)) == 2
+    assert "<!-- insertion marker -->\n## Unreleased\n" in rendered
+    assert "<!-- insertion marker -->\n## [" in rendered, "no empty line between marker and release"
+    assert len(re.findall("\n\n## \\[", rendered)) == 4, "empty line before each release"
     latest_tag = "91.6.14"
     assert latest_tag not in rendered
     repo.git("tag", latest_tag)
@@ -95,8 +99,10 @@ def test_rendering_in_place(repo: GitRepo, tmp_path: Path) -> None:
         in_place=True,
     )
     rendered = output.read_text(encoding="utf8")
-    assert len(re.findall("<!-- insertion marker -->", rendered)) == 1
-    assert "Unreleased" not in rendered
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
+    assert len(re.findall("\n<!-- insertion marker -->\n", rendered)) == 1
+    assert "\n## Unreleased\n" not in rendered
     assert latest_tag in rendered
     repo.git("tag", "-d", latest_tag)
 
@@ -145,7 +151,11 @@ def test_rendering_debian_prepend(repo: GitRepo, tmp_path: Path) -> None:
             "debian_version_suffix": "+dfsg-1",
         },
     )
-    assert re.match(r"my-pkg-name \(1.1.0\+\d+\+dfsg-1\) UNRELEASED;", rendered)
+    assert re.match(r"my-pkg-name \(1.1.0\+\d+\+dfsg-1\) UNRELEASED; urgency=medium\n\n", rendered)
+    assert re.findall(r"\n\nmy-pkg-name", rendered), "empty line between each release"
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
+
     latest_tag = "91.6.14"
     assert latest_tag not in rendered
     repo.git("tag", latest_tag)
@@ -162,8 +172,10 @@ def test_rendering_debian_prepend(repo: GitRepo, tmp_path: Path) -> None:
         },
     )
     rendered = output.read_text(encoding="utf8")
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
     assert "UNRELEASED" not in rendered
-    assert re.match(r"my-pkg-name \(91.6.14\+dfsg-2\) unstable;", rendered)
+    assert re.match(r"my-pkg-name \(91.6.14\+dfsg-2\) unstable; urgency=medium\n\n", rendered)
     assert latest_tag in rendered
     repo.git("tag", "-d", latest_tag)
 
@@ -210,6 +222,8 @@ def test_rendering_rpmbuild_prepend(repo: GitRepo, tmp_path: Path) -> None:
             "rpm_release": "1",
         },
     )
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
     assert re.match(r"\* .* dummy <dummy@example.com> - 1.1.0\+\d+-1\n", rendered)
     latest_tag = "91.6.14"
     assert latest_tag not in rendered
@@ -226,6 +240,8 @@ def test_rendering_rpmbuild_prepend(repo: GitRepo, tmp_path: Path) -> None:
         },
     )
     rendered = output.read_text(encoding="utf8")
+    assert rendered.endswith("\n"), "file end with empty line"
+    assert not rendered.endswith("\n\n"), "file end with a single empty line"
     assert re.match(r"\* .* dummy <dummy@example.com> - 91.6.14-2\n", rendered)
     assert latest_tag in rendered
     repo.git("tag", "-d", latest_tag)
