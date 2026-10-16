@@ -324,7 +324,12 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
 
 @pytest.mark.parametrize("versioning", ["semver", "pep440"])
 @pytest.mark.parametrize("bump", ["auto", "patch", "2.0.0"])
-def test_bumped_version_without_required_bump(repo: GitRepo, capsys: pytest.CaptureFixture, versioning: str, bump: str) -> None:
+def test_bumped_version_without_required_bump(
+    repo: GitRepo,
+    capsys: pytest.CaptureFixture,
+    versioning: str,
+    bump: str,
+) -> None:
     """A tagged HEAD has no planned version and reports that no bump is required."""
     # There are no unreleased commits after this tag, even with an explicit bump.
     repo.tag("1.2.3")
