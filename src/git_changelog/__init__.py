@@ -51,6 +51,8 @@ from git_changelog._internal.commit import (
     Commit,
     CommitConvention,
     ConventionalCommitConvention,
+    ConventionalCommitConventionV0,
+    ConventionalCommitConventionV1,
     LinuxConvention,
 )
 from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser, Ref, RefDef, RefRe
@@ -95,6 +97,8 @@ __all__: list[str] = [
     "CommitConvention",
     "ConventionType",
     "ConventionalCommitConvention",
+    "ConventionalCommitConventionV0",
+    "ConventionalCommitConventionV1",
     "Forgejo",
     "GitHub",
     "GitLab",

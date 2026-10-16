@@ -7,7 +7,14 @@ from typing import TYPE_CHECKING, Literal
 
 import pytest
 
-from git_changelog import AngularConvention, BasicConvention, Changelog
+from git_changelog import (
+    AngularConvention,
+    BasicConvention,
+    Changelog,
+    ConventionalCommitConventionV0,
+    ConventionalCommitConventionV1,
+    get_template,
+)
 
 if TYPE_CHECKING:
     from git_changelog import Version
@@ -66,6 +73,92 @@ def test_no_bump_on_first_tag(repo: GitRepo, bump: str) -> None:
     changelog = Changelog(repo.path, convention=AngularConvention, bump=bump)
     assert len(changelog.versions_list) == 1
     assert changelog.versions_list[0].tag == "1.1.1"
+
+
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+@pytest.mark.parametrize(
+    ("subjects", "expected"),
+    [
+        (["ci: Speed up CI", "docs: Update the guide"], None),
+        (["custom: Update something", "Unstructured commit"], None),
+        (["fix: Correct a bug", "ci: Speed up CI"], "1.2.4"),
+        (["ci: Speed up CI", "fix: Correct a bug"], "1.2.4"),
+        (["feat: Add a feature", "fix: Correct a bug"], "1.3.0"),
+        (["fix: Correct a bug", "feat: Add a feature"], "1.3.0"),
+        (["build!: Remove an API", "feat: Add a feature"], "2.0.0"),
+        (["feat: Add a feature", "custom!: Remove an API"], "2.0.0"),
+        (["fix: Correct a bug\n\nBREAKING-CHANGE: Remove an API"], "2.0.0"),
+    ],
+)
+def test_conventional_v1_auto_bump(
+    repo: GitRepo,
+    versioning: Literal["semver", "pep440"],
+    subjects: list[str],
+    expected: str | None,
+) -> None:
+    """Automatic bumps use the highest eligible commit and preserve unreleased URLs otherwise."""
+    repo.tag("1.2.3")
+    for subject in subjects:
+        repo.commit(subject)
+
+    changelog = Changelog(
+        repo.path,
+        convention="conventional-v1",
+        bump="auto",
+        versioning=versioning,
+        sections=[":all:"],
+        include_all=True,
+    )
+
+    latest = changelog.versions_list[0]
+    assert latest.planned_tag == expected
+    assert latest.previous_version is not None
+    assert latest.previous_version.tag == "1.2.3"
+    assert latest.compare_url.endswith(f"1.2.3...{expected or 'HEAD'}")
+
+    # A skipped bump must still render an unreleased entry with a HEAD comparison link.
+    rendered = get_template("keepachangelog").render(changelog=changelog)
+    assert ("## Unreleased" in rendered) == (expected is None)
+    assert latest.compare_url in rendered
+
+
+@pytest.mark.parametrize(
+    ("convention", "expected_class"),
+    [
+        ("conventional", ConventionalCommitConventionV0),
+        ("conventional-v0", ConventionalCommitConventionV0),
+        ("conventional-v1", ConventionalCommitConventionV1),
+    ],
+)
+def test_versioned_conventional_selection(repo: GitRepo, convention: str, expected_class: type) -> None:
+    """String selectors expose both versions while the original selector retains V0."""
+    changelog = Changelog(repo.path, convention=convention, bump="auto")
+
+    assert type(changelog.convention) is expected_class
+    assert changelog.versions_list[0].planned_tag == (None if convention == "conventional-v1" else "0.0.1")
+
+
+@pytest.mark.parametrize(
+    ("versioning", "bump", "expected"),
+    [
+        ("semver", "auto", None),
+        ("pep440", "auto", None),
+        ("pep440", "auto+dev", None),
+        ("semver", "patch", "0.0.1"),
+        ("pep440", "micro+dev", "0.0.1.dev0"),
+        ("semver", "2.0.0", "2.0.0"),
+    ],
+)
+def test_conventional_v1_bumping_new_repo(
+    repo: GitRepo,
+    versioning: Literal["semver", "pep440"],
+    bump: str,
+    expected: str | None,
+) -> None:
+    """Non-bumping commits skip automatic initial releases but allow explicit versions and strategies."""
+    changelog = Changelog(repo.path, convention=ConventionalCommitConventionV1, bump=bump, versioning=versioning)
+
+    assert changelog.versions_list[0].planned_tag == expected
 
 
 def test_one_release_branch_with_feat_branch(repo: GitRepo) -> None:

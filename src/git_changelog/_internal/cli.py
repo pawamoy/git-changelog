@@ -49,6 +49,7 @@ from git_changelog._internal.commit import (
     BasicConvention,
     CommitConvention,
     ConventionalCommitConvention,
+    ConventionalCommitConventionV1,
     LinuxConvention,
 )
 from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser
@@ -203,6 +204,7 @@ def get_parser() -> argparse.ArgumentParser:
             {BasicConvention._format_sections_help()}
             {AngularConvention._format_sections_help()}
             {ConventionalCommitConvention._format_sections_help()}
+            {ConventionalCommitConventionV1._format_sections_help()}
             {LinuxConvention._format_sections_help()}
             """,
         ),

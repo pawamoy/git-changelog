@@ -16,6 +16,8 @@ from git_changelog._internal.commit import (
     Commit,
     CommitConvention,
     ConventionalCommitConvention,
+    ConventionalCommitConventionV0,
+    ConventionalCommitConventionV1,
     LinuxConvention,
 )
 from git_changelog._internal.providers import (
@@ -238,6 +240,8 @@ class Changelog:
         "basic": BasicConvention,
         "angular": AngularConvention,
         "conventional": ConventionalCommitConvention,
+        "conventional-v0": ConventionalCommitConventionV0,
+        "conventional-v1": ConventionalCommitConventionV1,
         "linux": LinuxConvention,
     }
     """Available commit message conventions."""
@@ -566,13 +570,18 @@ class Changelog:
             version, *plus = version.split("+")
             if version == "auto":
                 # Guess the next version number based on last version and recent commits.
-                version = "patch"
+                version = ""
                 for commit in last_version.commits:
                     if commit.convention["is_major"]:
                         version = "major"
                         break
                     if commit.convention["is_minor"]:
                         version = "minor"
+                    elif commit.convention["is_patch"] and not version:
+                        version = "patch"
+                if not version:
+                    # Keep the unreleased entry and its HEAD URLs when no commit warrants a bump.
+                    return
             version = "+".join((version, *plus))
             if version in self.version_bumper.strategies:
                 # Bump version.

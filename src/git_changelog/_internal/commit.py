@@ -331,7 +331,7 @@ class CommitConvention(ABC):
             r"\n *",
             "\n",
             f"""
-            #### {cls.__name__[: -(len("Convention"))].strip()}
+            #### {cls.__name__.replace("Convention", "").strip()}
 
             *Default sections:*
 
@@ -533,8 +533,8 @@ class AngularConvention(CommitConvention):
         return bool(self.BREAK_REGEX.search(commit_message))
 
 
-class ConventionalCommitConvention(AngularConvention):
-    """Conventional commit message convention."""
+class ConventionalCommitConventionV0(AngularConvention):
+    """Original Conventional Commit convention, including patch bumps for other commit types."""
 
     TYPES: ClassVar[dict[str, str]] = AngularConvention.TYPES
     """The commit message types."""
@@ -559,6 +559,69 @@ class ConventionalCommitConvention(AngularConvention):
         is_major = self.is_major(message) or subject.get("breaking") == "!"
         is_minor = not is_major and self.is_minor(subject["type"])
         is_patch = not any((is_major, is_minor))
+
+        return {
+            "type": subject["type"],
+            "scope": subject["scope"],
+            "subject": subject["subject"],
+            "is_major": is_major,
+            "is_minor": is_minor,
+            "is_patch": is_patch,
+        }
+
+
+# Keep the unversioned name bound to V0 so existing callers retain their release behavior.
+ConventionalCommitConvention = ConventionalCommitConventionV0
+"""Alias for the original Conventional Commit convention."""
+
+
+class ConventionalCommitConventionV1(ConventionalCommitConventionV0):
+    """Conventional Commits 1.0.0, with version bumps only for features, fixes, and breaking changes."""
+
+    SUBJECT_REGEX: ClassVar[Pattern] = re.compile(
+        r"^(?P<type>[^\s():!]+)(?:\((?P<scope>[^()\r\n]+)\))?(?P<breaking>!)?: (?P<subject>\S.*)$",
+        re.IGNORECASE,
+    )
+    """The commit subject regex, including custom types and case-insensitive matching."""
+    BREAK_REGEX: ClassVar[Pattern] = re.compile(r"^BREAKING(?: CHANGE|-CHANGE): .+$", re.MULTILINE)
+    """The case-sensitive breaking change footer regex."""
+    FOOTER_REGEX: ClassVar[Pattern] = re.compile(r"^(?:BREAKING CHANGE|[\w-]+)(?:: | #).+$")
+    """The footer token and separator regex."""
+
+    def parse_subject(self, commit_subject: str) -> dict[str, str]:
+        """Parse a Conventional Commits subject and map known types to section titles."""
+        subject_match = self.SUBJECT_REGEX.match(commit_subject)
+        if subject_match:
+            subject = subject_match.groupdict()
+            commit_type = subject["type"].lower()
+            subject["type"] = self.TYPES.get(commit_type, commit_type)
+            return subject
+        return {"type": "", "scope": "", "subject": commit_subject}
+
+    def is_major(self, commit_message: str) -> bool:
+        """Tell whether the message contains an uppercase breaking change footer."""
+        lines = commit_message.splitlines()
+        in_footers = False
+        for index, line in enumerate(lines):
+            # The first footer follows a blank line; later footers can follow multiline values.
+            if index > 0 and not lines[index - 1].strip() and self.FOOTER_REGEX.match(line):
+                in_footers = True
+            if in_footers and self.BREAK_REGEX.match(line):
+                return True
+        return False
+
+    def is_patch(self, commit_type: str) -> bool:
+        """Tell whether the parsed commit type warrants a patch bump."""
+        return commit_type == self.TYPES["fix"]
+
+    def parse_commit(self, commit: Commit) -> dict[str, str | bool]:
+        """Parse the commit and select its highest applicable version bump."""
+        subject = self.parse_subject(commit.subject)
+        # Commit.body has its leading blank lines removed, so restore the subject/body separator.
+        message = commit.subject + "\n\n" + "\n".join(commit.body)
+        is_major = bool(subject["type"]) and (self.is_major(message) or subject.get("breaking") == "!")
+        is_minor = not is_major and self.is_minor(subject["type"])
+        is_patch = not any((is_major, is_minor)) and self.is_patch(subject["type"])
 
         return {
             "type": subject["type"],

@@ -276,13 +276,20 @@ in the commit message body.
 
 ### Conventional Commit convention
 
-The [Conventional Commit specification][conventional-commit] originates
-from the Angular commit message convention. It's basically the same thing,
-but only the `feat` and `fix` types are specified, and the rest is up to you.
-In *git-changelog* though, it is equivalent to the Angular convention,
-with an additional thing: it detects breaking changes when `!`
-appears right before the colon in the message summary
-(for example: `refactor!: Stuff`).
+The [Conventional Commit specification][conventional-commit] originates from the Angular commit message convention. Two versions are available:
+
+- `conventional` and `conventional-v0` select the original implementation. It follows the Angular convention and also detects `!` immediately before the subject's colon, such as `refactor!: Remove an API`. Every commit that does not trigger a major or minor bump triggers a patch bump.
+- `conventional-v1` follows Conventional Commits 1.0.0. Types are case-insensitive, and custom types are accepted. Only `feat` triggers a minor bump, and only `fix` triggers a patch bump. Any type can trigger a major bump with `!` or an uppercase `BREAKING CHANGE:` or `BREAKING-CHANGE:` footer. Other commits do not trigger automatic version bumps.
+
+To select version 1:
+
+```bash
+git-changelog --convention conventional-v1 --bump auto
+```
+
+Known types use the Angular section titles listed above. Custom types require a corresponding entry in a custom convention's `TYPES` mapping to select their sections for rendering.
+
+In Python, use `ConventionalCommitConventionV0` or `ConventionalCommitConventionV1`. `ConventionalCommitConvention` remains an alias for `ConventionalCommitConventionV0`.
 
 ## Choose the sections to render
 
@@ -593,7 +600,8 @@ Thanks to the SemVer specification and the commit message conventions,
 *git-changelog* is able to guess the new version your project is supposed
 to take given a set of untagged commits (commits more recent than the latest tag).
 An "Added" (basic convention) or "feat" (Angular/Karma/ConventionalCommit) commit
-will bump the MINOR part of the latest tag. Other types will bump the PATCH part.
+will bump the MINOR part of the latest tag. Other types will bump the PATCH part, except with `conventional-v1`.
+With `conventional-v1`, only `fix` commits trigger PATCH bumps. If no commit warrants a bump, the changelog keeps an Unreleased entry.
 Commits containing breaking changes will bump the MAJOR part, unless MAJOR is 0,
 in which case they'll only bump the MINOR part.
 
@@ -1062,7 +1070,7 @@ the latest entry from your changelog: `--version-regex`
 and `--marker-line`.
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
-[conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/
+[conventional-commit]: https://www.conventionalcommits.org/en/v1.0.0/
 [jinja]: https://jinja.palletsprojects.com/en/3.1.x/
 [semver]: https://semver.org/
 [git-trailers]: https://git-scm.com/docs/git-interpret-trailers
