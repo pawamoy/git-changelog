@@ -998,6 +998,9 @@ def main(args: list[str] | None = None) -> int:
         if not changelog.versions_list:
             print("git-changelog: No version found in the repository.", file=sys.stderr)
             return 1
+        if changelog.versions_list[0].planned_tag is None:
+            print("git-changelog: No version bump required.", file=sys.stderr)
+            return 1
         print(changelog.versions_list[0].planned_tag)
         return 0
 

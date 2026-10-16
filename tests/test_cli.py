@@ -322,26 +322,55 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
     assert captured.out.strip() == "1.2.3"
 
 
-def test_bumped_version_none(repo: GitRepo, capsys: pytest.CaptureFixture) -> None:
-    """The `--bumped-version` return None on latest."""
-    repo.tag('1.2.3')
-    main(
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+@pytest.mark.parametrize("bump", ["auto", "patch", "2.0.0"])
+def test_bumped_version_without_required_bump(repo: GitRepo, capsys: pytest.CaptureFixture, versioning: str, bump: str) -> None:
+    """A tagged HEAD has no planned version and reports that no bump is required."""
+    # There are no unreleased commits after this tag, even with an explicit bump.
+    repo.tag("1.2.3")
+
+    result = main(
         [
             str(repo.path),
             "--config-file",
             str(repo.path / "conf.toml"),
+            "--versioning",
+            versioning,
             "--bump",
-            "auto",
+            bump,
             "--bumped-version",
         ],
     )
+
     captured = capsys.readouterr()
-    # FIXME This is not expected.
-    # I would recommand to return exit code non-zero with an error message.
-    # OR
-    # I would return a bumped version.
-    # Returning "None" is not expected.
-    assert captured.out.strip() == "None"
+    assert result == 1
+    assert captured.out == ""
+    assert captured.err == "git-changelog: No version bump required.\n"
+
+
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+def test_bumped_version_with_unreleased_commits(repo: GitRepo, capsys: pytest.CaptureFixture, versioning: str) -> None:
+    """Unreleased commits still produce a version on stdout and a successful exit."""
+    repo.tag("1.2.3")
+    repo.commit("fix: Correct a bug")
+
+    result = main(
+        [
+            str(repo.path),
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "--convention",
+            "conventional",
+            "--versioning",
+            versioning,
+            "--bumped-version",
+        ],
+    )
+
+    captured = capsys.readouterr()
+    assert result == 0
+    assert captured.out == "1.2.4\n"
+    assert captured.err == ""
 
 
 def test_latest_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
