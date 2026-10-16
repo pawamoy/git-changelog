@@ -322,6 +322,57 @@ def test_bumped_version_option(repo: GitRepo, capsys: pytest.CaptureFixture) -> 
     assert captured.out.strip() == "1.2.3"
 
 
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+@pytest.mark.parametrize("bump", ["auto", "patch", "2.0.0"])
+def test_bumped_version_without_required_bump(repo: GitRepo, capsys: pytest.CaptureFixture, versioning: str, bump: str) -> None:
+    """A tagged HEAD has no planned version and reports that no bump is required."""
+    # There are no unreleased commits after this tag, even with an explicit bump.
+    repo.tag("1.2.3")
+
+    result = main(
+        [
+            str(repo.path),
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "--versioning",
+            versioning,
+            "--bump",
+            bump,
+            "--bumped-version",
+        ],
+    )
+
+    captured = capsys.readouterr()
+    assert result == 1
+    assert captured.out == ""
+    assert captured.err == "git-changelog: No version bump required.\n"
+
+
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+def test_bumped_version_with_unreleased_commits(repo: GitRepo, capsys: pytest.CaptureFixture, versioning: str) -> None:
+    """Unreleased commits still produce a version on stdout and a successful exit."""
+    repo.tag("1.2.3")
+    repo.commit("fix: Correct a bug")
+
+    result = main(
+        [
+            str(repo.path),
+            "--config-file",
+            str(repo.path / "conf.toml"),
+            "--convention",
+            "conventional",
+            "--versioning",
+            versioning,
+            "--bumped-version",
+        ],
+    )
+
+    captured = capsys.readouterr()
+    assert result == 0
+    assert captured.out == "1.2.4\n"
+    assert captured.err == ""
+
+
 def test_latest_version_option(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
     """Print the first version in the input changelog without building a changelog."""
     changelog = tmp_path / "CHANGELOG.md"
