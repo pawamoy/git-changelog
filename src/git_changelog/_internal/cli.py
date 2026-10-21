@@ -80,10 +80,10 @@ DEFAULT_CONFIG_FILES = [
 """Default configuration files read by git-changelog."""
 
 _DEFAULT_DEBIAN_MARKER_LINE = _MARKER_LINE_PREPEND
-_DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w-]+ \((?:\d+:)?(?P<version>[^-+~)]+)(?!.*UNRELEASED)"
+_DEFAULT_DEBIAN_VERSION_REGEX = r"^[\w.+-]+ \((?P<version>[^)\s]+)\)(?!.*UNRELEASED)"
 
 _DEFAULT_RPMBUILD_MARKER_LINE = _MARKER_LINE_PREPEND
-_DEFAULT_RPMBUILD_VERSION_REGEX = r"^\* .* - (?:\d+:)?(?P<version>[^-+~)]+)-"
+_DEFAULT_RPMBUILD_VERSION_REGEX = r"^\* .* - (?P<version>\S+)\s*$"
 
 
 DEFAULT_SETTINGS: dict[str, Any] = {

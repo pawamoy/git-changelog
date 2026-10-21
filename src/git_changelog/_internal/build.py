@@ -30,8 +30,12 @@ from git_changelog._internal.versioning import (
     ParsedVersion,
     bump_pep440,
     bump_semver,
+    bump_semver_plus_revision,
+    bump_pep440_plus_revision,
     parse_pep440,
     parse_semver,
+    parse_semver_plus_revision,
+    parse_pep440_plus_revision,
 )
 
 if TYPE_CHECKING:
@@ -346,6 +350,8 @@ class Changelog:
         version_parser, version_bumper = {
             "semver": (parse_semver, bump_semver),
             "pep440": (parse_pep440, bump_pep440),
+            "semver+revision": (parse_semver_plus_revision, bump_semver_plus_revision),
+            "pep440+revision": (parse_pep440_plus_revision, bump_pep440_plus_revision)
         }[versioning]
         self.version_parser = version_parser
         """The version parser function."""
