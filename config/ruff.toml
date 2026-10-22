@@ -13,7 +13,11 @@ ignore = [
     "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
     "ARG005",  # Unused lambda argument
     "C901",  # Too complex
+<<<<<<< before updating
     "CPY001",  # Copyright notice at the top
+=======
+    "COM812",  # Trailing comma, making formatting unstable
+>>>>>>> after updating
     "D105",  # Missing docstring in magic method
     "D417",  # Missing argument description in the docstring
     "E501",  # Line too long
