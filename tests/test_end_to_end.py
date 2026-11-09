@@ -294,13 +294,22 @@ def test_no_duplicate_rendering(repo: GitRepo, tmp_path: Path) -> None:
 @pytest.mark.parametrize("template", ["debian", "rpmbuild"])
 @pytest.mark.parametrize("prefix", ["", "v"])
 @pytest.mark.parametrize("versioning", ["semver", "pep440"])
-def test_prepend_without_duplicate_releases(repo: GitRepo, tmp_path: Path, template: str, prefix: str, versioning: Literal["semver", "pep440"]) -> None:
+def test_prepend_without_duplicate_releases(
+    repo: GitRepo, tmp_path: Path, template: str, prefix: str, versioning: Literal["semver", "pep440"]
+) -> None:
     """Match existing releases when the template removes the tag prefix."""
     # Record a tagged release using a template that omits the v prefix.
     repo.commit("feat: First feature")
     repo.tag(f"{prefix}1.0.0")
     output = tmp_path / "changelog"
-    render = partial(build_and_render, str(repo.path), template=template, convention="angular", output=str(output), versioning=versioning)
+    render = partial(
+        build_and_render,
+        str(repo.path),
+        template=template,
+        convention="angular",
+        output=str(output),
+        versioning=versioning,
+    )
     render(in_place=True)
 
     # Add a release without regenerating the already documented feature.
@@ -314,12 +323,21 @@ def test_prepend_without_duplicate_releases(repo: GitRepo, tmp_path: Path, templ
 
 @pytest.mark.parametrize("prefix", ["", "v"])
 @pytest.mark.parametrize("versioning", ["semver", "pep440"])
-def test_prepend_debian_revision(repo: GitRepo, tmp_path: Path, prefix: str, versioning: Literal["semver", "pep440"]) -> None:
+def test_prepend_debian_revision(
+    repo: GitRepo, tmp_path: Path, prefix: str, versioning: Literal["semver", "pep440"]
+) -> None:
     """Match a complete Debian version extracted with a custom regex."""
     repo.commit("feat: First feature")
     repo.tag(f"{prefix}2.2.6-13")
     output = tmp_path / "changelog"
-    render = partial(build_and_render, str(repo.path), template="debian", convention="angular", output=str(output), versioning=versioning)
+    render = partial(
+        build_and_render,
+        str(repo.path),
+        template="debian",
+        convention="angular",
+        output=str(output),
+        versioning=versioning,
+    )
     render(in_place=True)
 
     # The regex includes the Debian revision, as in issue #140.
@@ -340,13 +358,23 @@ def test_prepend_debian_revision(repo: GitRepo, tmp_path: Path, prefix: str, ver
 @pytest.mark.parametrize("template", ["debian", "rpmbuild"])
 @pytest.mark.parametrize("versioning", ["semver", "pep440"])
 @pytest.mark.parametrize("tagged", [False, True])
-def test_prepend_already_documented_version(repo: GitRepo, tmp_path: Path, template: str, versioning: Literal["semver", "pep440"], tagged: bool) -> None:
+def test_prepend_already_documented_version(
+    repo: GitRepo, tmp_path: Path, template: str, versioning: Literal["semver", "pep440"], tagged: bool
+) -> None:
     """Reject an already documented tag or planned tag despite a missing prefix."""
     repo.commit("feat: Already documented")
     if tagged:
         repo.tag("v1.0.0")
     output = tmp_path / "changelog"
-    render = partial(build_and_render, str(repo.path), template=template, convention="angular", output=str(output), versioning=versioning, bump=None if tagged else "v1.0.0")
+    render = partial(
+        build_and_render,
+        str(repo.path),
+        template=template,
+        convention="angular",
+        output=str(output),
+        versioning=versioning,
+        bump=None if tagged else "v1.0.0",
+    )
     render()
     original = output.read_text(encoding="utf8")
 
@@ -373,7 +401,9 @@ def test_in_place_distinct_semver_builds(repo: GitRepo, tmp_path: Path, tagged: 
     repo.commit("feat: First build")
     repo.tag("v1.0.0+build1")
     output = tmp_path / "changelog"
-    render = partial(build_and_render, str(repo.path), template=f"path:{template}", convention="angular", output=str(output))
+    render = partial(
+        build_and_render, str(repo.path), template=f"path:{template}", convention="angular", output=str(output)
+    )
     render()
 
     # Exercise the release boundary with a tag, and the duplicate guard with a planned tag.
@@ -404,7 +434,16 @@ def test_in_place_normalized_pep440_version(repo: GitRepo, tmp_path: Path, bump:
     output.write_text(original, encoding="utf8")
 
     # The changelog uses the normalized spelling of the prerelease tag.
-    render = partial(build_and_render, str(repo.path), template="keepachangelog", convention="angular", output=str(output), versioning="pep440", bump=bump, in_place=True)
+    render = partial(
+        build_and_render,
+        str(repo.path),
+        template="keepachangelog",
+        convention="angular",
+        output=str(output),
+        versioning="pep440",
+        bump=bump,
+        in_place=True,
+    )
     if bump == "v1.0RC1":
         with pytest.raises(ValueError, match=r"Version 1\.0rc1 already in changelog"):
             render()
@@ -428,7 +467,15 @@ def test_prepend_unparseable_version(repo: GitRepo, tmp_path: Path, versioning: 
     output.write_text(legacy_entry, encoding="utf8")
 
     # An unmatched legacy version previously allowed all releases to be prepended.
-    build_and_render(str(repo.path), template="debian", convention="angular", output=str(output), versioning=versioning, bump="v1.0.1", in_place=True)
+    build_and_render(
+        str(repo.path),
+        template="debian",
+        convention="angular",
+        output=str(output),
+        versioning=versioning,
+        bump="v1.0.1",
+        in_place=True,
+    )
 
     rendered = output.read_text(encoding="utf8")
     assert rendered.endswith(legacy_entry)

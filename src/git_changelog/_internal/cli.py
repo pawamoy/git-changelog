@@ -480,7 +480,9 @@ def _get_version_regex(version_regex: str | None, template: str) -> str:
     return DEFAULT_VERSION_REGEX
 
 
-def _version_key(tag: str | None, version_parser: Callable[[str], tuple[ParsedVersion, str]]) -> tuple[ParsedVersion, str | None] | str | None:
+def _version_key(
+    tag: str | None, version_parser: Callable[[str], tuple[ParsedVersion, str]]
+) -> tuple[ParsedVersion, str | None] | str | None:
     """Parse a release identifier, retaining unparseable identifiers for exact matching."""
     if not tag:
         return None
@@ -492,7 +494,9 @@ def _version_key(tag: str | None, version_parser: Callable[[str], tuple[ParsedVe
     return parsed, parsed.build if isinstance(parsed, SemVerVersion) else None
 
 
-def _unreleased(versions: list[Version], last_release: str, version_parser: Callable[[str], tuple[ParsedVersion, str]]) -> list[Version]:
+def _unreleased(
+    versions: list[Version], last_release: str, version_parser: Callable[[str], tuple[ParsedVersion, str]]
+) -> list[Version]:
     """Keep releases missing from the changelog, rejecting an already documented latest release."""
     last_release_key = _version_key(last_release, version_parser)
     latest = versions[0]
