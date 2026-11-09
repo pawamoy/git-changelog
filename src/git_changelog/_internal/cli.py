@@ -53,10 +53,12 @@ from git_changelog._internal.commit import (
     LinuxConvention,
 )
 from git_changelog._internal.providers import Bitbucket, Forgejo, GitHub, GitLab, ProviderRefParser
-from git_changelog._internal.versioning import bump_pep440, bump_semver
+from git_changelog._internal.versioning import SemVerVersion, bump_pep440, bump_semver
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
+
+    from git_changelog._internal.versioning import ParsedVersion
 
 _MARKER_LINE_PREPEND = ":prepend:"
 
@@ -478,9 +480,26 @@ def _get_version_regex(version_regex: str | None, template: str) -> str:
     return DEFAULT_VERSION_REGEX
 
 
-def _unreleased(versions: list[Version], last_release: str) -> list[Version]:
+def _version_key(tag: str | None, version_parser: Callable[[str], tuple[ParsedVersion, str]]) -> tuple[ParsedVersion, str | None] | str | None:
+    """Parse a release identifier, retaining unparseable identifiers for exact matching."""
+    if not tag:
+        return None
+    try:
+        parsed, _ = version_parser(tag)
+    except ValueError:
+        return tag
+    # SemVer equality ignores build metadata, but distinct builds can identify different releases.
+    return parsed, parsed.build if isinstance(parsed, SemVerVersion) else None
+
+
+def _unreleased(versions: list[Version], last_release: str, version_parser: Callable[[str], tuple[ParsedVersion, str]]) -> list[Version]:
+    """Keep releases missing from the changelog, rejecting an already documented latest release."""
+    last_release_key = _version_key(last_release, version_parser)
+    latest = versions[0]
+    if last_release_key in (_version_key(latest.tag, version_parser), _version_key(latest.planned_tag, version_parser)):
+        raise ValueError(f"Version {last_release} already in changelog")
     for index, version in enumerate(versions):
-        if version.tag == last_release:
+        if _version_key(version.tag, version_parser) == last_release_key:
             return versions[:index]
     return versions
 
@@ -757,15 +776,10 @@ def render(  # noqa: PLR0917
         # Only keep new entries (missing from changelog).
         last_released, last_released_line = _latest(lines, re.compile(version_regex))
         if last_released:
-            # Check if the latest version is already in the changelog.
-            if last_released in [
-                changelog.versions_list[0].tag,
-                changelog.versions_list[0].planned_tag,
-            ]:
-                raise ValueError(f"Version {last_released} already in changelog")
             changelog.versions_list = _unreleased(
                 changelog.versions_list,
                 last_released,
+                changelog.version_parser,
             )
 
         # Render new entries.
