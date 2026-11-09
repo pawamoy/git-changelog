@@ -164,6 +164,44 @@ versioning = "semver"
 zerover = true
 ```
 
+## Repository links and remotes
+
+By default, changelog links use the URL of the `origin` Git remote.
+Choose another remote when working with a fork:
+
+```bash
+git-changelog --remote upstream
+```
+
+To supply the repository URL directly, including in clones without a remote:
+
+```bash
+git-changelog --remote-url https://github.com/myorg/myproject.git
+```
+
+Both settings can also be stored in a configuration file:
+
+```toml
+[tool.git-changelog]
+remote = "upstream"
+remote_url = "https://github.com/myorg/myproject.git"
+```
+
+Command-line options override configuration file values. When neither specifies
+a value, `GIT_CHANGELOG_REMOTE` selects the remote name (default: `origin`), and
+`GIT_CHANGELOG_REMOTE_URL` supplies the repository URL directly. A URL override
+takes precedence over remote-name selection, even if the name comes from the
+command line. Omit or unset the URL override to select a named Git remote.
+
+```bash
+GIT_CHANGELOG_REMOTE=upstream git-changelog
+GIT_CHANGELOG_REMOTE_URL=https://github.com/myorg/myproject.git git-changelog
+```
+
+SSH-style Git URLs are converted to HTTPS, the `.git` suffix is removed, and
+credentials in HTTP(S) URLs are removed before generating links. These settings
+do not modify Git configuration.
+
 ## Output a changelog
 
 [(--output)](reference/cli.md#output)
