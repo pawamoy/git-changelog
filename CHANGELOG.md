@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [2.11.0](https://github.com/pawamoy/git-changelog/releases/tag/2.11.0) - 2026-11-09
+
+<small>[Compare with 2.10.0](https://github.com/pawamoy/git-changelog/compare/2.10.0...2.11.0)</small>
+
+### Build
+
+- Drop support for Python 3.10 ([4a74b7d](https://github.com/pawamoy/git-changelog/commit/4a74b7d3363f37b8cd96285ebbf183ea1c7fc043) by Timothée Mazzucotelli).
+
+### Features
+
+- Provide v1 of Conventional Commit ([1323df7](https://github.com/pawamoy/git-changelog/commit/1323df799f0c0b42ba18a269b940de6ad6bea648) by Timothée Mazzucotelli). [Follow-up-of-PR-109](https://github.com/pawamoy/git-changelog/pull/109), Co-authored-by: Stefan Hackenberg <Stefan.Hackenberg@infineon.com>
+- Add Forgejo provider ([915cfbd](https://github.com/pawamoy/git-changelog/commit/915cfbdb3fed8440e2dc6816b6b6ce2b4588614a) by Patrik Dufresne). [PR-132](https://github.com/pawamoy/git-changelog/pull/132), Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>
+
+### Bug Fixes
+
+- Handle `v` prefix when searching latest version in changelog ([647bf7c](https://github.com/pawamoy/git-changelog/commit/647bf7c829b0842291cec01e98e3bac5f0174878) by Timothée Mazzucotelli). [Issue-140](https://github.com/pawamoy/git-changelog/issues/140)
+- Exit 1 with error message when `--bumped-version` is passed and nothing is bumped ([dbcb3c5](https://github.com/pawamoy/git-changelog/commit/dbcb3c5e31ebd8b81d5dd5157a54e1b3f9a0f022) by Timothée Mazzucotelli). [Issue-135](https://github.com/pawamoy/git-changelog/issues/135), [Follow-up-of-PR-136](https://github.com/pawamoy/git-changelog/pull/136), [PR-137](https://github.com/pawamoy/git-changelog/pull/137), Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>, Co-authored-by: Patrik Dufresne <patrik@ikus-soft.com>
+- Dedup trailing line after in-place insertion ([e5dfd2e](https://github.com/pawamoy/git-changelog/commit/e5dfd2e63090d187eada60cfe5dd19030296b087) by Patrik Dufresne). [Issue-131](https://github.com/pawamoy/git-changelog/issues/131), [PR-134](https://github.com/pawamoy/git-changelog/pull/134), Signed-off-by: Patrik Dufresne <patrik@ikus-soft.com>
+
 ## [2.10.0](https://github.com/pawamoy/git-changelog/releases/tag/2.10.0) - 2026-09-26
 
 <small>[Compare with 2.9.7](https://github.com/pawamoy/git-changelog/compare/2.9.7...2.10.0)</small>
