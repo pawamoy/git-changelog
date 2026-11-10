@@ -262,6 +262,8 @@ class Changelog:
         filter_commits: str | None = None,
         include_all: bool = False,
         versioning: Literal["semver", "pep440"] = "semver",
+        remote: str | None = None,
+        remote_url: str | None = None,
     ):
         """Initialization method.
 
@@ -277,9 +279,13 @@ class Changelog:
             zerover: Keep major version at zero, even for breaking changes.
             filter_commits: The Git revision-range used to filter commits in git-log (e.g: `v1.0.1..`).
             include_all: Whether to include commits without a recognized type.
+            remote: Git remote name. Defaults to `GIT_CHANGELOG_REMOTE`, or `origin`.
+            remote_url: Repository URL. Defaults to `GIT_CHANGELOG_REMOTE_URL`, or the selected remote's URL.
         """
         self.repository: str | Path = repository
         """The repository (directory) for which to build the changelog."""
+        self._remote = remote
+        self._remote_url = remote_url
         self.parse_provider_refs: bool = parse_provider_refs
         """Whether to parse provider-specific references in the commit messages."""
         self.parse_trailers: bool = parse_trailers
@@ -396,10 +402,13 @@ class Changelog:
         """Get the git remote URL for the repository.
 
         Returns:
-            The origin remote URL.
+            The explicitly configured URL, or the selected Git remote URL.
         """
-        remote = "remote." + os.environ.get("GIT_CHANGELOG_REMOTE", "origin") + ".url"
-        git_url = self.run_git("config", "--default", "", "--get", remote).rstrip("\n")
+        git_url = self._remote_url if self._remote_url is not None else os.environ.get("GIT_CHANGELOG_REMOTE_URL")
+        if git_url is None:
+            remote = self._remote or os.environ.get("GIT_CHANGELOG_REMOTE", "origin")
+            git_url = self.run_git("config", "--default", "", "--get", f"remote.{remote}.url")
+        git_url = git_url.rstrip("\n")
         if git_url.startswith("git@"):
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
         git_url = git_url.removesuffix(".git")

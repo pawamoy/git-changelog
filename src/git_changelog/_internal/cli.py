@@ -103,6 +103,8 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "parse_refs": False,
     "parse_trailers": False,
     "provider": None,
+    "remote": None,
+    "remote_url": None,
     "release_notes": False,
     "latest_version": False,
     "bumped_version": False,
@@ -342,6 +344,17 @@ def get_parser() -> argparse.ArgumentParser:
         dest="provider",
         choices=providers.keys(),
         help="Explicitly specify the repository provider. Default: unset.",
+    )
+    parser.add_argument(
+        "--remote",
+        metavar="NAME",
+        help="Git remote to use for changelog links. Defaults to GIT_CHANGELOG_REMOTE, or origin.",
+    )
+    parser.add_argument(
+        "--remote-url",
+        metavar="URL",
+        help="Repository URL to use for changelog links. Overrides the remote name. "
+        "Defaults to GIT_CHANGELOG_REMOTE_URL, or the selected Git remote's URL.",
     )
     parser.add_argument(
         "-r",
@@ -638,6 +651,8 @@ def build(  # noqa: PLR0917
     filter_commits: str | None = None,
     include_all: bool = False,  # noqa: FBT001,FBT002
     versioning: Literal["pep440", "semver"] = "semver",
+    remote: str | None = None,
+    remote_url: str | None = None,
     **kwargs: Any,  # noqa: ARG001
 ) -> Changelog:
     """Build a changelog.
@@ -657,6 +672,8 @@ def build(  # noqa: PLR0917
         filter_commits: The Git revision-range used to filter commits in git-log.
         include_all: Whether to include commits without a recognized type.
         versioning: Versioning scheme to use when grouping commits and bumping versions.
+        remote: Git remote name used for changelog links.
+        remote_url: Repository URL used for changelog links, overriding the remote name.
         **kwargs: Swallowing kwargs to allow passing all settings at once.
 
     Raises:
@@ -684,6 +701,8 @@ def build(  # noqa: PLR0917
         filter_commits=filter_commits,
         include_all=include_all,
         versioning=versioning,
+        remote=remote,
+        remote_url=remote_url,
     )
 
     # Remove empty versions from changelog data.
@@ -851,6 +870,8 @@ def build_and_render(  # noqa: PLR0917
     jinja_context: dict[str, Any] | None = None,
     versioning: Literal["pep440", "semver"] = "semver",
     include_all: bool = False,  # noqa: FBT001,FBT002
+    remote: str | None = None,
+    remote_url: str | None = None,
     **kwargs: Any,  # noqa: ARG001
 ) -> tuple[Changelog, str]:
     """Build a changelog and render it.
@@ -879,6 +900,8 @@ def build_and_render(  # noqa: PLR0917
         include_all: Whether to include commits without a recognized type.
         jinja_context: Key/value pairs passed to the Jinja template.
         versioning: Versioning scheme to use when grouping commits and bumping versions.
+        remote: Git remote name used for changelog links.
+        remote_url: Repository URL used for changelog links, overriding the remote name.
         **kwargs: Swallowing kwargs to allow passing all settings at once.
 
     Raises:
@@ -901,6 +924,8 @@ def build_and_render(  # noqa: PLR0917
         filter_commits=filter_commits,
         include_all=include_all,
         versioning=versioning,
+        remote=remote,
+        remote_url=remote_url,
     )
     rendered = render(
         changelog=changelog,
