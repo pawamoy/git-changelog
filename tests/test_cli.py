@@ -574,3 +574,18 @@ def test_selecting_convention(convention: str, monkeypatch: pytest.MonkeyPatch) 
     """Test that the CLI option to select a convention works as expected."""
     monkeypatch.setattr("git_changelog._internal.cli.build_and_render", lambda *args, **kwargs: None)
     assert main(["-c", convention]) == 0
+
+
+# IMPORTANT: See top module comment.
+def test_jinja_context_without_equals_is_usage_error(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
+    """Invalid `--jinja-context` value is a usage error (exit 2), not a traceback.
+
+    Parameters:
+        tmp_path: A temporary path to write an empty config to.
+        capsys: Pytest fixture to capture output.
+    """
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--config-file", str(tmp_path / "conf.toml"), "-j", "justakey"])
+    assert exc_info.value.code == 2
+    captured = capsys.readouterr()
+    assert "KEY=VALUE" in captured.err

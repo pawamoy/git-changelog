@@ -155,7 +155,10 @@ class _ParseDictAction(argparse.Action):
         if not isinstance(attribute, dict):
             setattr(namespace, self.dest, {})
         if isinstance(values, str):
-            key, value = values.split("=", 1)
+            try:
+                key, value = values.split("=", 1)
+            except ValueError:
+                raise argparse.ArgumentError(self, f"expected KEY=VALUE, got {values!r}") from None
             getattr(namespace, self.dest)[key] = value
 
 
