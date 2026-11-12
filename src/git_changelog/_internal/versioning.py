@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import re
 import sys
-from typing import Any, Literal, Protocol
-
+from typing import Any, Callable, Literal, Protocol
+import functools
 import semver
 from packaging import version as packaging_version
 
@@ -68,6 +69,7 @@ PEP440Strategy = Literal[
 ]
 """PEP 440 versioning strategies."""
 
+_TRAILING_NUMBER = re.compile(r"(\d+)(\D*)$")
 
 _release_kind = {"a": "alpha", "b": "beta", "c": "candidate", "rc": "candidate", "p": "post"}
 
@@ -637,6 +639,84 @@ class PEP440Version(packaging_version.Version, ParsedVersion):  # ty:ignore[inva
             dev=0,
         )
 
+class RevisionVersion():
+    """This version parser delegate the upstream version management
+    to another class and only manage the revision number. This implementation is an over
+    simplification of debian and rpm revision capabilities.
+    """
+
+    @classmethod
+    def parse(cls, version: str, upstream_parser: Callable):
+        parts = version.split('-', maxsplit=1)
+        return cls(
+            upstream=upstream_parser(parts[0]),
+            revision=parts[1] if len(parts) == 2 else None,
+        )
+
+    def __init__(self, upstream: ParsedVersion, revision: str|None):
+        self._upstream = upstream
+        self._revision = revision
+
+    def __getattr__(self, name):
+        # Delegate everything else to upstream version
+        return getattr(self._upstream, name)
+    
+    @property
+    def upstream_version(self):
+        return self._upstream
+
+    @property
+    def revision(self):
+        return self._revision
+
+    def bump_revision(self) -> RevisionVersion:
+        """Increment the last number found in a Debian revision."""
+        # When undefined, reset to '-1'
+        if self._revision is None:
+            return RevisionVersion(
+                upstream=self._upstream,
+                revision='1'
+            )
+
+        # Keep it simple and predictable: increment the last digits in the revision
+        # Similar to `dch --increment`
+        match = _TRAILING_NUMBER.search(self._revision)
+        if not match:
+            # No digits at all (rare): append one
+            return RevisionVersion(
+                    upstream=self._upstream,
+                    revision=f"{self._revision}1"
+                )
+        number, suffix = match.groups()
+        start = match.start(1)
+        return RevisionVersion(
+                upstream=self._upstream,
+                revision=f"{self._revision[:start]}{int(number) + 1}{suffix}"
+            )
+
+    def __eq__(self, other):
+        if not isinstance(other, RevisionVersion):
+            return NotImplemented
+        return self._upstream == other._upstream and self._revision == other._revision
+    
+    def __lt__(self, other):
+        if not isinstance(other, RevisionVersion):
+            return NotImplemented
+        if self._upstream != other._upstream:
+            return self._upstream < other._upstream
+        return self._revision < other._revision
+        
+    def __hash__(self):
+        return hash((self._upstream, self._revision))
+
+    def __repr__(self):
+        return f"RevisionVersion(upstream='{self._upstream}',revision='{self._revision}')"
+
+    def __str__(self):
+        if self._revision:
+            return f"{self._upstream}-{self._revision}"
+        return self._upstream
+
 
 def version_prefix(version: str) -> tuple[str, str]:
     """Return a version and its optional `v` prefix.
@@ -674,6 +754,22 @@ def parse_pep440(version: str) -> tuple[PEP440Version, str]:
     version, prefix = version_prefix(version)
     return PEP440Version(version), prefix
 
+def parse_revision(version: str, upstream_parser: Callable) -> tuple[RevisionVersion, str]:
+    """Parse a version followed by a revision.
+    e.g.: <upstream>-<revision>
+
+    Returns:
+        A revision version.
+    """
+    version, prefix = version_prefix(version)
+    revision_version = RevisionVersion.parse(version, upstream_parser)
+    return revision_version, prefix
+    
+
+parse_semver_plus_revision = functools.partial(parse_revision, upstream_parser=SemVerVersion.parse)
+"""Parser for SemVer version with revision."""
+parse_pep440_plus_revision = functools.partial(parse_revision, upstream_parser=PEP440Version)
+"""Parser for PEP 440 version with revision."""
 
 class VersionBumper:
     """Base class for version bumpers."""
@@ -820,8 +916,64 @@ class SemVerBumper(VersionBumper):
             raise ValueError(f"Invalid strategy {strategy}, use one of {', '.join(self.strategies)}")
         return prefix + str(semver_version)
 
+class RevisionBumper(VersionBumper):
+    """Wrap another bumper and own the "revision" strategy.
+
+    Every strategy except "revision" is delegated to the wrapped bumper.
+    "revision" is handled here, uniformly for any scheme, by finalizing
+    the version (dropping pre-revision/dev markers).
+    """
+    REVISION = "revision"
+    
+    def __init__(
+        self,
+        bumper: VersionBumper,
+        upstream_parser: Callable,
+    ) -> None:
+        """Initialize the bumper.
+
+        Parameters:
+            bumper: The bumper to delegate non-revision strategies to.
+            parse: Function parsing a version string into `(version, prefix)`.
+        """
+        super().__init__((*bumper.strategies, self.REVISION))
+        self._bumper = bumper
+        self.initial = bumper.initial + '-1'
+        self._upstream_parser = upstream_parser
+
+    def __call__(self, version: str, strategy: str, **kwargs: Any) -> str:
+        """Bump a version, handling "revision" locally and delegating the rest.
+
+        Parameters:
+            version: The version to bump.
+            strategy: The bumping strategy.
+            **kwargs: Additional arguments, forwarded to the wrapped bumper.
+
+        Returns:
+            The bumped version.
+        """
+        revision_version, prefix = parse_revision(version, upstream_parser=self._upstream_parser)
+
+        if strategy == self.REVISION:
+            revision_version = revision_version.bump_revision()
+            return prefix + str(revision_version)
+
+        # Delegate everything else.
+        upstream_version = str(revision_version.upstream_version)
+        new_upstream_version = self._bumper(upstream_version, strategy, **kwargs)
+        revision_version = RevisionVersion(
+            upstream=new_upstream_version,
+            revision='1'
+        )
+        return prefix + str(revision_version)
+
+
 
 bump_pep440 = PEP440Bumper(PEP440Strategy.__args__)
 """Bump a PEP 440 version."""
 bump_semver = SemVerBumper(SemVerStrategy.__args__)
 """Bump a SemVer version."""
+bump_pep440_plus_revision = RevisionBumper(bumper=bump_pep440, upstream_parser=PEP440Version)
+"""Bump a PEP 440 version with a revision."""
+bump_semver_plus_revision = RevisionBumper(bumper=bump_semver, upstream_parser=SemVerVersion.parse)
+"""Bump a SemVer version with a revision."""
