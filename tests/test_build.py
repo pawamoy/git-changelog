@@ -13,11 +13,11 @@ from git_changelog import (
     Changelog,
     ConventionalCommitConventionV0,
     ConventionalCommitConventionV1,
+    Version,
     get_template,
 )
 
 if TYPE_CHECKING:
-    from git_changelog import Version
     from tests.helpers import GitRepo
 
 
@@ -608,3 +608,34 @@ def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
 
     # Should map to full section names.
     assert changelog.sections == ["Features", "Bug Fixes"]
+
+
+@pytest.mark.parametrize(
+    ("tag", "is_major", "is_minor"),
+    [
+        ("1.0.0", True, False),
+        ("v2.0.0", True, False),
+        ("1.2.0", False, True),
+        ("v1.2.0", False, True),
+        ("0.1.0", False, True),
+        ("1.10.0", False, True),
+        ("1.2.0-rc.1", False, True),
+        ("1.2.0b1", False, True),
+        ("1.2.0+build.1", False, True),
+        ("1.2.3", False, False),
+        ("v1.2.3", False, False),
+        ("0.0.1", False, False),
+        ("1.2.10", False, False),
+    ],
+)
+def test_version_is_major_and_is_minor(tag: str, is_major: bool, is_minor: bool) -> None:
+    """Test that a version's tag tells whether it is a major, minor, or patch release.
+
+    Parameters:
+        tag: The version tag.
+        is_major: Whether the version is expected to be major.
+        is_minor: Whether the version is expected to be minor.
+    """
+    version = Version(tag=tag)
+    assert version.is_major is is_major
+    assert version.is_minor is is_minor

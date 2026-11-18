@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime  # noqa: ICN001
 import os
+import re
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
@@ -199,7 +200,12 @@ class Version:
         Returns:
             Whether this version is minor.
         """
-        return bool(self.tag.split(".", 2)[2])
+        parts = self.tag.split(".", 2)
+        if len(parts) < 3:  # noqa: PLR2004
+            return False
+        # The patch part can carry pre-release or build metadata (`0-rc.1`, `0b1`, `0+build`).
+        patch = re.match(r"\d+", parts[2])
+        return patch is not None and int(patch.group()) == 0 and not self.is_major
 
     def add_commit(self, commit: Commit) -> None:
         """Register the given commit and add it to the relevant section based on its message convention.
