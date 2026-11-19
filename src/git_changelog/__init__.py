@@ -76,6 +76,7 @@ from git_changelog._internal.versioning import (
     bump_semver,
     parse_pep440,
     parse_semver,
+    parse_revision,
     version_prefix,
 )
 
@@ -133,6 +134,7 @@ __all__: list[str] = [
     "output_release_notes",
     "parse_pep440",
     "parse_semver",
+    "parse_revision",
     "parse_settings",
     "parse_version",
     "providers",
