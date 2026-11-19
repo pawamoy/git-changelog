@@ -124,11 +124,11 @@ class SemVerVersion(semver.Version, ParsedVersion):
         return SemVerVersion(self.major, self.minor, self.patch)
 
 
-class PEP440Version(packaging_version.Version, ParsedVersion):  # ty:ignore[invalid-method-override]
+class PEP440Version(packaging_version.Version, ParsedVersion):  # ty:ignore[incompatible-method-override]
     """PEP 440 version."""
 
     @classmethod
-    def from_parts(  # ty:ignore[invalid-method-override]
+    def from_parts(  # ty:ignore[incompatible-method-override]
         cls,
         epoch: int | None = None,
         release: tuple[int, ...] | None = None,
@@ -710,7 +710,7 @@ class PEP440Bumper(VersionBumper):
     initial: str = "0.0.0"
     """The initial version."""
 
-    def __call__(  # ty:ignore[invalid-method-override]
+    def __call__(  # ty:ignore[incompatible-method-override]
         self,
         version: str,
         strategy: PEP440Strategy = "micro",
@@ -787,7 +787,7 @@ class SemVerBumper(VersionBumper):
     initial: str = "0.0.0"
     """The initial version."""
 
-    def __call__(  # ty:ignore[invalid-method-override]
+    def __call__(  # ty:ignore[incompatible-method-override]
         self,
         version: str,
         strategy: SemVerStrategy = "patch",

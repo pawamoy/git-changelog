@@ -996,7 +996,7 @@ def output_release_notes(
     output_file = output_file or sys.stdout
     release_notes = get_release_notes(input_file, version_regex, marker_line)
     try:
-        output_file.write(release_notes)  # ty:ignore[unresolved-attribute]
+        output_file.write(release_notes)  # ty:ignore[missing-union-attribute]
     except AttributeError:
         with open(output_file, "w") as file:  # ty:ignore[no-matching-overload]
             file.write(release_notes)
