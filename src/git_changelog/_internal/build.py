@@ -458,7 +458,7 @@ class Changelog:
                 return self.run_git("log", "--date=raw", "--format=" + self.FORMAT, self.filter_commits)
             except CalledProcessError as e:
                 raise ValueError(
-                    f"An error ocurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
+                    f"An error occurred. Maybe the provided git-log revision-range is not valid: '{self.filter_commits}'",
                 ) from e
 
         # No revision-range provided. Call normally
