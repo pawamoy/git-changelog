@@ -17,6 +17,7 @@ from git_changelog import (
 @pytest.mark.parametrize(
     ("version", "expected"),
     [
+        ("", ("", "")),
         ("1", ("1", "")),
         ("v1", ("1", "v")),
         ("va", ("a", "v")),
@@ -28,7 +29,7 @@ def test_version_prefix(version: str, expected: tuple[str, str]) -> None:
 
     Parameters:
         version: The version to split.
-        bumped: The expected version and prefix.
+        expected: The expected version and prefix.
     """
     assert expected == version_prefix(version)
 

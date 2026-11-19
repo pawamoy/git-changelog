@@ -649,7 +649,7 @@ def version_prefix(version: str) -> tuple[str, str]:
         prefix: The version prefix.
     """
     prefix = ""
-    if version[0] == "v":
+    if version.startswith("v"):
         prefix = "v"
         version = version[1:]
     return version, prefix
