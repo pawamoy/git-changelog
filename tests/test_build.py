@@ -15,6 +15,8 @@ from git_changelog import (
     ConventionalCommitConventionV1,
     Version,
     get_template,
+    parse_pep440,
+    parse_semver,
 )
 
 if TYPE_CHECKING:
@@ -626,10 +628,22 @@ def test_sections_explicit_list_still_works(repo: GitRepo) -> None:
         ("v1.2.3", False, False),
         ("0.0.1", False, False),
         ("1.2.10", False, False),
+        ("", False, False),
+        ("not-a-version", False, False),
+        ("v", False, False),
+        ("1", True, False),
+        ("1.2", False, True),
+        ("1.0.0rc1", True, False),
+        ("1.0.0+build.1", True, False),
+        ("1.0.01", False, False),
+        ("1.2.dev1", False, True),
+        ("1.2.0.1", False, False),
+        ("1!2.0", True, False),
+        ("1!1.2rc1", False, True),
     ],
 )
 def test_version_is_major_and_is_minor(tag: str, is_major: bool, is_minor: bool) -> None:
-    """Test that a version's tag tells whether it is a major, minor, or patch release.
+    """Classify the parsed release numbers independently of suffixes.
 
     Parameters:
         tag: The version tag.
@@ -637,5 +651,116 @@ def test_version_is_major_and_is_minor(tag: str, is_major: bool, is_minor: bool)
         is_minor: Whether the version is expected to be minor.
     """
     version = Version(tag=tag)
+
+    assert version.is_major is is_major
+    assert version.is_minor is is_minor
+
+
+@pytest.mark.parametrize("previous_tag", ["", "not-a-version", "1.1.8", "9.0.0"])
+@pytest.mark.parametrize(
+    ("tag", "is_major", "is_minor"), [("2.0.0", True, False), ("1.2.0", False, True), ("1.2.3", False, False)]
+)
+def test_version_release_type_ignores_predecessor(previous_tag: str, tag: str, is_major: bool, is_minor: bool) -> None:
+    """A linked predecessor does not affect classification of the current release numbers."""
+    version = Version(tag=tag)
+    version.previous_version = Version(tag=previous_tag)
+
+    assert version.is_major is is_major
+    assert version.is_minor is is_minor
+
+
+def test_version_release_type_tracks_mutable_tags() -> None:
+    """Recompute the release type when callers update the tag."""
+    version = Version(tag="1.2.0")
+
+    assert version.is_minor
+    assert not version.is_major
+
+    version.tag = "2.0.0"
+
+    assert version.is_major
+    assert not version.is_minor
+
+    version.tag = "2.0.1"
+
+    assert not version.is_major
+    assert not version.is_minor
+
+
+def test_version_constructor_keeps_positional_arguments() -> None:
+    """Existing positional arguments keep their meaning with the optional parser keyword."""
+    version = Version("1.2.0", None, None, None, "tag-url", "compare-url")
+
+    assert version.tag == "1.2.0"
+    assert version.url == "tag-url"
+    assert version.compare_url == "compare-url"
+    assert version.is_minor
+
+
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+def test_version_uses_explicit_parser(versioning: Literal["semver", "pep440"]) -> None:
+    """An explicit parser determines which tags are accepted for release classification."""
+    parser = parse_semver if versioning == "semver" else parse_pep440
+    version = Version(tag="1.2.0rc1", version_parser=parser)
+
+    assert not version.is_major
+    assert version.is_minor is (versioning == "pep440")
+
+
+@pytest.mark.parametrize(
+    ("versioning", "previous_tag", "tag", "is_major", "is_minor"),
+    [
+        ("semver", "1.1.8", "1.2.0-rc.1", False, True),
+        ("semver", "1.1.8", "2.3.4", False, False),
+        ("semver", "1.1.8", "2.0.0", True, False),
+        ("semver", "1.2.0-rc.1", "1.2.0", False, True),
+        ("pep440", "1.1.8", "1.2.0rc1", False, True),
+        ("pep440", "1.1", "1.2", False, True),
+        ("pep440", "1.9", "2", True, False),
+        ("pep440", "1!1.1", "1!1.2rc1", False, True),
+        ("pep440", "1.2", "1!2.0", True, False),
+    ],
+)
+def test_changelog_release_type(  # noqa: PLR0917
+    repo: GitRepo,
+    versioning: Literal["semver", "pep440"],
+    previous_tag: str,
+    tag: str,
+    is_major: bool,
+    is_minor: bool,
+) -> None:
+    """Changelog versions classify release numbers using the selected scheme."""
+    repo.tag(previous_tag)
+    repo.commit("feat: New release")
+    repo.tag(tag)
+
+    changelog = Changelog(repo.path, versioning=versioning)
+    version = changelog.versions_list[0]
+
+    assert version.previous_version is not None
+    assert version.previous_version.tag == previous_tag
+    assert version.is_major is is_major
+    assert version.is_minor is is_minor
+
+
+@pytest.mark.parametrize("versioning", ["semver", "pep440"])
+@pytest.mark.parametrize(
+    ("bump", "is_major", "is_minor"), [("major", True, False), ("minor", False, True), (None, False, False)]
+)
+def test_changelog_planned_release_type(
+    repo: GitRepo,
+    versioning: Literal["semver", "pep440"],
+    bump: str | None,
+    is_major: bool,
+    is_minor: bool,
+) -> None:
+    """Classify planned releases and leave unplanned entries unclassified."""
+    repo.tag("1.1.8")
+    repo.commit("feat: Unreleased feature")
+
+    changelog = Changelog(repo.path, versioning=versioning, bump=bump)
+    version = changelog.versions_list[0]
+
+    assert version.tag == ""
     assert version.is_major is is_major
     assert version.is_minor is is_minor

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime  # noqa: ICN001
 import os
-import re
 import sys
 import warnings
 from subprocess import CalledProcessError, check_output
@@ -29,6 +28,8 @@ from git_changelog._internal.providers import (
 )
 from git_changelog._internal.versioning import (
     ParsedVersion,
+    PEP440Version,
+    SemVerVersion,
     bump_pep440,
     bump_semver,
     parse_pep440,
@@ -36,9 +37,8 @@ from git_changelog._internal.versioning import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
-
-    from git_changelog._internal.versioning import SemVerVersion
 
 ConventionType = str | CommitConvention | type[CommitConvention]
 """The type of convention used for commits."""
@@ -110,6 +110,8 @@ class Version:
         commits: list[Commit] | None = None,
         url: str = "",
         compare_url: str = "",
+        *,
+        version_parser: Callable[[str], tuple[SemVerVersion | PEP440Version, str]] | None = None,
     ):
         """Initialization method.
 
@@ -120,12 +122,10 @@ class Version:
             commits: The version commits.
             url: The version URL.
             compare_url: The version 'compare' URL.
+            version_parser: The version parser. By default, try SemVer, then PEP 440.
         """
         self.tag = tag
         """The version tag."""
-        self._date = date
-        """The version date."""
-
         self.sections_list: list[Section] = sections or []
         """The version sections (list)."""
         self.sections_dict: dict[str, Section] = {section.type: section for section in self.sections_list}
@@ -143,9 +143,12 @@ class Version:
         self.planned_tag: str | None = None
         """The planned version tag."""
 
+        self._date = date
+        self._version_parser = version_parser
+
     @property
     def date(self) -> datetime.date | None:
-        """Return version date."""
+        """The version date."""
         if isinstance(self._date, datetime.datetime):
             return self._date.date()
         if isinstance(self._date, datetime.date):
@@ -154,7 +157,7 @@ class Version:
 
     @property
     def timestamp(self) -> datetime.datetime | None:
-        """Return version timestamp."""
+        """The version timestamp."""
         if isinstance(self._date, datetime.datetime):
             return self._date
         if isinstance(self._date, datetime.date):
@@ -168,44 +171,60 @@ class Version:
 
     @property
     def typed_sections(self) -> list[Section]:
-        """Return typed sections only.
-
-        Returns:
-            The typed sections.
-        """
+        """The typed sections."""
         return [section for section in self.sections_list if section.type]
 
     @property
     def untyped_section(self) -> Section | None:
-        """Return untyped section if any.
-
-        Returns:
-            The untyped section if any.
-        """
+        """Untyped section if any."""
         return self.sections_dict.get("", None)
 
     @property
     def is_major(self) -> bool:
-        """Tell if this version is a major one.
+        """Tell if the release has zero minor and patch components.
+
+        Use the planned tag for an unreleased version with a planned release.
+        Ignore prerelease and build metadata when classifying the release.
+        Return false for empty or invalid tags.
 
         Returns:
             Whether this version is major.
         """
-        return self.tag.split(".", 1)[1].startswith("0.0")
+        return self._get_release_type() == "major"
 
     @property
     def is_minor(self) -> bool:
-        """Tell if this version is a minor one.
+        """Tell if the release has a nonzero minor and zero patch components.
+
+        Use the planned tag for an unreleased version with a planned release.
+        Ignore prerelease and build metadata when classifying the release.
+        Return false for empty or invalid tags.
 
         Returns:
             Whether this version is minor.
         """
-        parts = self.tag.split(".", 2)
-        if len(parts) < 3:  # noqa: PLR2004
-            return False
-        # The patch part can carry pre-release or build metadata (`0-rc.1`, `0b1`, `0+build`).
-        patch = re.match(r"\d+", parts[2])
-        return patch is not None and int(patch.group()) == 0 and not self.is_major
+        return self._get_release_type() == "minor"
+
+    def _get_release_type(self) -> Literal["major", "minor"] | None:
+        tag = self.tag or self.planned_tag
+        if not tag:
+            return None
+
+        parsers = (self._version_parser,) if self._version_parser is not None else (parse_semver, parse_pep440)
+        for parser in parsers:
+            try:
+                parsed, _ = parser(tag)
+            except ValueError:
+                continue
+
+            # PEP 440 release tuples can omit the patch component or contain additional components.
+            release = (
+                parsed.release if isinstance(parsed, PEP440Version) else (parsed.major, parsed.minor, parsed.patch)
+            )
+            if any(release[2:]):
+                return None
+            return "minor" if parsed.minor else "major"
+        return None
 
     def add_commit(self, commit: Commit) -> None:
         """Register the given commit and add it to the relevant section based on its message convention.
@@ -545,7 +564,7 @@ class Changelog:
 
     def _create_version(self, commit: Commit) -> Version:
         date = commit.committer_date if commit.version else datetime.datetime.now().astimezone()
-        version = Version(tag=commit.version, date=date)
+        version = Version(tag=commit.version, date=date, version_parser=self.version_parser)
         if self.provider:
             version.url = self.provider.get_tag_url(tag=commit.version)
         return version
