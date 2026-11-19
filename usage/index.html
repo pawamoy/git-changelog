@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://pawamoy.github.io/git-changelog/usage/">
       
       
+      
         <link rel="prev" href="../license/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.60">
+      <meta name="generator" content="zensical-0.1.2">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.ce62732f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.ebb7f775.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -87,14 +88,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#usage" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -143,9 +141,10 @@
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.92 7.92 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.92 7.92 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.92 7.92 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.92 7.92 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69zM12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+    <label class="md-header__button md-icon" for="__drawer">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+      <span class="md-visually-hidden">Navigation</span>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -207,9 +206,10 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <label class="md-header__button md-icon" for="__search">
           
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          <span class="md-visually-hidden">Search</span>
         </label>
         <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
   <button type="button" class="md-search__button">
@@ -479,20 +479,21 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_1">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+              
   
   Home
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+              
+                
+                  
   
   
   
@@ -516,10 +517,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -543,10 +544,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -570,10 +571,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -660,6 +662,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Configuration files
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-links-and-remotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Repository links and remotes
       </span>
     </span>
   </a>
@@ -1105,18 +1118,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+              
   
   Development
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -1140,10 +1154,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1167,10 +1181,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1260,6 +1275,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Configuration files
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-links-and-remotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Repository links and remotes
       </span>
     </span>
   </a>
@@ -1619,10 +1645,12 @@
 
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
+
   
-    <a href="https://github.com/pawamoy/git-changelog/edit/master/docs/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/pawamoy/git-changelog/edit/main/docs/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-pen" viewBox="0 0 24 24"><path d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34"/><path d="M14 2v5a1 1 0 0 0 1 1h5M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z"/></svg>
     </a>
@@ -1631,7 +1659,7 @@
     
       
     
-    <a href="https://github.com/pawamoy/git-changelog/raw/master/docs/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/pawamoy/git-changelog/raw/main/docs/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-code-2" viewBox="0 0 24 24"><path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5M5 16l-3 3 3 3M9 22l3-3-3-3"/></svg>
     </a>
@@ -1756,6 +1784,30 @@ settings must be found in the appropriate section:</p>
 <span class="n">versioning</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"semver"</span>
 <span class="n">zerover</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
+<h2 id="repository-links-and-remotes">Repository links and remotes<a class="headerlink" href="#repository-links-and-remotes" title="Permanent link">¤</a></h2>
+<p>By default, changelog links use the URL of the <code>origin</code> Git remote.
+Choose another remote when working with a fork:</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--remote<span class="w"> </span>upstream
+</code></pre></div>
+<p>To supply the repository URL directly, including in clones without a remote:</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--remote-url<span class="w"> </span>https://github.com/myorg/myproject.git
+</code></pre></div>
+<p>Both settings can also be stored in a configuration file:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[tool.git-changelog]</span>
+<span class="n">remote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"upstream"</span>
+<span class="n">remote_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"https://github.com/myorg/myproject.git"</span>
+</code></pre></div>
+<p>Command-line options override configuration file values. When neither specifies
+a value, <code>GIT_CHANGELOG_REMOTE</code> selects the remote name (default: <code>origin</code>), and
+<code>GIT_CHANGELOG_REMOTE_URL</code> supplies the repository URL directly. A URL override
+takes precedence over remote-name selection, even if the name comes from the
+command line. Omit or unset the URL override to select a named Git remote.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">GIT_CHANGELOG_REMOTE</span><span class="o">=</span>upstream<span class="w"> </span>git-changelog
+<span class="nv">GIT_CHANGELOG_REMOTE_URL</span><span class="o">=</span>https://github.com/myorg/myproject.git<span class="w"> </span>git-changelog
+</code></pre></div>
+<p>SSH-style Git URLs are converted to HTTPS, the <code>.git</code> suffix is removed, and
+credentials in HTTP(S) URLs are removed before generating links. These settings
+do not modify Git configuration.</p>
 <h2 id="output-a-changelog">Output a changelog<a class="headerlink" href="#output-a-changelog" title="Permanent link">¤</a></h2>
 <p><a href="../reference/cli/#output">(--output)</a></p>
 <p>To output a changelog for the current repository (current directory),
@@ -1832,7 +1884,7 @@ scheduler: change behavior
 ci: fix pipeline for arm64
 </code></pre></div>
 <h3 id="angularkarma-convention">Angular/Karma convention<a class="headerlink" href="#angularkarma-convention" title="Permanent link">¤</a></h3>
-<p>The Angular/Karma convention initiated the <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/">Conventional Commit specification</a>.
+<p>The Angular/Karma convention initiated the <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commit specification</a>.
 It expects the following format for commit messages:</p>
 <div class="highlight"><pre><span></span><code>&lt;type&gt;[optional scope]: &lt;description&gt;
 
@@ -1902,13 +1954,16 @@ It expects the following format for commit messages:</p>
 <p>Breaking changes are detected by searching for <code>^break(s|ing changes?)?[ :]</code>
 in the commit message body.</p>
 <h3 id="conventional-commit-convention">Conventional Commit convention<a class="headerlink" href="#conventional-commit-convention" title="Permanent link">¤</a></h3>
-<p>The <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/">Conventional Commit specification</a> originates
-from the Angular commit message convention. It's basically the same thing,
-but only the <code>feat</code> and <code>fix</code> types are specified, and the rest is up to you.
-In <em>git-changelog</em> though, it is equivalent to the Angular convention,
-with an additional thing: it detects breaking changes when <code>!</code>
-appears right before the colon in the message summary
-(for example: <code>refactor!: Stuff</code>).</p>
+<p>The <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commit specification</a> originates from the Angular commit message convention. Two versions are available:</p>
+<ul>
+<li><code>conventional</code> and <code>conventional-v0</code> select the original implementation. It follows the Angular convention and also detects <code>!</code> immediately before the subject's colon, such as <code>refactor!: Remove an API</code>. Every commit that does not trigger a major or minor bump triggers a patch bump.</li>
+<li><code>conventional-v1</code> follows Conventional Commits 1.0.0. Types are case-insensitive, and custom types are accepted. Only <code>feat</code> triggers a minor bump, and only <code>fix</code> triggers a patch bump. Any type can trigger a major bump with <code>!</code> or an uppercase <code>BREAKING CHANGE:</code> or <code>BREAKING-CHANGE:</code> footer. Other commits do not trigger automatic version bumps.</li>
+</ul>
+<p>To select version 1:</p>
+<div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--convention<span class="w"> </span>conventional-v1<span class="w"> </span>--bump<span class="w"> </span>auto
+</code></pre></div>
+<p>Known types use the Angular section titles listed above. Custom types require a corresponding entry in a custom convention's <code>TYPES</code> mapping to select their sections for rendering.</p>
+<p>In Python, use <code>ConventionalCommitConventionV0</code> or <code>ConventionalCommitConventionV1</code>. <code>ConventionalCommitConvention</code> remains an alias for <code>ConventionalCommitConventionV0</code>.</p>
 <h2 id="choose-the-sections-to-render">Choose the sections to render<a class="headerlink" href="#choose-the-sections-to-render" title="Permanent link">¤</a></h2>
 <p><a href="../reference/cli/#sections">(--sections)</a></p>
 <p>Each commit message convention has a default set of sections
@@ -2161,7 +2216,8 @@ understand the impact of version changes. To quote SemVer itself:</p>
 <em>git-changelog</em> is able to guess the new version your project is supposed
 to take given a set of untagged commits (commits more recent than the latest tag).
 An "Added" (basic convention) or "feat" (Angular/Karma/ConventionalCommit) commit
-will bump the MINOR part of the latest tag. Other types will bump the PATCH part.
+will bump the MINOR part of the latest tag. Other types will bump the PATCH part, except with <code>conventional-v1</code>.
+With <code>conventional-v1</code>, only <code>fix</code> commits trigger PATCH bumps. If no commit warrants a bump, the changelog keeps an Unreleased entry.
 Commits containing breaking changes will bump the MAJOR part, unless MAJOR is 0,
 in which case they'll only bump the MINOR part.</p>
 <p>To tell <em>git-changelog</em> to try and guess the new version, use the <code>--bump=auto</code> CLI option:</p>
@@ -2568,6 +2624,7 @@ git-changelog<span class="w"> </span>--bump<span class="w"> </span><span class="
 </code></pre></div>
 <h2 id="show-bumped-version">Show bumped version<a class="headerlink" href="#show-bumped-version" title="Permanent link">¤</a></h2>
 <p>To retrieve the bumped version (for example, to pass the same version to your package builder) use the <code>--bumped-version</code> flag. This flag forces output to stdout (overriding <code>--output</code>) and sets <code>--bump</code> to <code>auto</code> if it isn’t already set.</p>
+<p>If no version bump is required, <code>--bumped-version</code> writes a message to stderr, leaves stdout empty, and exits with status 1.</p>
 <div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--bumped-version
 <span class="c1"># prints the next auto-bumped version, e.g. 1.2.3</span>
 
@@ -2585,6 +2642,7 @@ to find additional information.</p>
 <h3 id="provider-specific-references">Provider-specific references<a class="headerlink" href="#provider-specific-references" title="Permanent link">¤</a></h3>
 <p><a href="../reference/cli/#parse_refs">(--parse-refs)</a><br>
 <a href="../reference/cli/#provider">(--provider)</a></p>
+<p>List of available provider: <code>bitbucket</code>, <code>forgejo</code>, <code>github</code> and <code>gitlab</code>.</p>
 <p><em>git-changelog</em> will detect when you are using GitHub, GitLab or Bitbucket
 by checking the <code>origin</code> remote configured in your local clone
 (or the remote indicated by the value of the <code>GIT_CHANGELOG_REMOTE</code> environment variable).</p>
@@ -2682,7 +2740,7 @@ is displayed in web pages.</p>
     to match the contents of your custom template,
     with the <code>-g</code> or <code>--version-regex</code>, and <code>-m</code> or <code>--marker-line</code> CLI options:</p>
 <div class="highlight"><pre><span></span><code>git-changelog<span class="w"> </span>--output<span class="w"> </span>CHANGELOG.md<span class="w"> </span>--in-place<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--version-regex<span class="w"> </span><span class="s1">'&lt;a href="../[^"]+"&gt;(?P&lt;version&gt;[^&lt;]+)'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--version-regex<span class="w"> </span><span class="s1">'&lt;a href="[^"]+"&gt;(?P&lt;version&gt;[^&lt;]+)'</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--marker-line<span class="w"> </span><span class="s1">'&lt;!-- new entries will be injected here --&gt;'</span>
 </code></pre></div>
 </li>
@@ -3029,7 +3087,7 @@ and <code>--marker-line</code>.</p>
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -3037,10 +3095,14 @@ and <code>--marker-line</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"redirect":null,"search":"../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.88ee1349.min.js"></script>
+      <script src="../assets/javascripts/bundle.3cb411a8.min.js"></script>
       
         <script src="../js/feedback.js"></script>
       

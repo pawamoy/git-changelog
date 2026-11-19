@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://pawamoy.github.io/git-changelog/credits/">
       
       
+      
         <link rel="prev" href="../changelog/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.60">
+      <meta name="generator" content="zensical-0.1.2">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.ce62732f.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.ebb7f775.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -87,14 +88,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#exec-3--credits" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -143,9 +141,10 @@
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4.41 3 3 4.41 5.69 7.1A7.92 7.92 0 0 0 4 12c0 1.85.63 3.55 1.69 4.9L3 19.59 4.41 21l2.69-2.69A7.92 7.92 0 0 0 12 20c1.85 0 3.55-.63 4.9-1.69L19.59 21 21 19.59l-2.69-2.69A7.92 7.92 0 0 0 20 12c0-1.85-.63-3.55-1.69-4.9L21 4.41 19.59 3 16.9 5.69A7.92 7.92 0 0 0 12 4c-1.85 0-3.55.63-4.9 1.69zM12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+    <label class="md-header__button md-icon" for="__drawer">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+      <span class="md-visually-hidden">Navigation</span>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -207,9 +206,10 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <label class="md-header__button md-icon" for="__search">
           
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          <span class="md-visually-hidden">Search</span>
         </label>
         <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
   <button type="button" class="md-search__button">
@@ -484,20 +484,21 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_1">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_1">
+              <span class="md-nav__icon md-icon"></span>
+              
   
   Home
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+              
+                
+                  
   
   
   
@@ -521,10 +522,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
     
@@ -589,7 +590,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#exec-3--runtime-dependencies" class="md-nav__link">
+  <a href="#exec-1--runtime-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         Runtime dependencies
@@ -600,7 +601,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exec-3--development-dependencies" class="md-nav__link">
+  <a href="#exec-1--development-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         Development dependencies
@@ -617,10 +618,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -644,10 +645,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -777,18 +779,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+              
   
   Development
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -812,10 +815,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -839,10 +842,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -917,7 +921,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#exec-3--runtime-dependencies" class="md-nav__link">
+  <a href="#exec-1--runtime-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         Runtime dependencies
@@ -928,7 +932,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exec-3--development-dependencies" class="md-nav__link">
+  <a href="#exec-1--development-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
         Development dependencies
@@ -958,10 +962,12 @@
 
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
+
   
-    <a href="https://github.com/pawamoy/git-changelog/edit/master/docs/credits.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/pawamoy/git-changelog/edit/main/docs/credits.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-pen" viewBox="0 0 24 24"><path d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34"/><path d="M14 2v5a1 1 0 0 0 1 1h5M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z"/></svg>
     </a>
@@ -970,19 +976,19 @@
     
       
     
-    <a href="https://github.com/pawamoy/git-changelog/raw/master/docs/credits.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/pawamoy/git-changelog/raw/main/docs/credits.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-code-2" viewBox="0 0 24 24"><path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5M5 16l-3 3 3 3M9 22l3-3-3-3"/></svg>
     </a>
   
 
 
-<p><h1 id="exec-3--credits">Credits<a class="headerlink" href="#exec-3--credits" title="Permanent link">¤</a></h1>
+<p><h1 id="exec-1--credits">Credits<a class="headerlink" href="#exec-1--credits" title="Permanent link">¤</a></h1>
 <p>These projects were used to build <em>git-changelog</em>. <strong>Thank you!</strong></p>
 <p><a href="https://www.python.org/">Python</a> |
 <a href="https://github.com/astral-sh/uv">uv</a> |
 <a href="https://github.com/pawamoy/copier-uv">copier-uv</a></p>
-<h3 id="exec-3--runtime-dependencies">Runtime dependencies<a class="headerlink" href="#exec-3--runtime-dependencies" title="Permanent link">¤</a></h3>
+<h3 id="exec-1--runtime-dependencies">Runtime dependencies<a class="headerlink" href="#exec-1--runtime-dependencies" title="Permanent link">¤</a></h3>
 <table>
 <thead>
 <tr>
@@ -1005,7 +1011,7 @@
 <td><a href="https://pypi.org/project/MarkupSafe/">MarkupSafe</a></td>
 <td>Safely add untrusted strings to HTML/XML markup.</td>
 <td><code>&gt;=2.0, &gt;=1.1</code></td>
-<td><code>3.0.3</code></td>
+<td><code>3.0.4</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
@@ -1019,33 +1025,26 @@
 <td><a href="https://pypi.org/project/platformdirs/">platformdirs</a></td>
 <td>A small Python package for determining appropriate platform-specific dirs, e.g. a <code>user data dir</code>.</td>
 <td><code>&gt;=4.4, &gt;=2.2.0</code></td>
-<td><code>4.11.8</code></td>
+<td><code>4.14.7</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/semver/">semver</a></td>
 <td>Python helper for Semantic Versioning (https://semver.org)</td>
 <td><code>&gt;=3.0</code></td>
-<td><code>3.0.4</code></td>
-<td>BSD License</td>
-</tr>
-<tr>
-<td><a href="https://pypi.org/project/tomli/">tomli</a></td>
-<td>A lil' TOML parser</td>
-<td><code>&gt;=2.0</code></td>
-<td><code>2.4.1</code></td>
-<td>MIT</td>
+<td><code>3.1.2</code></td>
+<td>BSD-3-Clause</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/typing_extensions/">typing_extensions</a></td>
 <td>Backported and Experimental Type Hints for Python 3.9+</td>
-<td><code>&gt;=4.9, &gt;=4.12.0</code></td>
+<td><code>&gt;=4.9, &gt;=4.14</code></td>
 <td><code>4.16.0</code></td>
 <td>PSF-2.0</td>
 </tr>
 </tbody>
 </table>
-<h3 id="exec-3--development-dependencies">Development dependencies<a class="headerlink" href="#exec-3--development-dependencies" title="Permanent link">¤</a></h3>
+<h3 id="exec-1--development-dependencies">Development dependencies<a class="headerlink" href="#exec-1--development-dependencies" title="Permanent link">¤</a></h3>
 <table>
 <thead>
 <tr>
@@ -1068,14 +1067,14 @@
 <td><a href="https://pypi.org/project/cappa/">cappa</a></td>
 <td>Declarative CLI argument parser.</td>
 <td><code>&gt;=0.29</code></td>
-<td><code>0.32.2</code></td>
+<td><code>0.33.0</code></td>
 <td>?</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/certifi/">certifi</a></td>
 <td>Python package for providing Mozilla's CA Bundle.</td>
 <td><code>&gt;=2023.5.7</code></td>
-<td><code>2026.7.22</code></td>
+<td><code>2026.10.23</code></td>
 <td>MPL-2.0</td>
 </tr>
 <tr>
@@ -1089,14 +1088,14 @@
 <td><a href="https://pypi.org/project/charset-normalizer/">charset-normalizer</a></td>
 <td>The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet.</td>
 <td><code>&gt;=2, &lt;4</code></td>
-<td><code>3.5.1</code></td>
+<td><code>3.5.2</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/click/">click</a></td>
 <td>Composable command line interface toolkit</td>
 <td><code>&gt;=8.1.8</code></td>
-<td><code>8.5.0</code></td>
+<td><code>8.5.1</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
@@ -1110,22 +1109,15 @@
 <td><a href="https://pypi.org/project/coverage/">coverage</a></td>
 <td>Code coverage measurement for Python</td>
 <td><code>&gt;=7.10.6</code></td>
-<td><code>7.16.0</code></td>
+<td><code>7.17.3</code></td>
 <td>Apache-2.0</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/cryptography/">cryptography</a></td>
 <td>cryptography is a package which provides cryptographic recipes and primitives to Python developers.</td>
 <td><code>&gt;=2.0</code></td>
-<td><code>50.0.1</code></td>
+<td><code>50.0.2</code></td>
 <td>Apache-2.0 OR BSD-3-Clause</td>
-</tr>
-<tr>
-<td><a href="https://pypi.org/project/deepmerge/">deepmerge</a></td>
-<td>A toolset for deeply merging Python dictionaries.</td>
-<td><code>&gt;=2.0</code></td>
-<td><code>3.0.1</code></td>
-<td>MIT Licence</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/docutils/">docutils</a></td>
@@ -1138,7 +1130,7 @@
 <td><a href="https://pypi.org/project/duty/">duty</a></td>
 <td>A simple task runner.</td>
 <td><code>&gt;=1.6</code></td>
-<td><code>1.9.0</code></td>
+<td><code>1.10.1</code></td>
 <td>ISC</td>
 </tr>
 <tr>
@@ -1152,7 +1144,7 @@
 <td><a href="https://pypi.org/project/failprint/">failprint</a></td>
 <td>Run a command, print its output only if it fails.</td>
 <td><code>&gt;=1.0.5</code></td>
-<td><code>1.1.0</code></td>
+<td><code>1.1.1</code></td>
 <td>ISC</td>
 </tr>
 <tr>
@@ -1166,35 +1158,35 @@
 <td><a href="https://pypi.org/project/griffe/">griffe</a></td>
 <td>Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API.</td>
 <td><code>&gt;=2.0</code></td>
-<td><code>2.3.0</code></td>
+<td><code>2.4.1</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/griffe-inherited-docstrings/">griffe-inherited-docstrings</a></td>
 <td>Griffe extension for inheriting docstrings.</td>
 <td><code>&gt;=1.1</code></td>
-<td><code>1.1.3</code></td>
+<td><code>1.1.4</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/griffecli/">griffecli</a></td>
 <td>Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API.</td>
-<td><code>==2.3.0</code></td>
-<td><code>2.3.0</code></td>
+<td><code>==2.4.1</code></td>
+<td><code>2.4.1</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/griffelib/">griffelib</a></td>
 <td>Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API.</td>
-<td><code>==2.3.0</code></td>
-<td><code>2.3.0</code></td>
+<td><code>&gt;=2.0</code></td>
+<td><code>2.4.1</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/humanize/">humanize</a></td>
 <td>Python humanize utilities</td>
 <td><code>&gt;=4.9</code></td>
-<td><code>4.16.0</code></td>
+<td><code>4.17.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1208,14 +1200,14 @@
 <td><a href="https://pypi.org/project/idna/">idna</a></td>
 <td>Internationalized Domain Names in Applications (IDNA)</td>
 <td><code>&gt;=2.5, &lt;4</code></td>
-<td><code>3.19</code></td>
+<td><code>3.20</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/iniconfig/">iniconfig</a></td>
 <td>brain-dead simple config-ini parsing</td>
-<td><code>&gt;=1.0.1</code></td>
-<td><code>2.3.0</code></td>
+<td><code>&gt;=2</code></td>
+<td><code>2.3.1</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1263,8 +1255,8 @@
 <tr>
 <td><a href="https://pypi.org/project/Markdown/">Markdown</a></td>
 <td>Python implementation of John Gruber's Markdown.</td>
-<td><code>&gt;=3.6</code></td>
-<td><code>3.10.3</code></td>
+<td><code>&gt;=3.7</code></td>
+<td><code>3.11.3</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
@@ -1278,21 +1270,21 @@
 <td><a href="https://pypi.org/project/markdown-exec/">markdown-exec</a></td>
 <td>Utilities to execute code blocks in Markdown files.</td>
 <td><code>&gt;=1.8</code></td>
-<td><code>1.12.3</code></td>
+<td><code>1.13.0</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/markdown-it-py/">markdown-it-py</a></td>
 <td>Python port of markdown-it. Markdown parsing, done right!</td>
 <td><code>&gt;=2.2.0</code></td>
-<td><code>4.2.0</code></td>
+<td><code>4.3.0</code></td>
 <td>MIT License</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/MarkupSafe/">MarkupSafe</a></td>
 <td>Safely add untrusted strings to HTML/XML markup.</td>
 <td><code>&gt;=2.0, &gt;=1.1</code></td>
-<td><code>3.0.3</code></td>
+<td><code>3.0.4</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
@@ -1320,7 +1312,7 @@
 <td><a href="https://pypi.org/project/mkdocs-autorefs/">mkdocs-autorefs</a></td>
 <td>Automatically link across pages in MkDocs.</td>
 <td><code>&gt;=1.4</code></td>
-<td><code>1.4.4</code></td>
+<td><code>1.4.5</code></td>
 <td>ISC</td>
 </tr>
 <tr>
@@ -1334,28 +1326,28 @@
 <td><a href="https://pypi.org/project/mkdocstrings/">mkdocstrings</a></td>
 <td>Automatic documentation from sources, for MkDocs.</td>
 <td><code>&gt;=0.29</code></td>
-<td><code>1.0.6</code></td>
+<td><code>1.0.8</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/mkdocstrings-python/">mkdocstrings-python</a></td>
 <td>A Python handler for mkdocstrings.</td>
 <td><code>&gt;=1.16.2</code></td>
-<td><code>2.0.8</code></td>
+<td><code>2.0.11</code></td>
 <td>ISC</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/more-itertools/">more-itertools</a></td>
 <td>More routines for operating on iterables, beyond itertools</td>
 <td></td>
-<td><code>11.1.0</code></td>
+<td><code>11.2.1</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/nh3/">nh3</a></td>
 <td>Python binding to Ammonia HTML sanitizer Rust crate</td>
 <td><code>&gt;=0.2.14</code></td>
-<td><code>0.3.7</code></td>
+<td><code>0.3.8</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1368,7 +1360,7 @@
 <tr>
 <td><a href="https://pypi.org/project/pathspec/">pathspec</a></td>
 <td>Utility library for gitignore style pattern matching of file paths.</td>
-<td><code>&gt;=0.11.1</code></td>
+<td><code>&gt;=1.0.4</code></td>
 <td><code>1.1.1</code></td>
 <td>Mozilla Public License 2.0 (MPL 2.0)</td>
 </tr>
@@ -1376,14 +1368,14 @@
 <td><a href="https://pypi.org/project/platformdirs/">platformdirs</a></td>
 <td>A small Python package for determining appropriate platform-specific dirs, e.g. a <code>user data dir</code>.</td>
 <td><code>&gt;=4.4, &gt;=2.2.0</code></td>
-<td><code>4.11.8</code></td>
+<td><code>4.14.7</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/pluggy/">pluggy</a></td>
 <td>plugin and hook calling mechanisms for python</td>
-<td><code>&gt;=1.5, &lt;2</code></td>
-<td><code>1.6.0</code></td>
+<td><code>&gt;=1.2</code></td>
+<td><code>1.7.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1397,28 +1389,28 @@
 <td><a href="https://pypi.org/project/pycparser/">pycparser</a></td>
 <td>C parser in Python</td>
 <td></td>
-<td><code>3.0</code></td>
+<td><code>3.12</code></td>
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/Pygments/">Pygments</a></td>
 <td>Pygments is a syntax highlighting package written in Python.</td>
-<td><code>&gt;=2.7.2</code></td>
+<td><code>&gt;=2.20</code></td>
 <td><code>2.21.0</code></td>
 <td>BSD-2-Clause</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/pymdown-extensions/">pymdown-extensions</a></td>
 <td>Extension pack for Python Markdown.</td>
-<td><code>&gt;=6.3</code></td>
-<td><code>11.0.2</code></td>
+<td><code>&gt;=11.0</code></td>
+<td><code>13.1</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/pytest/">pytest</a></td>
 <td>pytest: simple powerful testing with Python</td>
 <td><code>&gt;=8.2</code></td>
-<td><code>9.1.1</code></td>
+<td><code>9.2.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1439,7 +1431,7 @@
 <td><a href="https://pypi.org/project/pytest-randomly/">pytest-randomly</a></td>
 <td>Pytest plugin to randomly order tests and control random.seed.</td>
 <td><code>&gt;=3.15</code></td>
-<td><code>5.0.0</code></td>
+<td><code>5.1.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1453,13 +1445,13 @@
 <td><a href="https://pypi.org/project/python-dateutil/">python-dateutil</a></td>
 <td>Extensions to the standard Python datetime module</td>
 <td><code>&gt;=2.8.1</code></td>
-<td><code>2.9.0.post0</code></td>
-<td>BSD License + Apache Software License</td>
+<td><code>4.0.0</code></td>
+<td>BSD-3-Clause</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/PyYAML/">PyYAML</a></td>
 <td>YAML parser and emitter for Python</td>
-<td></td>
+<td><code>&gt;=6.0.2</code></td>
 <td><code>6.0.3</code></td>
 <td>MIT</td>
 </tr>
@@ -1509,7 +1501,7 @@
 <td><a href="https://pypi.org/project/ruff/">ruff</a></td>
 <td>An extremely fast Python linter and code formatter, written in Rust.</td>
 <td><code>&gt;=0.4</code></td>
-<td><code>0.16.6</code></td>
+<td><code>0.17.5</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1520,17 +1512,10 @@
 <td>BSD-3-Clause</td>
 </tr>
 <tr>
-<td><a href="https://pypi.org/project/six/">six</a></td>
-<td>Python 2 and 3 compatibility utilities</td>
-<td><code>&gt;=1.5</code></td>
-<td><code>1.17.0</code></td>
-<td>MIT</td>
-</tr>
-<tr>
 <td><a href="https://pypi.org/project/tomli/">tomli</a></td>
 <td>A lil' TOML parser</td>
-<td><code>&gt;=2.0</code></td>
-<td><code>2.4.1</code></td>
+<td><code>&gt;=2.4.0</code></td>
+<td><code>2.5.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
@@ -1551,7 +1536,7 @@
 <td><a href="https://pypi.org/project/ty/">ty</a></td>
 <td>An extremely fast Python type checker, written in Rust.</td>
 <td><code>&gt;=0.0.14</code></td>
-<td><code>0.0.80</code></td>
+<td><code>0.0.107</code></td>
 <td>MIT License</td>
 </tr>
 <tr>
@@ -1565,35 +1550,42 @@
 <td><a href="https://pypi.org/project/types-Markdown/">types-Markdown</a></td>
 <td>Typing stubs for Markdown</td>
 <td><code>&gt;=3.6</code></td>
-<td><code>3.10.2.20260712</code></td>
+<td><code>3.11.3.20261108</code></td>
 <td>Apache-2.0</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/types-PyYAML/">types-PyYAML</a></td>
 <td>Typing stubs for PyYAML</td>
 <td><code>&gt;=6.0</code></td>
-<td><code>6.0.12.20260906</code></td>
+<td><code>6.0.12.20261113</code></td>
 <td>Apache-2.0</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/typing_extensions/">typing_extensions</a></td>
 <td>Backported and Experimental Type Hints for Python 3.9+</td>
-<td><code>&gt;=4.9, &gt;=4.12.0</code></td>
+<td><code>&gt;=4.9, &gt;=4.14</code></td>
 <td><code>4.16.0</code></td>
 <td>PSF-2.0</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/tzdata/">tzdata</a></td>
+<td>Provider of IANA time zone data</td>
+<td></td>
+<td><code>2026.6</code></td>
+<td>Apache-2.0</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/urllib3/">urllib3</a></td>
 <td>HTTP library with thread-safe connection pooling, file post, and more.</td>
 <td><code>&gt;=1.26.0</code></td>
-<td><code>2.7.0</code></td>
+<td><code>2.8.0</code></td>
 <td>MIT</td>
 </tr>
 <tr>
 <td><a href="https://pypi.org/project/watchdog/">watchdog</a></td>
 <td>Filesystem events monitoring</td>
 <td><code>&gt;=2.0</code></td>
-<td><code>6.0.0</code></td>
+<td><code>7.1.0</code></td>
 <td>Apache-2.0</td>
 </tr>
 <tr>
@@ -1607,7 +1599,21 @@
 <td><a href="https://pypi.org/project/zensical/">zensical</a></td>
 <td>A modern static site generator built by the creators of Material for MkDocs</td>
 <td><code>&gt;=0.0.21</code></td>
-<td><code>0.0.60</code></td>
+<td><code>0.1.2</code></td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/zensical-ui/">zensical-ui</a></td>
+<td>Templates and browser assets for Zensical</td>
+<td><code>==0.0.42</code></td>
+<td><code>0.0.42</code></td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/zizmor/">zizmor</a></td>
+<td>Static analysis for GitHub Actions</td>
+<td><code>&gt;=1.0</code></td>
+<td><code>1.32.0</code></td>
 <td>MIT</td>
 </tr>
 </tbody>
@@ -1888,7 +1894,7 @@
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -1896,10 +1902,14 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.action.edit","content.action.view","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.tabs","navigation.tabs.sticky","navigation.top","search.highlight","toc.follow"],"redirect":null,"search":"../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.88ee1349.min.js"></script>
+      <script src="../assets/javascripts/bundle.3cb411a8.min.js"></script>
       
         <script src="../js/feedback.js"></script>
       
