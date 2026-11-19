@@ -49,7 +49,7 @@ class _Trailers(list[tuple[str, str]]):
     def _dict(self) -> dict[str, str]:
         return dict(iter(self))
 
-    def __contains__(self, key: str | tuple[str, str]) -> bool:  # ty:ignore[invalid-method-override]
+    def __contains__(self, key: str | tuple[str, str]) -> bool:  # ty:ignore[incompatible-method-override]
         if isinstance(key, str):
             warnings.warn(
                 "Checking membership of a string in trailers will stop being supported in version 3.",

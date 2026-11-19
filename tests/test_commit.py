@@ -49,13 +49,13 @@ def test_trailers_emit_deprecation_warnings() -> None:
         parse_trailers=True,
     )
     with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
-        assert not commit.trailers.keys()  # ty:ignore[unresolved-attribute]
+        assert not commit.trailers.keys()  # ty:ignore[missing-attribute]
     with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
-        assert not commit.trailers.values()  # ty:ignore[unresolved-attribute]
+        assert not commit.trailers.values()  # ty:ignore[missing-attribute]
     with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
-        assert not commit.trailers.items()  # ty:ignore[unresolved-attribute]
+        assert not commit.trailers.items()  # ty:ignore[missing-attribute]
     with pytest.warns(DeprecationWarning, match="Trailers are now a list of 2-tuples."):
-        assert not commit.trailers.get("key")  # ty:ignore[unresolved-attribute]
+        assert not commit.trailers.get("key")  # ty:ignore[missing-attribute]
     with (
         pytest.warns(
             DeprecationWarning,
