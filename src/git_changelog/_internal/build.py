@@ -434,8 +434,17 @@ class Changelog:
             remote = self._remote or os.environ.get("GIT_CHANGELOG_REMOTE", "origin")
             git_url = self.run_git("config", "--default", "", "--get", f"remote.{remote}.url")
         git_url = git_url.rstrip("\n")
-        if git_url.startswith("git@"):
+
+        if git_url.startswith(("ssh://", "git+ssh://", "ssh+git://")):
+            # ssh://[user@]host[:port]/path -> https://host/path
+            # The SSH port is dropped: it doesn't apply to the HTTPS web URL.
+            urlparts = urlsplit(git_url)
+            host = urlparts.hostname or ""
+            git_url = urlunsplit(("https", host, urlparts.path, "", ""))
+        elif git_url.startswith("git@"):
+            # scp-like syntax: git@host:path -> https://host/path
             git_url = git_url.replace(":", "/", 1).replace("git@", "https://", 1)
+
         git_url = git_url.removesuffix(".git")
 
         # Remove credentials from the URL.

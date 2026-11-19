@@ -37,6 +37,11 @@ def test_named_remote_overrides_environment(repo: GitRepo, monkeypatch: pytest.M
     [
         ("https://github.com/upstream/project.git", "https://github.com/upstream/project"),
         ("git@github.com:upstream/project.git", "https://github.com/upstream/project"),
+        ("git+ssh://git@github.com/org/repo.git", "https://github.com/org/repo"),
+        ("ssh+git://git@github.com/org/repo.git", "https://github.com/org/repo"),
+        ("ssh://git@github.com/org/repo.git", "https://github.com/org/repo"),
+        ("ssh://git@github.com:2222/org/repo.git", "https://github.com/org/repo"),
+        ("ssh://user:secret@git.example.com/org/repo", "https://git.example.com/org/repo"),
         ("https://gitlab.com/group/subgroup/project.git", "https://gitlab.com/group/subgroup/project"),
         ("https://user:secret@example.org/group/project.git", "https://example.org/group/project"),
     ],
