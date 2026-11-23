@@ -497,7 +497,7 @@ def test_removing_credentials_from_remotes(repo: GitRepo) -> None:
         "user:password",
     ]
     for creds in credentials:
-        repo.git("remote", "set-url", "origin", f"https://{creds}@github.com:example/example")
+        repo.git("remote", "set-url", "origin", f"https://{creds}@github.com/example/example")
         changelog = Changelog(repo.path)
         assert creds not in changelog.remote_url
         assert urlunsplit(urlsplit(changelog.remote_url)) == changelog.remote_url
