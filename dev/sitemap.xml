@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/changelog/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/code_of_conduct/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/contributing/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/credits/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/license/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/reference/api/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/reference/cli/</loc>
+      </url>
+      <url>
+        <loc>https://pawamoy.github.io/git-changelog/dev/usage/</loc>
+      </url>
+</urlset>
