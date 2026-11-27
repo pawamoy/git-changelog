@@ -6,6 +6,7 @@ import datetime  # noqa: ICN001
 import os
 import sys
 import warnings
+from graphlib import TopologicalSorter
 from subprocess import CalledProcessError, check_output
 from typing import TYPE_CHECKING, ClassVar, Literal
 from urllib.parse import urlsplit, urlunsplit
@@ -404,6 +405,8 @@ class Changelog:
         self.versions_dict = v_dict
         """The dictionary of versions."""
 
+        self._cancel_reverted_commits()
+
         # YORE: Bump 3: Remove block.
         if bump_latest:
             warnings.warn(
@@ -583,6 +586,33 @@ class Changelog:
             version.url = self.provider.get_tag_url(tag=commit.version)
         return version
 
+    def _cancel_reverted_commits(self) -> None:
+        """Exclude revert pairs within each version from sections and automatic bumps.
+
+        Keep all commits in the history so tags, parent links, and comparison URLs remain available.
+        """
+        commits = {commit.hash: commit for commit in self.commits}
+        revert_order = TopologicalSorter[str]()
+        for commit in self.commits:
+            if commit.revert_hash and commit.revert_hash in commits:
+                revert_order.add(commit.revert_hash, commit.hash)
+
+        # Process reverts before their targets so reverting a revert restores the original change.
+        # Neither commit dates nor breadth-first version traversal guarantee this order after merges.
+        for commit_hash in revert_order.static_order():
+            commit = commits[commit_hash]
+            if commit.reverted or not commit.revert_hash:
+                continue
+            original = commits.get(commit.revert_hash)
+            if original and not original.reverted and original.version == commit.version:
+                commit.reverted = original.reverted = True
+
+        for version in self.versions_list:
+            for section in version.sections_list:
+                section.commits = [commit for commit in section.commits if not commit.reverted]
+            version.sections_list = [section for section in version.sections_list if section.commits]
+            version.sections_dict = {section.type: section for section in version.sections_list}
+
     def _assign_previous_versions(self, versions_dict: dict[str, Version], previous_versions: dict[str, str]) -> None:
         """Assign each version its previous version and create the compare URL.
 
@@ -620,6 +650,8 @@ class Changelog:
                 # Guess the next version number based on last version and recent commits.
                 version = ""
                 for commit in last_version.commits:
+                    if commit.reverted:
+                        continue
                     if commit.convention["is_major"]:
                         version = "major"
                         break

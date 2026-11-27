@@ -46,6 +46,164 @@ def test_version_breaking_changes() -> None:
     assert Version().breaking_changes == []
 
 
+@pytest.mark.parametrize("convention", ["basic", "linux", "angular", "conventional-v0", "conventional-v1"])
+@pytest.mark.parametrize("tagged", [False, True])
+def test_reverted_commits_cancel_within_version(repo: GitRepo, convention: str, tagged: bool) -> None:
+    """Canceled changes disappear from every rendered section and do not trigger a bump."""
+    repo.tag("1.0.0")
+    original = repo.commit("feat: Add a feature")
+    repo.git("revert", "--no-edit", original)
+    revert = repo.git("rev-parse", "HEAD").strip()
+    if tagged:
+        repo.tag("1.1.0")
+
+    changelog = Changelog(repo.path, convention=convention, sections=[":all:"], include_all=True, bump="auto")
+
+    latest = changelog.versions_list[0]
+    assert latest.sections_list == []
+    assert latest.sections_dict == {}
+    assert latest.planned_tag is None
+    assert latest.tag == ("1.1.0" if tagged else "")
+    assert latest.previous_version is not None
+    assert latest.previous_version.tag == "1.0.0"
+    assert latest.compare_url.endswith(f"1.0.0...{'1.1.0' if tagged else 'HEAD'}")
+
+    # Preserve the complete history for callers and for Git graph traversal.
+    assert {commit.hash for commit in latest.commits} == {original, revert}
+    assert all(commit.reverted for commit in latest.commits)
+
+    rendered = get_template("keepachangelog").render(changelog=changelog)
+    assert "Add a feature" not in rendered
+    assert "### Features" not in rendered
+    assert "### Reverts" not in rendered
+
+
+@pytest.mark.parametrize("convention", ["angular", "conventional-v0", "conventional-v1"])
+def test_revert_preserves_previous_release(repo: GitRepo, convention: str) -> None:
+    """Reverting a released change preserves its original entry and renders the new revert."""
+    original = repo.commit("feat: Add a feature")
+    repo.tag("1.0.0")
+    repo.git("revert", "--no-edit", original)
+
+    changelog = Changelog(repo.path, convention=convention)
+
+    latest, released = changelog.versions_list
+    assert len(latest.sections_dict["Reverts"].commits) == 1
+    assert released.sections_dict["Features"].commits[0].hash == original
+    assert not any(commit.reverted for commit in changelog.commits)
+
+    rendered = get_template("keepachangelog").render(changelog=changelog)
+    assert 'Revert "feat: Add a feature"' in rendered
+    assert "### Features" in rendered
+    assert "### Reverts" in rendered
+
+
+@pytest.mark.parametrize("revert_count", [1, 2, 3, 4])
+def test_reverting_reverts(repo: GitRepo, revert_count: int) -> None:
+    """An even number of reverts restores the original feature and its minor bump."""
+    repo.tag("1.0.0")
+    original = repo.commit("feat: Add a feature")
+    for _ in range(revert_count):
+        repo.git("revert", "--no-edit", "HEAD")
+
+    changelog = Changelog(repo.path, convention="conventional-v1", bump="auto")
+
+    latest = changelog.versions_list[0]
+    if revert_count % 2:
+        assert latest.sections_list == []
+        assert latest.planned_tag is None
+    else:
+        assert latest.sections_dict["Features"].commits[0].hash == original
+        assert "Reverts" not in latest.sections_dict
+        assert latest.planned_tag == "1.1.0"
+
+
+@pytest.mark.parametrize("convention", ["angular", "conventional-v0", "conventional-v1"])
+@pytest.mark.parametrize("subject", ["feat: Add a feature", "feat!: Change the API"])
+def test_reverted_changes_do_not_affect_remaining_bump(repo: GitRepo, convention: str, subject: str) -> None:
+    """A remaining fix triggers only a patch bump after a feature or breaking change is reverted."""
+    repo.tag("1.0.0")
+    original = repo.commit(subject)
+    repo.git("revert", "--no-edit", original)
+    fix = repo.commit("fix: Correct a bug")
+
+    changelog = Changelog(repo.path, convention=convention, bump="auto", zerover=False)
+
+    latest = changelog.versions_list[0]
+    assert latest.planned_tag == "1.0.1"
+    assert list(latest.sections_dict) == ["Bug Fixes"]
+    assert latest.sections_dict["Bug Fixes"].commits[0].hash == fix
+
+
+def test_revert_in_merged_branch(repo: GitRepo) -> None:
+    """Cancel reverts even when version graph traversal visits the original commit first."""
+    repo.tag("1.0.0")
+    original = repo.commit("feat: Add a feature")
+    repo.branch("revert-feature")
+    repo.checkout("revert-feature")
+    repo.git("revert", "--no-edit", original)
+    repo.checkout("main")
+    repo.merge("revert-feature")
+
+    changelog = Changelog(repo.path, convention="conventional-v1", bump="auto")
+
+    latest = changelog.versions_list[0]
+    assert "Features" not in latest.sections_dict
+    assert "Reverts" not in latest.sections_dict
+    assert latest.planned_tag is None
+
+
+def test_revert_chain_with_out_of_order_commit_dates(repo: GitRepo, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A restored feature survives even if Git lists the first revert before its own revert."""
+    repo.tag("1.0.0")
+    original = repo.commit("feat: Add a feature")
+    repo.git("revert", "--no-edit", original)
+    repo.branch("restore-feature")
+    repo.checkout("restore-feature")
+
+    # Simulate a contributor whose clock is behind the other branch's clock.
+    with monkeypatch.context() as context:
+        context.setenv("GIT_COMMITTER_DATE", "2000-01-01T00:00:00+00:00")
+        repo.git("revert", "--no-edit", "HEAD")
+
+    repo.checkout("main")
+    repo.commit("docs: Explain the feature")
+    repo.merge("restore-feature")
+
+    changelog = Changelog(repo.path, convention="conventional-v1", bump="auto")
+
+    latest = changelog.versions_list[0]
+    assert latest.sections_dict["Features"].commits[0].hash == original
+    assert "Reverts" not in latest.sections_dict
+    assert latest.planned_tag == "1.1.0"
+
+
+def test_revert_target_outside_revision_range(repo: GitRepo) -> None:
+    """Keep a revert whose original commit is excluded by the revision filter."""
+    original = repo.commit("feat: Add a feature")
+    repo.git("revert", "--no-edit", original)
+
+    changelog = Changelog(repo.path, convention="angular", filter_commits=f"{original}..HEAD")
+
+    latest = changelog.versions_list[0]
+    assert len(latest.commits) == 1
+    assert latest.sections_dict["Reverts"].commits == latest.commits
+    assert not latest.commits[0].reverted
+
+
+def test_conventional_revert_message(repo: GitRepo) -> None:
+    """Conventional revert subjects use the same cancellation as Git's default subject."""
+    repo.tag("1.0.0")
+    original = repo.commit("feat: Add a feature")
+    repo.git("revert", "--no-edit", original)
+    repo.git("commit", "--amend", "-m", f"revert: Undo a feature\n\nThis reverts commit {original}.")
+
+    changelog = Changelog(repo.path, convention="angular", bump="auto")
+
+    assert changelog.versions_list[0].sections_list == []
+    assert changelog.versions_list[0].planned_tag is None
+
+
 @pytest.mark.parametrize(
     ("versioning", "bump", "expected"),
     [

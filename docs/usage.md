@@ -361,6 +361,16 @@ The plural `BREAKING CHANGES:` and dashed `BREAKING-CHANGE:` spellings do not st
 
 For breaking commits that have no breaking change section, the description uses the parsed subject.
 
+### Reverted commits
+
+*git-changelog* recognizes the `This reverts commit <hash>.` line that `git revert` adds to commit bodies. The hash must be a full SHA-1 or SHA-256 commit hash.
+
+When a commit and its revert belong to the same version, both disappear from the rendered sections. Neither commit contributes to automatic version bumps. Reverting the revert restores the original entry and its version bump.
+
+When the original commit belongs to an earlier version, its entry stays in that version. The revert follows the selected convention's version bump rules. With the Angular and Conventional Commit conventions, Git's default revert message appears in the Reverts section.
+
+In Python, `Commit.revert_hash` identifies the original commit. `Commit.reverted` identifies commits in canceled pairs. `Changelog.commits` and `Version.commits` retain the complete history, including canceled commits.
+
 ## Choose the sections to render
 
 [(--sections)](reference/cli.md#sections)

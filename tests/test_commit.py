@@ -217,6 +217,26 @@ def test_breaking_prefix_with_unrecognized_marker(marker: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("body", "expected_hash"),
+    [
+        ([f"This reverts commit {'a' * 40}."], "a" * 40),
+        (["Explanation.", "", f"This reverts commit {'b' * 64}."], "b" * 64),
+        (["This reverts commit abcdefg."], None),
+        ([f"This reverts commit {'g' * 40}."], None),
+        ([f"Example: This reverts commit {'a' * 40}."], None),
+        ([f"This reverts commit {'a' * 40}. More text."], None),
+        ([], None),
+    ],
+)
+def test_revert_hash(body: list[str], expected_hash: str | None) -> None:
+    """Recognize Git's revert marker without treating ordinary prose as a revert."""
+    commit = Commit(commit_hash="c" * 40, subject='Revert "Add a feature"', body=body)
+
+    assert commit.revert_hash == expected_hash
+    assert not commit.reverted
+
+
+@pytest.mark.parametrize(
     ("body", "expected_trailers"),
     [
         ("t1: v1\nt2: v2", [("t1", "v1"), ("t2", "v2")]),  # ok

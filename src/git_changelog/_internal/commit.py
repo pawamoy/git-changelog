@@ -188,6 +188,17 @@ class Commit:
         """The commit subject."""
         self.body: list[str] = _clean_body(body) if body else []
         """The commit body."""
+        self.revert_hash: str | None = next(
+            (
+                match[1]
+                for line in self.body
+                if (match := re.fullmatch(r"This reverts commit ([0-9a-f]{40}|[0-9a-f]{64})\.", line))
+            ),
+            None,
+        )
+        """The hash reverted by this commit, as recorded by `git revert`."""
+        self.reverted: bool = False
+        """Whether this commit belongs to a canceled revert pair within its version."""
         self.url: str = url
         """The commit URL."""
 
@@ -243,6 +254,8 @@ class Commit:
         """
         self.convention.update(convention.parse_commit(self))
         self.breaking_changes = convention.parse_breaking_changes(self)
+        if self.revert_hash and not self.convention.get("type") and "revert" in convention.TYPES:
+            self.convention["type"] = convention.TYPES["revert"]
 
     def update_with_provider(
         self,
