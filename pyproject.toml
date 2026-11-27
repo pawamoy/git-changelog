@@ -46,7 +46,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://pawamoy.github.io/git-changelog"
 Documentation = "https://pawamoy.github.io/git-changelog"
-Changelog = "https://pawamoy.github.io/git-changelog/changelog"
+Changelog = "https://pawamoy.github.io/git-changelog/latest/changelog/"
 Repository = "https://github.com/pawamoy/git-changelog"
 Issues = "https://github.com/pawamoy/git-changelog/issues"
 Discussions = "https://github.com/pawamoy/git-changelog/discussions"
@@ -86,7 +86,6 @@ data = [
 [dependency-groups]
 maintain = [
     "git-changelog>=2.5",
-    "twine>=5.1",
     "yore>=0.3.3",
 ]
 ci = [
@@ -106,12 +105,13 @@ ci = [
     "zizmor>=1.0",
 ]
  docs = [
-    "ghp-import>=2.1",
     "griffe-inherited-docstrings>=1.1",
     "markdown-callouts>=0.4",
     "markdown-exec>=1.8",
+    # Zensical requires its compatible Mike fork until native versioning is available.
+    "mike @ git+https://github.com/squidfunk/mike.git@2d4ad799442f4592db8ad53b179bfb33db8c69ac",
     "mkdocstrings[python]>=0.29",
-    "zensical>=0.0.21",
+    "zensical>=0.1",
 ]
 
 [tool.uv]

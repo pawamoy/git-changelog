@@ -1,4 +1,4 @@
-name: ci
+name: Check/Test
 
 on:
   push:
@@ -28,7 +28,7 @@ env:
 
 jobs:
 
-  quality:
+  check:
     strategy:
       matrix:
         os:
@@ -88,10 +88,10 @@ jobs:
         name: objects.inv
         path: site/objects.inv
 
-  tests:
+  test:
 
     needs:
-    - quality
+    - check
     strategy:
       matrix:
         os:

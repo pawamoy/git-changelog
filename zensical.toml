@@ -2,13 +2,13 @@
 site_name = "git-changelog"
 site_description = "Automatic Changelog generator using Jinja2 templates."
 site_author = "Timothée Mazzucotelli"
-site_url = "https://pawamoy.github.io/git-changelog"
+site_url = "https://pawamoy.github.io/git-changelog/"
 repo_url = "https://github.com/pawamoy/git-changelog"
 repo_name = "pawamoy/git-changelog"
 edit_uri = "edit/main/docs/"
 copyright = "Copyright &copy; 2020 Timothée Mazzucotelli"
-extra_css = ["css/apidocs.css", "css/pyodide.css"]
-extra_javascript = ["js/feedback.js", "js/pyodide.js"]
+extra_css = ["assets/css/apidocs.css"]
+extra_javascript = ["assets/js/feedback.js"]
 nav = [
   { "Home" = [
     { "Overview" = "index.md" },
@@ -31,6 +31,7 @@ nav = [
 # ----------------------------------------------------------------------------
 [project.theme]
 custom_dir = "docs/.overrides"
+favicon = "assets/img/favicon.svg"
 language = "en"
 features = [
     "announce.dismiss",
@@ -80,8 +81,12 @@ toggle.name = "Switch to system preference"
 logo = "material/currency-sign"
 
 # ----------------------------------------------------------------------------
-# Social configuration
+# Extra configuration
 # ----------------------------------------------------------------------------
+[project.extra.version]
+provider = "mike"
+default = "latest"
+
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/pawamoy"
@@ -173,6 +178,22 @@ configurations = [{targets.include = ["reference/api.md"]}]
 # ----------------------------------------------------------------------------
 # Plugins configuration
 # ----------------------------------------------------------------------------
+[project.plugins.llmstxt]
+full_output = "llms-full.txt"
+
+[project.plugins.llmstxt.sections]
+Usage = ["index.md"]
+API = ["reference/api.md"]
+
+[project.plugins.minify]
+minify_html = true
+minify_js = true
+minify_css = true
+minify_inline_js = true
+minify_inline_css = true
+js_files = ["assets/js/feedback.js"]
+css_files = ["assets/css/apidocs.css"]
+
 [project.plugins.mkdocstrings.handlers.python]
 paths = ["src"]
 inventories = ["https://docs.python.org/3/objects.inv"]
@@ -197,3 +218,8 @@ show_symbol_type_toc = true
 signature_crossrefs = true
 summary = true
 unwrap_annotated = true
+
+[project.plugins.optimize]
+optimize_exclude = ["assets/images/favicon.png"]
+
+[project.plugins.privacy]

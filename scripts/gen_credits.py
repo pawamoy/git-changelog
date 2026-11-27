@@ -65,7 +65,11 @@ def _extra_marker(req: Requirement) -> str | None:
     if not req.marker:
         return None
     try:
-        return next(marker[2].value for marker in req.marker._markers if getattr(marker[0], "value", None) == "extra")  # ty:ignore[missing-union-attribute]
+        return next(
+            marker[2].value
+            for marker in req.marker._markers
+            if isinstance(marker, tuple) and getattr(marker[0], "value", None) == "extra"
+        )
     except StopIteration:
         return None
 
@@ -74,7 +78,7 @@ def _get_metadata() -> Metadata:
     metadata = {}
     for pkg in distributions():
         name = _norm_name(pkg.name)
-        metadata[name] = _merge_fields(pkg.metadata)  # ty: ignore[invalid-argument-type]
+        metadata[name] = _merge_fields(pkg.metadata)  # ty:ignore[invalid-argument-type]
         metadata[name]["spec"] = set()
         metadata[name]["extras"] = set()
         metadata[name].setdefault("summary", "")
@@ -101,8 +105,8 @@ def _get_deps(base_deps: dict[str, Requirement], metadata: Metadata) -> Metadata
     for dep_name, dep_req in base_deps.items():
         if dep_name not in metadata or dep_name == "git-changelog":
             continue
-        metadata[dep_name]["spec"] |= {str(spec) for spec in dep_req.specifier}  # ty: ignore[unsupported-operator]
-        metadata[dep_name]["extras"] |= dep_req.extras  # ty: ignore[unsupported-operator]
+        metadata[dep_name]["spec"] |= {str(spec) for spec in dep_req.specifier}  # ty:ignore[unsupported-operator]
+        metadata[dep_name]["extras"] |= dep_req.extras  # ty:ignore[unsupported-operator]
         deps[dep_name] = metadata[dep_name]
 
     again = True
@@ -120,7 +124,7 @@ def _get_deps(base_deps: dict[str, Requirement], metadata: Metadata) -> Metadata
                         and dep_name != project["name"]
                         and (not extra_marker or extra_marker in deps[pkg_name]["extras"])
                     ):
-                        metadata[dep_name]["spec"] |= {str(spec) for spec in requirement.specifier}  # ty: ignore[unsupported-operator]
+                        metadata[dep_name]["spec"] |= {str(spec) for spec in requirement.specifier}  # ty:ignore[unsupported-operator]
                         deps[dep_name] = metadata[dep_name]
                         again = True
 

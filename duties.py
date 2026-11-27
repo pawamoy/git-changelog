@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import os
 import re
+import shlex
 import sys
 from cProfile import Profile
 from pathlib import Path
@@ -56,7 +57,7 @@ def pyprefix(title: str) -> str:
 def _get_changelog_version() -> str:
     changelog_version_re = re.compile(r"^## \[(\d+\.\d+\.\d+)\].*$")
     with Path(__file__).parent.joinpath("CHANGELOG.md").open("r", encoding="utf8") as file:
-        return next(filter(bool, map(changelog_version_re.match, file))).group(1)  # ty: ignore[missing-union-attribute]
+        return next(filter(bool, map(changelog_version_re.match, file))).group(1)  # ty:ignore[missing-union-attribute]
 
 
 @duty
@@ -149,23 +150,33 @@ def docs(ctx: Context, *cli_args: str, host: str = "127.0.0.1", port: int = 8000
 
 
 @duty
-def docs_deploy(ctx: Context) -> None:
-    """Deploy the documentation to GitHub pages."""
-    from ghp_import import ghp_import  # noqa: PLC0415
+def docs_deploy(ctx: Context, version: str = "") -> None:
+    """Deploy versioned documentation to GitHub Pages.
 
-    ctx.run(tools.zensical.build(), title="Building documentation site")
+    Parameters:
+        version: Documentation version. Default to the current tag, or `dev` for untagged commits.
+    """
+    if not version:
+        version = ctx.run(
+            ["git", "describe", "--tags", "--exact-match"],
+            capture="stdout",
+            silent=True,
+            nofail=True,
+        ).strip()
+    version = version or "dev"
+    stable = version != "dev"
+    aliases = ["latest"] if stable else []
     ctx.run(
-        ghp_import,
-        kwargs={
-            "srcdir": "site",
-            "mesg": "chore: Update documentation",
-            "push": True,
-            "force": True,
-        },
-        title="Deploying site to GitHub Pages",
-        command="ghp-import site -fpm 'chore: Update documentation'",
+        ["mike", "deploy", "--push", "--update-aliases", version, *aliases],
+        title=f"Deploying documentation for {version}",
         pty=PTY,
     )
+    if stable:
+        ctx.run(
+            ["mike", "set-default", "--push", "latest"],
+            title="Redirecting the documentation root to the latest release",
+            pty=PTY,
+        )
 
 
 @duty
@@ -203,10 +214,11 @@ def publish(ctx: Context) -> None:
             silent=True,
             allow_overrides=False,
         ).strip()
+    command = ["uv", "publish", *dists]
     ctx.run(
-        tools.twine.upload(*dists, skip_existing=True, password=password),
+        [*command, "--password", password] if password is not None else command,
         # Keep the password out of the displayed command, including on failure.
-        command=tools.twine.upload(*dists, skip_existing=True).cli_command,
+        command=shlex.join(command),
         title="Publishing distributions to PyPI",
         pty=PTY,
     )
