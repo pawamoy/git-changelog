@@ -1,12 +1,18 @@
-<!doctype html>
-<!-- copier-uv: redirects to versioned documentation -->
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8">
-<title>Redirecting</title>
-<link rel="canonical" href="latest/">
-<script>window.location.replace("latest/" + window.location.search + window.location.hash);</script>
-<meta http-equiv="refresh" content="0; url=latest/">
+  <meta charset="utf-8">
+  <title>Redirecting</title>
+  <noscript>
+    <meta http-equiv="refresh" content="1; url=latest/" />
+  </noscript>
+  <script>
+    window.location.replace(
+      "latest/" + window.location.search + window.location.hash
+    );
+  </script>
 </head>
-<body><a href="latest/">Continue to the latest documentation.</a></body>
+<body>
+  Redirecting to <a href="latest/">latest/</a>...
+</body>
 </html>
