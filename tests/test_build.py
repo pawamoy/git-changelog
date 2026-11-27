@@ -11,6 +11,7 @@ from git_changelog import (
     AngularConvention,
     BasicConvention,
     Changelog,
+    Commit,
     ConventionalCommitConventionV0,
     ConventionalCommitConventionV1,
     Version,
@@ -21,6 +22,28 @@ from git_changelog import (
 
 if TYPE_CHECKING:
     from tests.helpers import GitRepo
+
+
+def test_version_breaking_changes() -> None:
+    """Aggregate descriptions for initial commits and commits added later, regardless of tag."""
+    first = Commit(
+        "aaaaaaa",
+        subject="feat!: Replace the API",
+        body=["BREAKING CHANGE: Rename the API.", "BREAKING CHANGE: Remove the old option."],
+    )
+    first.update_with_convention(ConventionalCommitConventionV1())
+    version = Version(tag="0.2.0", commits=[first])
+
+    assert version.breaking_changes == ["Rename the API.", "Remove the old option."]
+
+    # Adding ordinary commits contributes no descriptions; new major commits extend the list.
+    version.add_commit(Commit("bbbbbbb", subject="fix: Correct a typo"))
+    second = Commit("ccccccc", subject="fix!: Remove the legacy format")
+    second.update_with_convention(ConventionalCommitConventionV1())
+    version.add_commit(second)
+
+    assert version.breaking_changes == ["Rename the API.", "Remove the old option.", "Remove the legacy format"]
+    assert Version().breaking_changes == []
 
 
 @pytest.mark.parametrize(
@@ -89,7 +112,8 @@ def test_no_bump_on_first_tag(repo: GitRepo, bump: str) -> None:
         (["fix: Correct a bug", "feat: Add a feature"], "1.3.0"),
         (["build!: Remove an API", "feat: Add a feature"], "2.0.0"),
         (["feat: Add a feature", "custom!: Remove an API"], "2.0.0"),
-        (["fix: Correct a bug\n\nBREAKING-CHANGE: Remove an API"], "2.0.0"),
+        (["fix: Correct a bug\n\nBREAKING CHANGE: Remove an API"], "2.0.0"),
+        (["fix: Correct a bug\n\nBREAKING-CHANGE: Remove an API"], "1.2.4"),
     ],
 )
 def test_conventional_v1_auto_bump(

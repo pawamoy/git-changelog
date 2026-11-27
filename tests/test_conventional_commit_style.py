@@ -231,9 +231,9 @@ def test_conventional_v1_preserves_scope_and_description() -> None:
     ("body", "expected_major"),
     [
         (["BREAKING CHANGE: Remove an API"], True),
-        (["BREAKING-CHANGE: Remove an API"], True),
+        (["BREAKING-CHANGE: Remove an API"], False),
         (["Explain the change.", "", "BREAKING CHANGE: Remove an API"], True),
-        (["Reviewed-by: Someone", "BREAKING-CHANGE: Remove an API"], True),
+        (["Reviewed-by: Someone", "BREAKING-CHANGE: Remove an API"], False),
         (["Refs #123", "BREAKING CHANGE: Remove an API"], True),
         (["Reviewed-by: Someone", "continued value", "BREAKING CHANGE: Remove an API"], True),
         (["BREAKING CHANGE: Remove an API", "continued description", "Refs #123"], True),

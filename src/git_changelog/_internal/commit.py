@@ -18,7 +18,7 @@ else:
     from warnings import deprecated
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, ItemsView, Iterable, KeysView, ValuesView
+    from collections.abc import Callable, ItemsView, Iterable, Iterator, KeysView, ValuesView
 
     from git_changelog._internal.providers import ProviderRefParser, Ref
     from git_changelog._internal.versioning import ParsedVersion
@@ -214,6 +214,8 @@ class Commit:
         """The commit text references."""
         self.convention: dict[str, Any] = {}
         """The commit message convention."""
+        self.breaking_changes: list[str] = []
+        """Breaking change descriptions, populated when a convention is applied."""
 
         # YORE: Bump 3: Replace `_Trailers()` with `[]` within line.
         self.trailers: list[tuple[str, str]] = _Trailers()
@@ -240,6 +242,7 @@ class Commit:
             convention: The convention to use.
         """
         self.convention.update(convention.parse_commit(self))
+        self.breaking_changes = convention.parse_breaking_changes(self)
 
     def update_with_provider(
         self,
@@ -302,6 +305,10 @@ class CommitConvention(ABC):
     """The commit message type regex."""
     BREAK_REGEX: ClassVar[Pattern]
     """The commit message breaking change regex."""
+    BREAKING_CHANGE_REGEX: ClassVar[Pattern] = re.compile(r"^BREAKING CHANGE: (?P<description>\S.*)$", re.MULTILINE)
+    """The singular, space-separated marker used to extract breaking change descriptions."""
+    TRAILER_REGEX: ClassVar[Pattern] = re.compile(r"^[A-Za-z0-9-]+[ \t]*(?::(?!//)[^\r\n]*| #[^\r\n]+)$")
+    """The trailer token and value regex, also accepting Conventional Commits reference footers."""
     DEFAULT_RENDER: ClassVar[list[str]]
     """The sections rendered by default."""
 
@@ -316,6 +323,60 @@ class CommitConvention(ABC):
             A dictionary containing the parsed data.
         """
         raise NotImplementedError
+
+    def _breaking_change_matches(self, message: str) -> Iterator[re.Match[str]]:
+        return self.BREAKING_CHANGE_REGEX.finditer(message)
+
+    def parse_breaking_changes(self, commit: Commit) -> list[str]:
+        """Extract breaking change sections, or use the subject of a major commit.
+
+        Sections end at another breaking change marker or the final Git trailer block.
+        Markdown code fences protect their contents from section delimiters.
+        """
+        if not commit.convention.get("is_major"):
+            return []
+
+        message = commit.subject + "\n\n" + "\n".join(commit.body)
+        matches = {match.start(): match for match in self._breaking_change_matches(message)}
+        if not matches:
+            return [commit.convention.get("subject", commit.subject)]
+
+        lines = message.splitlines(keepends=True)
+        trailer_start = next(index + 1 for index in reversed(range(len(lines))) if not lines[index].strip())
+        trailer_lines = [line.rstrip("\r\n") for line in lines[trailer_start:]]
+        # Only a final, blank-separated block is metadata; colon-bearing prose remains description text.
+        has_trailers = bool(trailer_lines and self.TRAILER_REGEX.match(trailer_lines[0])) and all(
+            self.TRAILER_REGEX.match(line) or line.startswith((" ", "\t")) for line in trailer_lines
+        )
+
+        sections: list[list[str]] = []
+        current: list[str] | None = None
+        fence = ""
+        offset = 0
+        for index, raw_line in enumerate(lines):
+            if not fence and has_trailers and index == trailer_start:
+                break
+            line = raw_line.rstrip("\r\n")
+            match = matches.get(offset)
+            if not fence and match:
+                first_line = match.group("description")
+                current = [first_line.strip()]
+                sections.append(current)
+            elif current is not None:
+                current.append(line)
+
+            stripped = line.lstrip()
+            if stripped.startswith(("```", "~~~")):
+                marker = stripped[:3]
+                if fence == marker:
+                    fence = ""
+                elif not fence:
+                    fence = marker
+            offset += len(raw_line)
+
+        return ["\n".join(cleaned) for section in sections if (cleaned := _clean_body(section))] or [
+            commit.convention.get("subject", commit.subject)
+        ]
 
     @classmethod
     def _format_sections_help(cls) -> str:
@@ -583,7 +644,7 @@ class ConventionalCommitConventionV1(ConventionalCommitConventionV0):
         re.IGNORECASE,
     )
     """The commit subject regex, including custom types and case-insensitive matching."""
-    BREAK_REGEX: ClassVar[Pattern] = re.compile(r"^BREAKING(?: CHANGE|-CHANGE): .+$", re.MULTILINE)
+    BREAK_REGEX: ClassVar[Pattern] = CommitConvention.BREAKING_CHANGE_REGEX
     """The case-sensitive breaking change footer regex."""
     FOOTER_REGEX: ClassVar[Pattern] = re.compile(r"^(?:BREAKING CHANGE|[\w-]+)(?:: | #).+$")
     """The footer token and separator regex."""
@@ -598,17 +659,22 @@ class ConventionalCommitConventionV1(ConventionalCommitConventionV0):
             return subject
         return {"type": "", "scope": "", "subject": commit_subject}
 
-    def is_major(self, commit_message: str) -> bool:
-        """Tell whether the message contains an uppercase breaking change footer."""
-        lines = commit_message.splitlines()
+    def _breaking_change_matches(self, message: str) -> Iterator[re.Match[str]]:
+        lines = message.splitlines(keepends=True)
         in_footers = False
+        offset = 0
         for index, line in enumerate(lines):
             # The first footer follows a blank line; later footers can follow multiline values.
             if index > 0 and not lines[index - 1].strip() and self.FOOTER_REGEX.match(line):
                 in_footers = True
-            if in_footers and self.BREAK_REGEX.match(line):
-                return True
-        return False
+            match = self.BREAK_REGEX.match(message, offset) if in_footers else None
+            if match:
+                yield match
+            offset += len(line)
+
+    def is_major(self, commit_message: str) -> bool:
+        """Tell whether the message contains an uppercase breaking change footer."""
+        return next(self._breaking_change_matches(commit_message), None) is not None
 
     def is_patch(self, commit_type: str) -> bool:
         """Tell whether the parsed commit type warrants a patch bump."""

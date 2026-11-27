@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from urllib.parse import urlsplit, urlunsplit
 
 import pytest
+from jinja2 import Template
 
 from git_changelog import AngularConvention, Changelog, build_and_render, bump_semver, get_template
 
@@ -20,6 +21,33 @@ if TYPE_CHECKING:
 VERSIONS = ("0.1.0", "0.2.0", "0.2.1", "1.0.0", "1.1.0", "")
 VERSIONS_V = ("v0.1.0", "v0.2.0", "v0.2.1", "v1.0.0", "v1.1.0", "")
 KEEP_A_CHANGELOG = get_template("keepachangelog")
+
+
+@pytest.mark.parametrize(
+    "template",
+    [
+        "{% for change in changelog.versions_list[0].breaking_changes %}{{ change }}{% endfor %}",
+        "{% for commit in changelog.versions_list[0].commits %}{% for change in commit.breaking_changes %}{{ change }}{% endfor %}{% endfor %}",
+    ],
+)
+@pytest.mark.parametrize("bump", [None, "auto"])
+@pytest.mark.parametrize("parse_trailers", [False, True])
+def test_rendering_breaking_changes(repo: GitRepo, template: str, bump: str | None, parse_trailers: bool) -> None:
+    """Expose version and commit breaking changes to custom templates regardless of rendered sections."""
+    repo.tag("0.1.0")
+    repo.commit(
+        "docs!: Replace the configuration\n\nBREAKING CHANGE: Rename the setting.\n\nUse the new key.\n\n---\n\nThen restart.\n\nRefs: #14"
+    )
+    repo.commit("feat: Add a new command")
+
+    changelog = Changelog(repo.path, convention="conventional-v1", bump=bump, parse_trailers=parse_trailers)
+    rendered = Template(template).render(changelog=changelog)
+
+    assert changelog.versions_list[0].breaking_changes == [
+        "Rename the setting.\n\nUse the new key.\n\n---\n\nThen restart."
+    ]
+    assert rendered == "Rename the setting.\n\nUse the new key.\n\n---\n\nThen restart."
+    assert changelog.versions_list[0].planned_tag == ("0.2.0" if bump else None)
 
 
 @pytest.mark.parametrize("repo", [VERSIONS, VERSIONS_V], indirect=True)

@@ -317,7 +317,7 @@ in the commit message body.
 The [Conventional Commit specification][conventional-commit] originates from the Angular commit message convention. Two versions are available:
 
 - `conventional` and `conventional-v0` select the original implementation. It follows the Angular convention and also detects `!` immediately before the subject's colon, such as `refactor!: Remove an API`. Every commit that does not trigger a major or minor bump triggers a patch bump.
-- `conventional-v1` follows Conventional Commits 1.0.0. Types are case-insensitive, and custom types are accepted. Only `feat` triggers a minor bump, and only `fix` triggers a patch bump. Any type can trigger a major bump with `!` or an uppercase `BREAKING CHANGE:` or `BREAKING-CHANGE:` footer. Other commits do not trigger automatic version bumps.
+- `conventional-v1` uses Conventional Commits 1.0.0 with the space-separated `BREAKING CHANGE:` marker. Types are case-insensitive, and custom types are accepted. Only `feat` triggers a minor bump, and only `fix` triggers a patch bump. Any type can trigger a major bump with `!` or an uppercase `BREAKING CHANGE:` footer. Other commits do not trigger automatic version bumps.
 
 To select version 1:
 
@@ -328,6 +328,38 @@ git-changelog --convention conventional-v1 --bump auto
 Known types use the Angular section titles listed above. Custom types require a corresponding entry in a custom convention's `TYPES` mapping to select their sections for rendering.
 
 In Python, use `ConventionalCommitConventionV0` or `ConventionalCommitConventionV1`. `ConventionalCommitConvention` remains an alias for `ConventionalCommitConventionV0`.
+
+### Breaking change descriptions
+
+Custom templates can access breaking change descriptions through `commit.breaking_changes` and `version.breaking_changes`.
+Both attributes contain lists of strings, with multiline descriptions stored as single strings.
+These attributes are available for unreleased versions and `0.x` releases that contain breaking changes.
+
+Write the uppercase, singular `BREAKING CHANGE:` marker, followed by a space and a description:
+
+```text
+feat: Replace the configuration format
+
+BREAKING CHANGE: Rename the `settings` key to `config`.
+
+Update each configuration file before restarting.
+
+---
+
+The horizontal rule above is part of the description.
+
+Refs: #14
+```
+
+Descriptions can contain multiple paragraphs and code blocks.
+A section ends at another breaking change marker or the Git trailer section.
+The trailer section is a final block separated from the description by a blank line.
+The `---` line remains part of the description.
+Each breaking change section becomes a separate description.
+Description extraction requires a nonempty first line and the exact `BREAKING CHANGE:` spelling, including for legacy conventions.
+The plural `BREAKING CHANGES:` and dashed `BREAKING-CHANGE:` spellings do not start descriptions.
+
+For breaking commits that have no breaking change section, the description uses the parsed subject.
 
 ## Choose the sections to render
 

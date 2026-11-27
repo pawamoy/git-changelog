@@ -147,6 +147,11 @@ class Version:
         self._version_parser = version_parser
 
     @property
+    def breaking_changes(self) -> list[str]:
+        """Return breaking change descriptions from all commits in this version."""
+        return [change for commit in self.commits for change in commit.breaking_changes]
+
+    @property
     def date(self) -> datetime.date | None:
         """The version date."""
         if isinstance(self._date, datetime.datetime):
